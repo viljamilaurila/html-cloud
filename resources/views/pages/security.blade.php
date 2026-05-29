@@ -155,10 +155,12 @@
     <li><strong>The link is the credential.</strong> Anyone who obtains the full link — including the
       fragment — can read the file. There is no second factor. Share links over channels you trust, and
       use an expiry for sensitive files.</li>
-    <li><strong>Link handling is your responsibility.</strong> A key in a URL can leak through browser
-      history, screen-sharing, shoulder-surfing, or pasting the link into a tool that previews or
-      crawls it. The fragment isn’t sent in the <code>Referer</code> header, but the link as a whole
-      is still sensitive.</li>
+    <li><strong>Link handling is your responsibility.</strong> The key lives in the link, so it can leak
+      if the full link is captured — by shoulder-surfing as you paste it, or by pasting it into a tool
+      that previews or crawls it. To reduce this, the viewer <em>strips the key from the address bar the
+      moment the page loads</em>, so screen-sharing or recording a file you’re viewing won’t expose it
+      (use the “Copy link” button to forward the real link). The fragment is also never sent in the
+      <code>Referer</code> header. Still: treat the original link itself as sensitive.</li>
     <li><strong>You trust us to serve honest code.</strong> The encryption runs in JavaScript we serve,
       so a compromised or malicious server could in principle ship code that leaks a key. This is the
       standard trust caveat for all browser-based encryption — and it is why html.cloud is

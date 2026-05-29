@@ -1,4 +1,4 @@
-import { importViewKey, decryptBytes, unpackCiphertext, b64urlDecode } from './crypto.js';
+import { importViewKey, decryptBytes, unpackCiphertext, b64url, b64urlDecode } from './crypto.js';
 
 const docId       = window.__DOC_ID__;
 const loadScreen  = document.getElementById('loading-screen');
@@ -7,6 +7,9 @@ const errorTitle  = document.getElementById('error-title');
 const errorBody   = document.getElementById('error-body');
 const frame       = document.getElementById('content-frame');
 
+// Per-tab cache so the page survives a reload after we strip the key from the URL.
+const SS_KEY = `hc_vk_${docId}`;
+
 function showError(title, body) {
   errorTitle.textContent = title;
   errorBody.textContent  = body;
@@ -14,10 +17,29 @@ function showError(title, body) {
   errorScreen.classList.remove('hidden');
 }
 
+// Read the key from the URL fragment if present, then strip it from the address
+// bar immediately (so it can't leak via screen-sharing, history, or Referer).
+// On a reload — where the fragment is already gone — fall back to the per-tab cache.
+function takeKeyFragment() {
+  const fromHash = window.location.hash.slice(1);
+  if (fromHash) {
+    history.replaceState(null, '', window.location.pathname + window.location.search);
+    return { fragment: fromHash, fromHash: true };
+  }
+  let stored = '';
+  try { stored = sessionStorage.getItem(SS_KEY) || ''; } catch { /* sessionStorage unavailable */ }
+  return { fragment: stored, fromHash: false };
+}
+
+const MISSING_KEY_BODY =
+  "The key is the part after the # in the original link, and it never reaches our " +
+  "servers — so we can't recover it. Ask whoever shared it to send you the full, " +
+  'unmodified link.';
+
 async function main() {
-  const fragment = window.location.hash.slice(1);
+  const { fragment, fromHash } = takeKeyFragment();
   if (!fragment) {
-    return showError('Missing decryption key', 'The link is incomplete — the part after # is the key and must not be removed.');
+    return showError('This link is missing its key', MISSING_KEY_BODY);
   }
 
   let viewKeyRaw;
@@ -71,9 +93,11 @@ async function main() {
   }
   #__hc__ a { color: #3a4f3a !important; text-decoration: none !important; font-weight: 500 !important; }
   #__hc__ svg { display: inline !important; vertical-align: -2px !important; margin-right: 5px !important; opacity: .55 !important; }
+  #__hc__ .copy { color: #3a4f3a !important; font-weight: 500 !important; cursor: pointer !important; }
+  #__hc__ .copy:hover { text-decoration: underline !important; }
 </style>
 <div id="__hc__">
-  <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="10" height="8" rx="1.5"/><path d="M5 7V5a3 3 0 0 1 6 0v2"/></svg>Encrypted &middot; shared via <a href="https://html.cloud" target="_blank" rel="noopener">html.cloud</a>
+  <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="10" height="8" rx="1.5"/><path d="M5 7V5a3 3 0 0 1 6 0v2"/></svg>Encrypted &middot; shared via <a href="https://html.cloud" target="_blank" rel="noopener">html.cloud</a> &middot; <span class="copy" role="button" tabindex="0" onclick="parent.postMessage('hc:copy-link','*');var s=this,o=s.textContent;s.textContent='Link copied';setTimeout(function(){s.textContent=o},1800)">Copy link</span>
 </div>`;
 
   // Append before </body> if present, otherwise at the end.
@@ -86,6 +110,30 @@ async function main() {
   frame.srcdoc = injected;
   frame.classList.remove('hidden');
   loadScreen.classList.add('hidden');
+
+  // The key decrypted cleanly — remember it for this tab so a reload still works
+  // even though the address bar no longer carries it.
+  if (fromHash) {
+    try { sessionStorage.setItem(SS_KEY, fragment); } catch { /* ignore */ }
+  }
+
+  // The address bar is now key-free. The "Copy link" control lives inside the
+  // sandboxed iframe (the footer badge), but the key is kept out of that frame —
+  // so the badge asks us (the parent, which holds the key) to copy the full link.
+  const shareUrl = `${window.location.origin}/v/${docId}#${b64url(viewKeyRaw)}`;
+  window.addEventListener('message', (e) => {
+    if (e.source === frame.contentWindow && e.data === 'hc:copy-link') {
+      copyToClipboard(shareUrl);
+    }
+  });
+}
+
+async function copyToClipboard(text) {
+  try { await navigator.clipboard.writeText(text); }
+  catch {
+    const ta = Object.assign(document.createElement('textarea'), { value: text, style: 'position:fixed;opacity:0' });
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+  }
 }
 
 main();

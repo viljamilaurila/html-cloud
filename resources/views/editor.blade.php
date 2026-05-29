@@ -89,7 +89,7 @@
           Copy management link
         </button>
       </div>
-      <p class="edit-hint">Save this link — it lets you replace or delete this document later. Don't share it with viewers.</p>
+      <p class="edit-hint"><strong>Bookmark this page now — it's your only way back.</strong> There's no account, so this link is the one thing that lets you replace or delete the document later. It stays in your browser history. Don't share it with viewers.</p>
     </div>
 
     <!-- Delete -->
