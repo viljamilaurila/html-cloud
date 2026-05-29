@@ -59,6 +59,7 @@
 
 @section('page')
 <div class="content-eyebrow">Security</div>
+@include('partials.illustrations.locked-doc')
 <h1 class="content-title">How html.cloud encryption works</h1>
 
 <p class="content-lead">

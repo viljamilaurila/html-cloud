@@ -56,6 +56,7 @@
 
     <section class="explainer">
       <div class="explainer-label">How it works</div>
+      @include('partials.illustrations.flow')
       <div class="explainer-row">
         <!-- Your file -->
         <div class="explainer-card explainer-file">

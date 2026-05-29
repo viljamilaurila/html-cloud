@@ -34,6 +34,9 @@
 
 @section('page')
 <div class="content-eyebrow">Use case</div>
+<div class="content-image-container">
+  @include('partials.illustrations.presenter')
+</div>
 <h1 class="content-title">Send a client a private report or proposal</h1>
 
 <p class="content-lead">

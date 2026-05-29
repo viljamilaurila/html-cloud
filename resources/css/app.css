@@ -107,6 +107,34 @@ html, body {
   padding: 8px 56px 64px;
 }
 
+/* ─── Hand-drawn illustrations ─── */
+.hd-illu {
+  display: block;
+  color: var(--ink2);
+  height: auto;
+}
+.hd-locked-doc {
+  width: 116px;
+  margin: 6px 0 16px;
+}
+.hd-flow {
+  width: 100%;
+  max-width: 460px;
+  margin: 0 auto 36px;
+}
+.hd-presenter {
+  width: 100%;
+  max-width: 360px;
+}
+.hd-cap {
+  stroke: none;
+  fill: var(--ink3);
+  font-family: var(--sans);
+  font-size: 11.5px;
+  letter-spacing: 0.01em;
+  text-anchor: middle;
+}
+
 .headline {
   font-family: var(--serif);
   font-size: 44px;
@@ -1070,4 +1098,14 @@ html, body {
   .content-lead { font-size: 18px; }
   .content-h2 { font-size: 22px; }
   .store-grid { grid-template-columns: 1fr; gap: 8px; }
+}
+
+img {
+  max-width: 100%;
+}
+img.content-image {
+  border-radius: var(--radius);
+}
+.content-image-container {
+  margin-bottom: 14px;
 }
