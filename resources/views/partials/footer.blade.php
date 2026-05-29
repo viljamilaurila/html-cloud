@@ -30,6 +30,7 @@
         <span class="footer-links-label">More</span>
         <a href="{{ route('home') }}">Home</a>
         <a href="{{ route('security') }}">How encryption works</a>
+        <a href="https://github.com/viljamilaurila/html-cloud" rel="noopener" target="_blank">Source on GitHub ↗</a>
       </nav>
     </div>
     <p class="footer-copy">&copy; {{ date('Y') }} html.cloud</p>

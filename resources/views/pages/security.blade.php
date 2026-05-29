@@ -41,6 +41,16 @@
       "@@type": "Question",
       "name": "Do I need an account to share an encrypted HTML file?",
       "acceptedAnswer": { "@@type": "Answer", "text": "No. There is no sign-up. You drop a file, your browser encrypts it, and you get a link to share." }
+    },
+    {
+      "@@type": "Question",
+      "name": "Is html.cloud open source?",
+      "acceptedAnswer": { "@@type": "Answer", "text": "Yes. The code is public on GitHub, so you can verify exactly how the encryption works and what the server stores rather than taking our word for it." }
+    },
+    {
+      "@@type": "Question",
+      "name": "Can I share confidential or company documents with html.cloud?",
+      "acceptedAnswer": { "@@type": "Answer", "text": "Yes. Files are encrypted in your browser with AES-256-GCM before upload, and html.cloud only ever stores ciphertext — so even a server breach or a data request exposes nothing readable. Because the client is open source, your own team can review it before adopting it. Treat the link as the credential: share it over a trusted channel and set an expiry for sensitive files." }
     }
   ]
 }
@@ -150,8 +160,9 @@
       is still sensitive.</li>
     <li><strong>You trust us to serve honest code.</strong> The encryption runs in JavaScript we serve,
       so a compromised or malicious server could in principle ship code that leaks a key. This is the
-      standard trust caveat for all browser-based encryption. An open-source client (planned) would make
-      this verifiable.</li>
+      standard trust caveat for all browser-based encryption — and it is why html.cloud is
+      <a href="https://github.com/viljamilaurila/html-cloud" rel="noopener" target="_blank">open source</a>:
+      you can read exactly what runs in your browser and confirm it does what this page says.</li>
     <li><strong>No protection against a compromised device.</strong> If your machine or browser is
       compromised, the plaintext is readable before it is ever encrypted. Client-side encryption can’t
       help there.</li>
@@ -162,6 +173,25 @@
     What we can see is limited to metadata: the size of the encrypted blob, the expiry, upload and
     access timestamps, and request-level network information such as IP address at the moment of a
     request. We never see the contents, the filename, or the key.
+  </p>
+</section>
+
+<section class="content-section">
+  <h2 class="content-h2">Open source — don't take our word for it</h2>
+  <p class="content-p">
+    Every claim on this page is checkable, because the code that runs html.cloud is public. The
+    browser-side encryption, the key handling, what the server stores — it is all there to read.
+    If you are deciding whether to trust html.cloud with sensitive material, you don't have to
+    rely on this page: read the source, or have your own engineers review it.
+  </p>
+  <ul class="content-list">
+    <li>The client is the part that matters most for privacy — it does the encryption before
+      anything is uploaded. You can read it line by line and verify the key never leaves your browser.</li>
+    <li>You can also check exactly what the server receives and stores: ciphertext, a nonce, the
+      blob size, your expiry, and an auth hash — and nothing that could decrypt your file.</li>
+  </ul>
+  <p class="content-p">
+    <a class="source-link" href="https://github.com/viljamilaurila/html-cloud" rel="noopener" target="_blank">@include('partials.github-icon', ['size' => 16]) Read the source on GitHub →</a>
   </p>
 </section>
 
@@ -187,6 +217,21 @@
     <details class="faq-item">
       <summary>Do I need an account?</summary>
       <p>No. There is no sign-up. Drop a file, your browser encrypts it, and you get a link to share.</p>
+    </details>
+    <details class="faq-item">
+      <summary>Is html.cloud open source?</summary>
+      <p>Yes. The code is public on
+        <a href="https://github.com/viljamilaurila/html-cloud" rel="noopener" target="_blank">GitHub</a>,
+        so you can verify exactly how the encryption works and what the server stores rather than taking
+        our word for it.</p>
+    </details>
+    <details class="faq-item">
+      <summary>Can I share confidential or company documents with html.cloud?</summary>
+      <p>That is what the design is for. Files are encrypted in your browser with AES-256-GCM before
+        upload, and we only ever store ciphertext — so even a breach of our servers, or a request to us
+        for your data, exposes nothing readable. Because the client is open source, your own team can
+        review it before adopting it. Treat the link as the credential: share it over a channel you trust
+        and set an expiry for sensitive files.</p>
     </details>
   </div>
 </section>

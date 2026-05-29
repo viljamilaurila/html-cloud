@@ -79,6 +79,25 @@ html, body {
   letter-spacing: 0.04em;
 }
 
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.topbar-github {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--ink3);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+.topbar-github:hover { color: var(--accent); }
+.topbar-github .gh-icon { display: block; }
+
 /* ─── Home page ─── */
 .home-main {
   flex: 1;
@@ -374,6 +393,15 @@ html, body {
   white-space: nowrap;
 }
 .explainer-readmore:hover { text-decoration: underline; }
+
+/* Inline "read the source" link with GitHub mark (content pages) */
+.source-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+}
+.source-link .gh-icon { flex-shrink: 0; }
 
 /* ─── Done / post-upload page ─── */
 .done-main {
@@ -1024,6 +1052,8 @@ html, body {
 /* ─── Responsive ─── */
 @media (max-width: 700px) {
   .topbar { padding: 20px 24px; }
+  .topbar-tagline { display: none; }
+  .topbar-github-label { display: none; }
   .home-main, .done-main, .editor-main { padding: 8px 24px 48px; }
   .headline { font-size: 32px; }
   .dropzone { padding: 56px 20px 48px; }
