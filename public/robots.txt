@@ -1,0 +1,6 @@
+User-agent: *
+Disallow: /v/
+Disallow: /e/
+Disallow: /api/
+
+Sitemap: https://html.cloud/sitemap.xml
