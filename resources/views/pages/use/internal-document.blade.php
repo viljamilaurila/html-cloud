@@ -34,6 +34,9 @@
 
 @section('page')
 <div class="content-eyebrow">Use case</div>
+<div class="content-image-container">
+  @include('partials.illustrations.internal-doc')
+</div>
 <h1 class="content-title">Share an internal HTML document securely</h1>
 
 <p class="content-lead">

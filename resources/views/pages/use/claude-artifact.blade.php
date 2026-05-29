@@ -34,6 +34,9 @@
 
 @section('page')
 <div class="content-eyebrow">Use case</div>
+<div class="content-image-container">
+  @include('partials.illustrations.artifact')
+</div>
 <h1 class="content-title">Share a Claude artifact privately</h1>
 
 <p class="content-lead">

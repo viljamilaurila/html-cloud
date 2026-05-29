@@ -126,6 +126,18 @@ html, body {
   width: 100%;
   max-width: 360px;
 }
+.hd-artifact {
+  width: 100%;
+  max-width: 320px;
+}
+.hd-deck {
+  width: 100%;
+  max-width: 320px;
+}
+.hd-internal-doc {
+  width: 100%;
+  max-width: 300px;
+}
 .hd-cap {
   stroke: none;
   fill: var(--ink3);

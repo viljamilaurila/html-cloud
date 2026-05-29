@@ -34,6 +34,9 @@
 
 @section('page')
 <div class="content-eyebrow">Use case</div>
+<div class="content-image-container">
+  @include('partials.illustrations.deck')
+</div>
 <h1 class="content-title">Share an AI-generated presentation</h1>
 
 <p class="content-lead">
