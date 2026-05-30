@@ -1110,7 +1110,157 @@ html, body {
   .content-lead { font-size: 18px; }
   .content-h2 { font-size: 22px; }
   .store-grid { grid-template-columns: 1fr; gap: 8px; }
+  .enc-transform { grid-template-columns: 1fr; }
+  .enc-panel-mid {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    border-left: none;
+    border-right: none;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    padding: 10px 16px;
+  }
+  .enc-mid-arrow { transform: rotate(90deg); }
+  .enc-var-row { flex-wrap: wrap; gap: 4px; }
+  .enc-var-ct { flex-basis: 100%; }
+  .url-annots { grid-template-columns: 1fr; gap: 12px; }
 }
+
+/* ─── Security page: encryption diagrams ─── */
+
+.enc-transform {
+  display: grid;
+  grid-template-columns: 1fr 108px 1fr;
+  align-items: stretch;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin: 20px 0 0;
+}
+.enc-panel {
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+}
+.enc-panel-plain  { background: var(--paper); }
+.enc-panel-cipher { background: var(--ink); }
+.enc-panel-mid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 14px 10px;
+  background: var(--bg);
+  border-left: 1px solid var(--rule);
+  border-right: 1px solid var(--rule);
+  color: var(--ink3);
+}
+.enc-panel-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ink3);
+  margin-bottom: 10px;
+}
+.enc-panel-label-dark { color: rgba(255,255,255,0.35); }
+.enc-pre {
+  font-family: var(--mono);
+  margin: 0;
+  line-height: 1.65;
+  flex: 1;
+}
+.enc-pre-plain  { font-size: 14px; color: var(--ink); }
+.enc-pre-cipher { font-size: 12px; color: rgba(255,255,255,0.6); }
+.enc-algo-name {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--accent);
+  text-align: center;
+}
+.enc-algo-sub {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  color: var(--ink3);
+  text-align: center;
+}
+.enc-mid-arrow { color: var(--ink3); margin-top: 4px; }
+
+.enc-var-intro { margin-top: 20px; }
+.enc-variations {
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.enc-var-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--rule);
+}
+.enc-var-row:last-child { border-bottom: none; }
+.enc-var-src {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  color: var(--ink);
+  flex-shrink: 0;
+}
+.enc-var-arr { color: var(--ink3); flex-shrink: 0; font-size: 13px; }
+.enc-var-ct {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--ink2);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.url-anatomy { margin: 20px 0; }
+.url-bar-mock {
+  display: flex;
+  align-items: center;
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 11px 16px;
+  font-family: var(--mono);
+  font-size: 13px;
+  overflow: hidden;
+}
+.url-addr-base { color: var(--ink); white-space: nowrap; }
+.url-addr-hash { color: var(--accent); font-weight: 700; }
+.url-addr-key  { color: var(--ink2); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.url-annots {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 24px;
+  margin-top: 12px;
+}
+.url-annot { padding-top: 8px; }
+.url-annot-rule {
+  height: 2px;
+  background: var(--rule-strong);
+  margin-bottom: 8px;
+  border-radius: 1px;
+}
+.url-annot-rule-accent { background: var(--accent); }
+.url-annot-head {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+  margin: 0 0 4px;
+}
+.url-annot-head-accent { color: var(--accent); }
+.url-annot-body { font-size: 13px; color: var(--ink2); line-height: 1.55; margin: 0; }
 
 img {
   max-width: 100%;

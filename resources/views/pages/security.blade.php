@@ -86,6 +86,91 @@
 </section>
 
 <section class="content-section">
+  <h2 class="content-h2">What encryption does to your file</h2>
+  <p class="content-p">
+    Take a simple HTML file containing <code>&lt;p&gt;Hello World&lt;/p&gt;</code>. Before a single
+    byte leaves your device, your browser runs it through AES-256-GCM and turns it into unreadable bytes:
+  </p>
+
+  <div class="enc-transform">
+    <div class="enc-panel enc-panel-plain">
+      <div class="enc-panel-label">Your file &middot; readable</div>
+      <pre class="enc-pre enc-pre-plain">&lt;p&gt;Hello World&lt;/p&gt;</pre>
+    </div>
+    <div class="enc-panel-mid">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <rect x="5" y="11" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M8 11V7a4 4 0 0 1 8 0v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <span class="enc-algo-name">AES-256-GCM</span>
+      <span class="enc-algo-sub">in your browser</span>
+      <svg class="enc-mid-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="enc-panel enc-panel-cipher">
+      <div class="enc-panel-label enc-panel-label-dark">Stored on our server &middot; unreadable</div>
+      <pre class="enc-pre enc-pre-cipher">K3mP8xQ2nV7rL9aJ
+4wF5yH1bT6eC0sI2
+oU8dM3zN5kG7pQXr
+4fE1vBh9lW2sDy0z
+KnMqRtP6hA8cYsJ&hellip;</pre>
+    </div>
+  </div>
+
+  <p class="content-p enc-var-intro">
+    Because a fresh random number (nonce) is generated each time, the same file produces a completely
+    different result on every encryption &mdash; all three below are correct and decrypt back to the original:
+  </p>
+
+  <div class="enc-variations">
+    <div class="enc-var-row">
+      <code class="enc-var-src">&lt;p&gt;Hello World&lt;/p&gt;</code>
+      <span class="enc-var-arr" aria-hidden="true">&rarr;</span>
+      <code class="enc-var-ct">K3mP8xQ2nV7rL9aJ4wF5yH1bT6eC0sI2oU8dM3zN5kG7pQ&hellip;</code>
+    </div>
+    <div class="enc-var-row">
+      <code class="enc-var-src">&lt;p&gt;Hello World&lt;/p&gt;</code>
+      <span class="enc-var-arr" aria-hidden="true">&rarr;</span>
+      <code class="enc-var-ct">Qz9nL2mJ5pW8sR6vX1kT4fA0cY3hD7bE2oI9uN6gM5xV8j&hellip;</code>
+    </div>
+    <div class="enc-var-row">
+      <code class="enc-var-src">&lt;p&gt;Hello World&lt;/p&gt;</code>
+      <span class="enc-var-arr" aria-hidden="true">&rarr;</span>
+      <code class="enc-var-ct">Mx7kP4qN1rL8wF5yH2bT9eJ6cI0sA3oU5dQ7vR2gE4nZ6y&hellip;</code>
+    </div>
+  </div>
+</section>
+
+<section class="content-section">
+  <h2 class="content-h2">The # keeps your key out of our hands</h2>
+  <p class="content-p">
+    The link you share has two parts, divided by <code class="accent">#</code>. Everything before
+    it is the document address; everything after is the decryption key. Browsers have never sent the
+    part after <code class="accent">#</code> to the server &mdash; it is a rule of the web, built
+    into every browser since the beginning.
+  </p>
+
+  <div class="url-anatomy">
+    <div class="url-bar-mock">
+      <span class="url-addr-base">html.cloud/v/x8kP2Q</span><span class="url-addr-hash">#</span><span class="url-addr-key">Xk8pQ2mNrLf4wJ3dA9vT1zBsKqP7&hellip;</span>
+    </div>
+    <div class="url-annots">
+      <div class="url-annot">
+        <div class="url-annot-rule"></div>
+        <p class="url-annot-head">Sent to server</p>
+        <p class="url-annot-body">We receive only the document ID and return the encrypted blob.</p>
+      </div>
+      <div class="url-annot">
+        <div class="url-annot-rule url-annot-rule-accent"></div>
+        <p class="url-annot-head url-annot-head-accent">Stays in your browser only</p>
+        <p class="url-annot-body">This is the decryption key. It never travels over the network &mdash; not to us, not to anyone.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="content-section">
   <h2 class="content-h2">What we store — and what we can never see</h2>
   <div class="store-grid">
     <div class="store-col">
