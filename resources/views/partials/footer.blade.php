@@ -33,6 +33,12 @@
         <a href="https://github.com/viljamilaurila/html-cloud" rel="noopener" target="_blank">Source on GitHub ↗</a>
       </nav>
     </div>
-    <p class="footer-copy">&copy; {{ date('Y') }} html.cloud</p>
+    @php $documentCount = cache('document_count') @endphp
+    <p class="footer-copy">
+      &copy; {{ date('Y') }} html.cloud
+      @if ($documentCount)
+        &nbsp;&middot;&nbsp; {{ number_format($documentCount) }} files encrypted and shared
+      @endif
+    </p>
   </div>
 </footer>
