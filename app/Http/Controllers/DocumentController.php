@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\SyncDocumentCount;
 use App\Models\Document;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -68,6 +69,8 @@ class DocumentController extends Controller
             'expires_at'         => $expiresAt,
             'size'               => $request->size,
         ]);
+
+        SyncDocumentCount::dispatch();
 
         return response()->json(['id' => $id], 201);
     }
@@ -170,6 +173,8 @@ class DocumentController extends Controller
         }
 
         $doc->delete();
+
+        SyncDocumentCount::dispatch();
 
         return response()->json(['ok' => true]);
     }
