@@ -58,116 +58,147 @@
 @endpush
 
 @section('page')
-<div class="content-eyebrow">Security</div>
-@include('partials.illustrations.locked-doc')
-<h1 class="content-title">How html.cloud encryption works</h1>
-
-<p class="content-lead">
-  Your HTML file is encrypted <em>in your browser</em> with AES-256-GCM before anything is
-  uploaded. The decryption key lives in the part of the link after the <code class="accent">#</code> —
-  which browsers never send to a server. We store only ciphertext, so not even we can read your files.
-</p>
-
-<section class="content-section">
-  <h2 class="content-h2">The plain-English version</h2>
-  <p class="content-p">
-    When you drop an HTML file on html.cloud, the encryption happens on your own device before
-    a single byte leaves it. Your browser generates a random key, scrambles the file with it,
-    and uploads only the scrambled result. The key itself is tucked into the link you get back,
-    after the <code class="accent">#</code> symbol.
+<div class="sx-hero">
+  <div class="sx-eyebrow">Security · in plain English</div>
+  <h1 class="sx-h1">Follow one file from your screen to your friend's.</h1>
+  <p class="sx-lede">
+    Here is exactly what happens to a file when you share it on html.cloud —
+    and why a complete stranger, <em>including us</em>, can't read a word of it.
   </p>
-  <p class="content-p">
-    That detail is the whole point. The text after a <code>#</code> in a URL is called the
-    <em>fragment</em>, and browsers are built never to send it to the server — it stays in the
-    address bar. So when someone opens your link, their browser fetches the encrypted blob from us,
-    then uses the key from the fragment to decrypt it locally. We hand over scrambled bytes and never
-    see the key needed to unscramble them. That is what “zero-knowledge” means here.
-  </p>
-</section>
+</div>
 
-<section class="content-section">
-  <h2 class="content-h2">What encryption does to your file</h2>
-  <p class="content-p">
-    Take a simple HTML file containing <code>&lt;p&gt;Hello World&lt;/p&gt;</code>. Before a single
-    byte leaves your device, your browser runs it through AES-256-GCM and turns it into unreadable bytes:
-  </p>
-
-  <div class="enc-transform">
-    <div class="enc-panel enc-panel-plain">
-      <div class="enc-panel-label">Your file &middot; readable</div>
-      <pre class="enc-pre enc-pre-plain">&lt;p&gt;Hello World&lt;/p&gt;</pre>
-    </div>
-    <div class="enc-panel-mid">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <rect x="5" y="11" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.5"/>
-        <path d="M8 11V7a4 4 0 0 1 8 0v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-      </svg>
-      <span class="enc-algo-name">AES-256-GCM</span>
-      <span class="enc-algo-sub">in your browser</span>
-      <svg class="enc-mid-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-    </div>
-    <div class="enc-panel enc-panel-cipher">
-      <div class="enc-panel-label enc-panel-label-dark">Stored on our server &middot; unreadable</div>
-      <pre class="enc-pre enc-pre-cipher">K3mP8xQ2nV7rL9aJ
-4wF5yH1bT6eC0sI2
-oU8dM3zN5kG7pQXr
-4fE1vBh9lW2sDy0z
-KnMqRtP6hA8cYsJ&hellip;</pre>
-    </div>
+<section class="sx-journey">
+  <div class="sx-j-intro">
+    <div class="sx-eyebrow">How it works · the whole thing</div>
+    <h2>Your file makes <em>three stops</em>. Only the middle one is ours — and it's blindfolded.</h2>
   </div>
 
-  <p class="content-p enc-var-intro">
-    Because a fresh random number (nonce) is generated each time, the same file produces a completely
-    different result on every encryption &mdash; all three below are correct and decrypt back to the original:
-  </p>
-
-  <div class="enc-variations">
-    <div class="enc-var-row">
-      <code class="enc-var-src">&lt;p&gt;Hello World&lt;/p&gt;</code>
-      <span class="enc-var-arr" aria-hidden="true">&rarr;</span>
-      <code class="enc-var-ct">K3mP8xQ2nV7rL9aJ4wF5yH1bT6eC0sI2oU8dM3zN5kG7pQ&hellip;</code>
-    </div>
-    <div class="enc-var-row">
-      <code class="enc-var-src">&lt;p&gt;Hello World&lt;/p&gt;</code>
-      <span class="enc-var-arr" aria-hidden="true">&rarr;</span>
-      <code class="enc-var-ct">Qz9nL2mJ5pW8sR6vX1kT4fA0cY3hD7bE2oI9uN6gM5xV8j&hellip;</code>
-    </div>
-    <div class="enc-var-row">
-      <code class="enc-var-src">&lt;p&gt;Hello World&lt;/p&gt;</code>
-      <span class="enc-var-arr" aria-hidden="true">&rarr;</span>
-      <code class="enc-var-ct">Mx7kP4qN1rL8wF5yH2bT9eJ6cI0sA3oU5dQ7vR2gE4nZ6y&hellip;</code>
-    </div>
-  </div>
-</section>
-
-<section class="content-section">
-  <h2 class="content-h2">The # keeps your key out of our hands</h2>
-  <p class="content-p">
-    The link you share has two parts, divided by <code class="accent">#</code>. Everything before
-    it is the document address; everything after is the decryption key. Browsers have never sent the
-    part after <code class="accent">#</code> to the server &mdash; it is a rule of the web, built
-    into every browser since the beginning.
-  </p>
-
-  <div class="url-anatomy">
-    <div class="url-bar-mock">
-      <span class="url-addr-base">html.cloud/v/x8kP2Q</span><span class="url-addr-hash">#</span><span class="url-addr-key">Xk8pQ2mNrLf4wJ3dA9vT1zBsKqP7&hellip;</span>
-    </div>
-    <div class="url-annots">
-      <div class="url-annot">
-        <div class="url-annot-rule"></div>
-        <p class="url-annot-head">Sent to server</p>
-        <p class="url-annot-body">We receive only the document ID and return the encrypted blob.</p>
+  <div class="sx-j-row">
+    {{-- The key arc that bypasses the server --}}
+    <div class="sx-key-arc">
+      <svg viewBox="0 0 1000 78" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M150 70 C 150 14, 330 14, 500 14 S 850 14, 850 70" fill="none" stroke="#3a4f3a" stroke-width="1.6" stroke-dasharray="5 5" opacity="0.85"></path>
+        <circle cx="150" cy="70" r="4" fill="#3a4f3a"></circle>
+        <circle cx="850" cy="70" r="4" fill="#3a4f3a"></circle>
+      </svg>
+      <div class="sx-arc-label">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="8" r="3"></circle><path d="M8.5 8H15M12.5 8v2.5M14 8v2"></path></svg>
+        the key rides in the link — it skips our server
       </div>
-      <div class="url-annot">
-        <div class="url-annot-rule url-annot-rule-accent"></div>
-        <p class="url-annot-head url-annot-head-accent">Stays in your browser only</p>
-        <p class="url-annot-body">This is the decryption key. It never travels over the network &mdash; not to us, not to anyone.</p>
+    </div>
+
+    {{-- Stop 1 --}}
+    <div class="sx-j-card device">
+      <div class="sx-j-head">
+        <span class="sx-j-no">01</span>
+        <span class="sx-j-loc">In your browser</span>
+      </div>
+      <p class="sx-j-role">Your file is locked before it ever leaves your device.</p>
+      <ul class="sx-j-list">
+        <li><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5l3 3 6-7"></path></svg><span>A <strong>one-time key</strong> is created, right here</span></li>
+        <li><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5l3 3 6-7"></path></svg><span>Your HTML is <strong>scrambled</strong> with that key</span></li>
+        <li><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5l3 3 6-7"></path></svg><span>Only the scramble is <strong>uploaded</strong></span></li>
+      </ul>
+      <div class="sx-j-tag">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="10" height="7" rx="1.2"></rect><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2"></path></svg>
+        key made here · never uploaded
+      </div>
+    </div>
+
+    <div class="sx-j-conn">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15M14 7l5 5-5 5"></path></svg>
+      <span class="cl">scramble<br>uploads</span>
+    </div>
+
+    {{-- Stop 2 --}}
+    <div class="sx-j-card server">
+      <div class="sx-j-head">
+        <span class="sx-j-no">02</span>
+        <span class="sx-j-loc">On our server</span>
+      </div>
+      <p class="sx-j-role">We store a blob we genuinely can't read.</p>
+      <ul class="sx-j-list">
+        <li><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M3 8h10"></path></svg><span>We receive <strong>random-looking bytes</strong></span></li>
+        <li><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M3 8h10"></path></svg><span>No key — we can't even tell it's HTML</span></li>
+        <li><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M3 8h10"></path></svg><span>We save it and hand back a short <span class="tok-id">id</span></span></li>
+      </ul>
+      <div class="sx-j-tag">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8s2.5-4.5 6-4.5S14 8 14 8s-2.5 4.5-6 4.5S2 8 2 8z"></path><path d="M2.5 2.5l11 11"></path></svg>
+        sees only gibberish
+      </div>
+    </div>
+
+    <div class="sx-j-conn">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15M14 7l5 5-5 5"></path></svg>
+      <span class="cl">blob<br>fetched</span>
+    </div>
+
+    {{-- Stop 3 --}}
+    <div class="sx-j-card device">
+      <div class="sx-j-head">
+        <span class="sx-j-no">03</span>
+        <span class="sx-j-loc">In their browser</span>
+      </div>
+      <p class="sx-j-role">The link turns the blob back into your file.</p>
+      <ul class="sx-j-list">
+        <li><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5l3 3 6-7"></path></svg><span>The link carries the <span class="tok-id">id</span> and the <span class="tok-key">key</span></span></li>
+        <li><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5l3 3 6-7"></path></svg><span>Their browser fetches the bytes by id</span></li>
+        <li><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5l3 3 6-7"></path></svg><span>The key <strong>unscrambles</strong> it on their screen</span></li>
+      </ul>
+      <div class="sx-j-tag">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="10" height="7" rx="1.2"></rect><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0"></path></svg>
+        key used here · from the link
       </div>
     </div>
   </div>
+
+  {{-- Mobile-only key callout (the arc is hidden on small screens) --}}
+  <div class="sx-mobile-key">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="8" r="3"></circle><path d="M8.5 8H15M12.5 8v2.5M14 8v2"></path></svg>
+    <span>The <strong>key</strong> never makes the middle stop. It's created in stop&nbsp;1, rides inside the link, and is used in stop&nbsp;3 — <strong>our server never sees it.</strong></span>
+  </div>
+
+  <p class="sx-j-legend">
+    The encrypted file passes through all three stops. The key takes a different road —
+    it lives inside the link and <strong>never touches our server</strong>. So the only place your file
+    is ever readable is on your screen, and on the screen of whoever you send the link to.
+  </p>
+
+  {{-- The link itself --}}
+  <div class="sx-linkcard">
+    <div class="sx-linkcard-head"><span>the link you share</span><span><span class="tok-id">id</span> · then the <span class="tok-key">key</span></span></div>
+    <div class="sx-linkcard-body">
+      <pre class="sx-linkcard-url"><span class="sx-slash">html.cloud/v/</span><span class="tok-id">kT4eN7xQ</span><span class="sx-hash">#</span><span class="tok-key">b3FvXyHd5kJ2nP8vM1aQrT6wY9zCxEgI</span></pre>
+      <div class="sx-linkcard-legend">
+        <span><span class="tok-id">▮ id</span> — the part we store</span>
+        <span><span class="tok-key">▮ key</span> — after the <span class="tok-key">#</span>, it stays in the browser</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="content-section">
+  <h2 class="sx-story-q">“But couldn't someone just guess the key?”</h2>
+  <p class="sx-story-lead">
+    Sure — go ahead. There are just a <em>few</em> keys to get through:
+  </p>
+
+  <div class="sx-story">
+    <div class="sx-bignum">10<sup>77</sup></div>
+    <div class="sx-num-cap">possible keys — that's a 1 with 77 zeros after it</div>
+    <p class="sx-story-p">
+      Picture <em>every computer on Earth</em> guessing a billion billion keys a second,
+      non-stop, since the Big Bang. By today they'd have checked a rounding error's worth.
+      Still not done. Not even close.
+    </p>
+    <div class="sx-kicker">You'd run out of universe first.</div>
+  </div>
+  <p class="sx-story-after">
+    So “we can't read your files” isn't a pinky-promise we're asking you to take on faith.
+    <strong>It's math</strong> — and math doesn't do favours. The cipher doing the work is
+    <a href="https://en.wikipedia.org/wiki/Galois/Counter_Mode" rel="noopener" target="_blank">AES-256-GCM</a>,
+    the same standard that protects classified and banking systems.
+  </p>
 </section>
 
 <section class="content-section">
