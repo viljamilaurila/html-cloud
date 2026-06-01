@@ -15,6 +15,7 @@
   <meta property="og:description" content="@yield('og_description', 'Share an HTML file with a private link. Encrypted in your browser — not even we can read your files.')">
   <meta property="og:url" content="@yield('canonical', config('app.url'))">
   <meta property="og:image" content="{{ config('app.url') }}/og-image.png">
+  <meta property="og:image:type" content="image/png">
   <meta property="og:image:width" content="1000">
   <meta property="og:image:height" content="524">
 
