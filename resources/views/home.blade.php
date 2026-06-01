@@ -2,7 +2,7 @@
 @section('title', 'html.cloud — Private HTML file sharing')
 @section('description', 'Share an HTML file with a private link. Encrypted in your browser before upload — only people with your link can read it. Not even us. No sign-up.')
 @section('og_title', 'html.cloud — Private HTML file sharing')
-@section('og_description', 'Drop an HTML file, get a private link. Encrypted in your browser — not even we can read your files. Built for AI-generated presentations and sensitive documents.')
+@section('og_description', 'Drop an HTML file, get a private link. Encrypted in your browser. Built for AI-generated presentations and sensitive documents.')
 @section('canonical', config('app.url'))
 
 @push('head')
