@@ -112,6 +112,7 @@ async function handleFile(file) {
     });
 
     if (!res.ok) {
+      if (res.status === 429) throw new Error('Too many uploads — please wait a few minutes and try again.');
       const err = await res.json().catch(() => ({}));
       throw new Error(err.error || 'Upload failed');
     }
