@@ -12,7 +12,7 @@
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="html.cloud">
   <meta property="og:title" content="@yield('og_title', 'html.cloud — Private HTML file sharing')">
-  <meta property="og:description" content="@yield('og_description', 'Share an HTML file with a private link. Encrypted in your browser — not even we can read your files.')">
+  <meta property="og:description" content="@yield('og_description', 'Share an HTML file with a private link. Encrypted in your browser.')">
   <meta property="og:url" content="@yield('canonical', config('app.url'))">
   <meta property="og:image" content="{{ config('app.url') }}/og-image.png">
 
@@ -23,7 +23,7 @@
   <!-- Twitter / X -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="@yield('og_title', 'html.cloud — Private HTML file sharing')">
-  <meta name="twitter:description" content="@yield('og_description', 'Share an HTML file with a private link. Encrypted in your browser — not even we can read your files.')">
+  <meta name="twitter:description" content="@yield('og_description', 'Share an HTML file with a private link. Encrypted in your browser.')">
   <meta name="twitter:image" content="{{ config('app.url') }}/og-image.png">
 
   <link rel="canonical" href="@yield('canonical', config('app.url'))">
