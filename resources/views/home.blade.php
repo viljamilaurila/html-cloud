@@ -25,7 +25,7 @@
   @include('partials.topbar')
 
   <main class="home-main">
-    <h1 class="headline">Share an HTML file. <em>Private by design.</em></h1>
+    <h1 class="headline">Share an HTML page in seconds. <em>Private by design.</em></h1>
 
     <div class="dropzone" id="dropzone">
       <div class="dropzone-icon">
