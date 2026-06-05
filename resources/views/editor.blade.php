@@ -43,6 +43,7 @@
           Copy
         </button>
       </div>
+      <p class="share-card-hint" id="share-card-hint" style="opacity:0">Always share with <strong>Copy</strong>. The key lives after the <code>#</code> and is hidden from the address bar — a link copied from there won’t open.</p>
       <div class="expiry-info-row" id="expiry-row" style="opacity:0">
         <span id="expiry-text"></span>
         <div class="expiry-chips">

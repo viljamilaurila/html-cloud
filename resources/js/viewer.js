@@ -17,13 +17,14 @@ function showError(title, body) {
   errorScreen.classList.remove('hidden');
 }
 
-// Read the key from the URL fragment if present, then strip it from the address
-// bar immediately (so it can't leak via screen-sharing, history, or Referer).
+// Read the key from the URL fragment if present, then strip it (and any query,
+// such as the ?owner marker) from the address bar immediately — so the key can't
+// leak via screen-sharing, history, or Referer.
 // On a reload — where the fragment is already gone — fall back to the per-tab cache.
 function takeKeyFragment() {
   const fromHash = window.location.hash.slice(1);
   if (fromHash) {
-    history.replaceState(null, '', window.location.pathname + window.location.search);
+    history.replaceState(null, '', window.location.pathname);
     return { fragment: fromHash, fromHash: true };
   }
   let stored = '';
@@ -31,15 +32,31 @@ function takeKeyFragment() {
   return { fragment: stored, fromHash: false };
 }
 
-const MISSING_KEY_BODY =
-  "The key is the part after the # in the original link, and it never reaches our " +
-  "servers — so we can't recover it. Ask whoever shared it to send you the full, " +
-  'unmodified link.';
+// Shown when there's no key at all — the most common confusion, since the key
+// lives after the # and gets dropped when people copy from the address bar.
+// Renders the visitor's own (incomplete) URL next to a complete one so the
+// missing piece is obvious.
+function showMissingKeyError() {
+  errorTitle.textContent = 'This link is missing its key';
+  errorBody.textContent =
+    'Every working link ends with a key after the #. A complete one looks like this:';
+
+  document.getElementById('mk-url-full').textContent = `${location.host}/v/${docId}`;
+
+  document.getElementById('missing-key-help').classList.remove('hidden');
+  loadScreen.classList.add('hidden');
+  errorScreen.classList.remove('hidden');
+}
 
 async function main() {
+  // The editor's "Open" button tags its link with ?owner so we can remind the
+  // creator (the person most likely to re-share from the address bar) to copy
+  // the link properly. Read it before takeKeyFragment() strips the query.
+  const isOwner = new URLSearchParams(location.search).has('owner');
+
   const { fragment, fromHash } = takeKeyFragment();
   if (!fragment) {
-    return showError('This link is missing its key', MISSING_KEY_BODY);
+    return showMissingKeyError();
   }
 
   let viewKeyRaw;
@@ -126,6 +143,20 @@ async function main() {
       copyToClipboard(shareUrl);
     }
   });
+
+  // Creator previewing their own file: remind them to share via Copy link,
+  // since the address bar no longer carries the key.
+  if (isOwner) {
+    const notice = document.getElementById('owner-notice');
+    const copyBtn = document.getElementById('owner-copy');
+    copyBtn.addEventListener('click', () => {
+      copyToClipboard(shareUrl);
+      copyBtn.textContent = 'Copied';
+      setTimeout(() => { copyBtn.textContent = 'Copy link'; }, 1800);
+    });
+    document.getElementById('owner-dismiss').addEventListener('click', () => notice.remove());
+    notice.classList.remove('hidden');
+  }
 }
 
 async function copyToClipboard(text) {

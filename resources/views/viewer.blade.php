@@ -1,8 +1,17 @@
 @extends('layout')
 @section('title', 'html.cloud')
 @section('robots', 'noindex, nofollow')
+@section('og_title', 'An encrypted file shared via html.cloud')
+@section('og_description', 'Open it with the complete link — including the part after the “#”. That part is the decryption key; without it the file can’t be unlocked, and not even html.cloud can recover it.')
 
 @section('content')
+<div id="owner-notice" class="owner-notice hidden">
+  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="10" height="8" rx="1.5"/><path d="M5 7V5a3 3 0 0 1 6 0v2"/></svg>
+  <span class="owner-notice-text">You created this file. Share it with <strong>Copy link</strong> — for security the key stays out of the address bar, so a link copied from there won’t open.</span>
+  <button id="owner-copy" class="owner-notice-btn">Copy link</button>
+  <button id="owner-dismiss" class="owner-notice-x" aria-label="Dismiss">×</button>
+</div>
+
 <div id="loading-screen" class="loading-screen">
   <div class="loading-inner">
     <div class="loading-spinner"></div>
@@ -17,6 +26,14 @@
     </div>
     <h2 class="error-title" id="error-title">Unable to decrypt</h2>
     <p class="error-body" id="error-body">The link may be incomplete or the file has been removed.</p>
+
+    <div id="missing-key-help" class="missing-key-help hidden">
+      <div class="mk-url-display">
+        <span class="mk-base" id="mk-url-full"></span><span class="mk-key-group"><span class="mk-key">#a8Kf3v…</span><span class="mk-pointer"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 13V4M4 8l4-4 4 4"/></svg>the part you’re missing</span></span>
+      </div>
+      <p class="mk-caption">Ask whoever shared the file to send you the complete link.</p>
+    </div>
+
     <a href="/" class="error-link">← Back to html.cloud</a>
   </div>
 </div>

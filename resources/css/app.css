@@ -606,6 +606,19 @@ html, body {
   color: var(--ink3);
   line-height: 1.5;
 }
+.share-card-hint {
+  margin: 12px 0 0;
+  font-size: 12px;
+  color: var(--ink3);
+  line-height: 1.5;
+  transition: opacity 0.2s ease;
+}
+.share-card-hint strong { color: var(--ink2); font-weight: 600; }
+.share-card-hint code {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--accent);
+}
 
 /* ─── Viewer ─── */
 .loading-screen,
@@ -625,6 +638,7 @@ html, body {
   align-items: center;
   gap: 16px;
   text-align: center;
+  padding: 24px;
 }
 .loading-spinner {
   width: 32px;
@@ -658,9 +672,111 @@ html, body {
   margin: 0;
   color: var(--ink);
 }
-.error-body { font-size: 14px; color: var(--ink2); margin: 0; max-width: 360px; }
+.error-body { font-size: 14px; color: var(--ink2); margin: 0; max-width: min(400px, 100%); }
 .error-link { font-size: 13px; color: var(--accent); text-decoration: none; margin-top: 8px; }
 .error-link:hover { text-decoration: underline; }
+
+/* Missing-key error helper */
+.missing-key-help {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 14px;
+  width: min(440px, 88vw);
+  margin-top: 4px;
+}
+/* One large URL with the missing key segment highlighted and an arrow under it. */
+.mk-url-display {
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 22px 20px 18px;
+  font-family: var(--mono);
+  font-size: 16px;
+  line-height: 1.5;
+  word-break: break-all;
+  text-align: center;
+}
+.mk-base { color: var(--ink2); }
+.mk-key-group {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  vertical-align: top;
+}
+.mk-key {
+  color: var(--paper);
+  background: var(--accent);
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 5px;
+  animation: mk-pulse 1.8s ease-in-out infinite;
+}
+@keyframes mk-pulse { 0%, 100% { box-shadow: 0 0 0 0 var(--accent-soft); } 50% { box-shadow: 0 0 0 5px var(--accent-soft); } }
+.mk-pointer {
+  margin-top: 7px;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-family: var(--sans);
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--accent);
+  white-space: nowrap;
+}
+.mk-caption {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--ink2);
+  line-height: 1.5;
+  max-width: 380px;
+}
+
+/* Owner preview reminder (top of viewer) */
+.owner-notice {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: var(--paper);
+  border-bottom: 1px solid var(--rule);
+  font-size: 13px;
+  color: var(--ink2);
+  box-shadow: 0 1px 6px rgba(31,28,23,0.06);
+}
+.owner-notice svg { flex-shrink: 0; color: var(--accent); }
+.owner-notice-text { flex: 1; line-height: 1.4; }
+.owner-notice-text strong { color: var(--ink); font-weight: 600; }
+.owner-notice-btn {
+  flex-shrink: 0;
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--paper);
+  background: var(--accent);
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+.owner-notice-btn:active { opacity: 0.8; }
+.owner-notice-x {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--ink3);
+  cursor: pointer;
+  padding: 0 2px;
+}
+.owner-notice-x:hover { color: var(--ink); }
 
 .content-frame {
   position: fixed;

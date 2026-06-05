@@ -77,11 +77,15 @@ async function init() {
   const shareUrl  = `${location.origin}/v/${docId}#${b64url(viewKeyRaw)}`;
   const manageUrl = window.location.href;
 
-  // Show share link
+  // Show share link. The copied/displayed link stays clean; only the "Open"
+  // button tags the URL with ?owner so the viewer can recognise the creator
+  // and remind them to share via Copy link rather than the address bar.
   shareUrlEl.textContent = shareUrl;
-  document.getElementById('open-share').href = shareUrl;
+  document.getElementById('open-share').href =
+    `${location.origin}/v/${docId}?owner=1#${b64url(viewKeyRaw)}`;
   shareActions.style.opacity = '1';
   shareActions.style.pointerEvents = 'auto';
+  document.getElementById('share-card-hint').style.opacity = '1';
 
   // Show management link
   document.getElementById('manage-url').textContent = manageUrl;
