@@ -1,0 +1,33 @@
+{
+  "name": "html-cloud",
+  "version": "0.1.0",
+  "description": "Share an HTML file privately from the command line. Encrypted with AES-256-GCM before upload — the server stores only ciphertext. No account.",
+  "type": "module",
+  "bin": {
+    "html-cloud": "bin/html-cloud.js"
+  },
+  "files": [
+    "bin/",
+    "crypto.js",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "html",
+    "share",
+    "encrypted",
+    "zero-knowledge",
+    "private",
+    "claude-artifact",
+    "ai-generated"
+  ],
+  "homepage": "https://html.cloud",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/viljamilaurila/html-cloud.git",
+    "directory": "cli"
+  },
+  "license": "MIT"
+}
