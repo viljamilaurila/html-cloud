@@ -24,11 +24,3 @@ Route::view('/share-internal-document', 'pages.use.internal-document')->name('us
 
 Route::get('/v/{id}', [DocumentController::class, 'viewer'])->name('viewer');
 Route::get('/e/{id}', [DocumentController::class, 'editor'])->name('editor');
-
-Route::prefix('api')->group(function () {
-    Route::post('/documents', [DocumentController::class, 'store'])->middleware('throttle:20,60');
-    Route::get('/documents/{id}', [DocumentController::class, 'show']);
-    Route::put('/documents/{id}', [DocumentController::class, 'update']);
-    Route::patch('/documents/{id}/expiry', [DocumentController::class, 'updateExpiry']);
-    Route::delete('/documents/{id}', [DocumentController::class, 'destroy']);
-});
