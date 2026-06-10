@@ -26,7 +26,19 @@ The server stores:
 - **Edit authorization** — `SHA-256(editKey)` stored; raw editKey verified only on update requests
 - **Expiry enforcement** — daily cron deletes blobs and DB rows past their expiry date
 - **10 MB upload limit** enforced server-side
-- CSRF protection on all state-mutating routes
+- The API is stateless: every state-mutating request is authorized by the `edit_auth`
+  secret, and uploads are rate-limited
+
+## CLI
+
+Share a file from the terminal — encrypted locally, same crypto module as the browser:
+
+```bash
+npx html-cloud ./file.html
+```
+
+The package lives in [`cli/`](cli/) and on [npm](https://www.npmjs.com/package/html-cloud).
+See [html.cloud/cli](https://html.cloud/cli) for usage and options.
 
 ## Stack
 

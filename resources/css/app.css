@@ -284,6 +284,21 @@ html, body {
   white-space: nowrap;
 }
 .explainer-readmore:hover { text-decoration: underline; }
+.explainer-cli {
+  margin: 26px 0 0;
+  font-size: 12.5px;
+  color: var(--ink3);
+}
+.explainer-cli a { text-decoration: none; }
+.explainer-cli code {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink2);
+  background: var(--accent-soft);
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+.explainer-cli a:hover code { color: var(--accent); }
 
 /* Inline "read the source" link with GitHub mark (content pages) */
 .source-link {
@@ -842,6 +857,24 @@ html, body {
   color: var(--ink);
 }
 .content-col code.accent { color: var(--accent); font-weight: 600; }
+
+/* Terminal-style code blocks (CLI page) */
+.content-codeblock {
+  margin: 18px 0 0;
+  padding: 16px 20px;
+  background: var(--ink);
+  border-radius: 8px;
+  overflow-x: auto;
+}
+.content-codeblock code {
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.6;
+  color: #f0ede6;
+  background: none;
+  padding: 0;
+}
+.content-codeblock-out code { color: rgba(240, 237, 230, 0.62); }
 
 /* Two-column fact lists (e.g. "we store" / "we never receive") */
 .store-grid {

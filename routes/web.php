@@ -9,6 +9,7 @@ Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap')
 
 // Content / discoverability pages (static, no DB).
 Route::view('/security', 'pages.security')->name('security');
+Route::view('/cli', 'pages.cli')->name('cli');
 
 // Comparison pages.
 Route::view('/vs/netlify-drop', 'pages.vs.netlify-drop')->name('vs.netlify');

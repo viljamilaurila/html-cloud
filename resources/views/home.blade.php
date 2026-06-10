@@ -54,6 +54,9 @@
         The only key is in the link you share — we never see it, so not even we can read your file.
         <a href="{{ route('security') }}" class="explainer-readmore">How the encryption works →</a>
       </p>
+      <p class="explainer-cli">
+        or from your terminal: <a href="{{ route('cli') }}"><code>npx html-cloud ./file.html</code></a>
+      </p>
     </section>
   </main>
 
