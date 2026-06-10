@@ -299,6 +299,9 @@ html, body {
   border-radius: 6px;
 }
 .explainer-cli a:hover code { color: var(--accent); }
+.explainer-cli-alt { margin-top: 8px; }
+.explainer-cli-claude { color: var(--ink3); text-decoration: none; }
+.explainer-cli-claude:hover { color: var(--accent); }
 
 /* Inline "read the source" link with GitHub mark (content pages) */
 .source-link {
@@ -1068,6 +1071,92 @@ html, body {
   color: var(--ink2);
 }
 .step p strong { color: var(--ink); font-weight: 600; }
+/* Step body wraps a heading + code block (vs. a single <p>) */
+.step-body { padding-top: 1px; }
+.step-body p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--ink2);
+}
+.step-body p strong { color: var(--ink); font-weight: 600; }
+.step-body .content-codeblock { margin-top: 12px; }
+
+/* MCP page: example conversation, framed as its own card */
+.mcp-demo {
+  margin: 26px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 560px;
+  padding: 20px 20px 22px;
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 16px;
+}
+.mcp-turn { display: flex; flex-direction: column; gap: 5px; }
+.mcp-who {
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--ink3);
+}
+.mcp-msg {
+  padding: 12px 16px;
+  border-radius: 14px;
+  font-size: 15px;
+  line-height: 1.55;
+  max-width: 88%;
+}
+.mcp-msg-you {
+  align-self: flex-start;
+  background: var(--accent);
+  color: #f3f1ea;
+  border-top-left-radius: 4px;
+}
+.mcp-msg-claude {
+  align-self: flex-start;
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  color: var(--ink2);
+  border-top-left-radius: 4px;
+}
+.mcp-demo-link {
+  display: block;
+  margin-top: 6px;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  color: var(--accent);
+}
+.mcp-demo-note { margin-top: 16px; font-size: 14px; }
+
+/* Download button (MCP page). Scoped to .content-col to out-specify `.content-col a`. */
+.content-col a.btn-download {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 12px;
+  padding: 11px 20px;
+  background: var(--accent);
+  color: #f3f1ea;
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 500;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+.content-col a.btn-download:hover { background: #2e3f2e; text-decoration: none; }
+.btn-download svg { flex-shrink: 0; }
+.btn-sub {
+  margin: 8px 0 0;
+  font-size: 12.5px;
+  color: var(--ink3);
+}
+.btn-sub code {
+  font-family: var(--mono);
+  font-size: 11.5px;
+}
 
 /* Footer link groups */
 .footer-links {

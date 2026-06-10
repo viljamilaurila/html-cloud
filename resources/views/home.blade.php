@@ -50,6 +50,9 @@
     <p class="explainer-cli">
       or from your terminal: <a href="{{ route('cli') }}"><code>npx html-cloud ./file.html</code></a>
     </p>
+    <p class="explainer-cli explainer-cli-alt">
+      <a href="{{ route('mcp') }}" class="explainer-cli-claude">or let Claude share for you →</a>
+    </p>
 
     <section class="explainer">
       @include('partials.illustrations.flow')
