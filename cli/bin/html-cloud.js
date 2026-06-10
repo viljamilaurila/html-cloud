@@ -7,6 +7,7 @@
  * fragments — they are never sent to the server.
  */
 
+import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { basename } from 'node:path';
 import { parseArgs } from 'node:util';
@@ -30,6 +31,7 @@ Options:
   --expires <7|30|never>  Days until the link expires (default: 30)
   --url <base>            Server base URL (default: https://html.cloud,
                           or $HTML_CLOUD_URL)
+  --no-copy               Don't copy the share link to the clipboard
   -h, --help              Show this help
 
 The file is encrypted with AES-256-GCM in this process. The decryption
@@ -42,14 +44,27 @@ function fail(msg) {
   process.exit(1);
 }
 
+/** Copy text via the OS clipboard command. Returns true on success. */
+function copyToClipboard(text) {
+  const candidates = process.platform === 'darwin' ? [['pbcopy']]
+    : process.platform === 'win32' ? [['clip']]
+    : [['wl-copy'], ['xclip', '-selection', 'clipboard'], ['xsel', '--clipboard', '--input']];
+  for (const [cmd, ...cmdArgs] of candidates) {
+    const r = spawnSync(cmd, cmdArgs, { input: text, stdio: ['pipe', 'ignore', 'ignore'] });
+    if (!r.error && r.status === 0) return true;
+  }
+  return false;
+}
+
 let args;
 try {
   args = parseArgs({
     allowPositionals: true,
     options: {
-      expires: { type: 'string', default: '30' },
-      url:     { type: 'string' },
-      help:    { type: 'boolean', short: 'h', default: false },
+      expires:   { type: 'string', default: '30' },
+      url:       { type: 'string' },
+      'no-copy': { type: 'boolean', default: false },
+      help:      { type: 'boolean', short: 'h', default: false },
     },
   });
 } catch (err) {
@@ -119,11 +134,15 @@ if (!res.ok) {
 }
 
 const { id } = await res.json();
+const shareLink = `${baseUrl}/v/${id}#${b64url(viewKeyRaw)}`;
+
+// Copy only in interactive use — never alter the clipboard from scripts/pipes.
+const copied = !args.values['no-copy'] && process.stdout.isTTY && copyToClipboard(shareLink);
 
 const expiryNote = expires === 'never' ? 'never expires' : `expires in ${expires} days`;
 console.log(`
-Share link (anyone with this can view):
-  ${baseUrl}/v/${id}#${b64url(viewKeyRaw)}
+Share link (anyone with this can view)${copied ? ' — copied to clipboard' : ''}:
+  ${shareLink}
 
 Edit link (keep private — replace, change expiry, delete):
   ${baseUrl}/e/${id}#${b64url(editKeyRaw)}

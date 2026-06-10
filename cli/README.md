@@ -46,6 +46,11 @@ Read the full explainer: [html.cloud/security](https://html.cloud/security)
 |---|---|---|
 | `--expires <7\|30\|never>` | Days until the link expires | `30` |
 | `--url <base>` | Server base URL (or `$HTML_CLOUD_URL`) | `https://html.cloud` |
+| `--no-copy` | Don't copy the share link to the clipboard | copy is on |
+
+In interactive use the share link is copied to your clipboard (`pbcopy`,
+`wl-copy`/`xclip`/`xsel`, or `clip`, whichever your OS has). When output is
+piped or scripted, the clipboard is never touched.
 
 Limits: one `.html`/`.htm` file (or stdin), max 10 MB. Expiry can be changed
 later from the edit link.
