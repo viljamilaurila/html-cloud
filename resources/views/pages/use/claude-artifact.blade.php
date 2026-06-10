@@ -45,8 +45,9 @@
   in your browser before upload, with no account and no public URL.
 </p>
 
-<div class="content-cta content-cta-top">
-  <a href="{{ route('home') }}" class="content-cta-btn">Share a Claude artifact now →</a>
+<div class="content-callout content-callout-top">
+  <strong>Using Claude Desktop?</strong> Skip the download entirely — connect html.cloud to
+  Claude once, then just ask it to share what it made. <a href="{{ route('mcp') }}">Let Claude share for you →</a>
 </div>
 
 <section class="content-section">

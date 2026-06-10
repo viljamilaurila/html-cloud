@@ -1039,6 +1039,20 @@ html, body {
 .content-cta-btn:hover { opacity: 0.75; }
 .content-cta-top { margin-top: 20px; padding-top: 0; border-top: none; }
 
+/* Inline cross-reference callout */
+.content-callout {
+  margin-top: 30px;
+  padding: 16px 18px;
+  background: var(--accent-soft);
+  border-radius: 10px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--ink2);
+}
+.content-callout strong { color: var(--ink); font-weight: 600; }
+.content-col .content-callout a { font-weight: 500; white-space: nowrap; }
+.content-callout-top { margin-top: 22px; }
+
 /* How-it-works steps */
 .steps {
   list-style: none;
