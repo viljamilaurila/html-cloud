@@ -9,7 +9,8 @@ const MAX_SIZE = 10 * 1024 * 1024; // 10 MB
 const dropzone       = document.getElementById('dropzone');
 const fileInput      = document.getElementById('file-input');
 const uploadingState = document.getElementById('uploading-state');
-let selectedExpiry   = '30';
+// Default expiry; adjustable on the edit page after upload.
+const EXPIRES_IN = '30';
 
 // Web Crypto requires a secure context (HTTPS or localhost/127.0.0.1).
 if (!window.isSecureContext || !window.crypto?.subtle) {
@@ -37,15 +38,6 @@ function showDropzoneError(msg) {
     <button onclick="this.parentElement.remove()" style="background:none;border:none;cursor:pointer;color:var(--warn);font-size:16px;padding:0;line-height:1;">×</button>`;
   dropzone.insertAdjacentElement('afterend', errorBanner);
 }
-
-// ─── Expiry chips ───
-document.querySelectorAll('.expiry-chip').forEach(chip => {
-  chip.addEventListener('click', () => {
-    document.querySelectorAll('.expiry-chip').forEach(c => c.classList.remove('active'));
-    chip.classList.add('active');
-    selectedExpiry = chip.dataset.value;
-  });
-});
 
 // ─── Drag & drop ───
 dropzone.addEventListener('dragover', e => {
@@ -106,7 +98,7 @@ async function handleFile(file) {
         ciphertext:          packed,
         encrypted_view_key:  encryptedViewKey,
         edit_auth:           editAuth,
-        expires_in:          selectedExpiry,
+        expires_in:          EXPIRES_IN,
         size:                plaintext.length,
       }),
     });

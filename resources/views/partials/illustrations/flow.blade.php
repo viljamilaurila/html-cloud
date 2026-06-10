@@ -15,7 +15,7 @@
     <path d="M63 60 L56 69 L63 78"/>
     <path d="M72 58 L66 80" style="stroke:var(--accent)"/>
     <path d="M77 60 L84 69 L77 78"/>
-    <text x="70" y="131" class="hd-cap">HTML file</text>
+    <text x="70" y="131" class="hd-cap">Your HTML file</text>
   </g>
 
   {{-- arrow 1 --}}
@@ -32,7 +32,7 @@
     <path d="M213 63.5 C212 54.5 212.8 49 230 48.8 C247 49 247.6 54.5 247 63.6"/>
     <circle cx="230" cy="78" r="3.6" style="stroke:var(--accent)"/>
     <path d="M230 81.4 L227.4 89 L232.6 89 Z" style="stroke:var(--accent);fill:var(--accent)"/>
-    <text x="230" y="131" class="hd-cap">Encrypted</text>
+    <text x="230" y="131" class="hd-cap">Encrypted in your browser</text>
   </g>
 
   {{-- arrow 2 --}}
