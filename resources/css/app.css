@@ -654,6 +654,77 @@ html, body {
   border: none;
 }
 
+/* ─── Floating html.cloud badge (overlays the document frame) ─── */
+.hc-badge {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 30;
+  font-family: var(--sans);
+  font-size: 12.5px;
+  line-height: 1.4;
+}
+.hc-badge.hidden { display: none; }
+.hc-badge-inner {
+  display: inline-flex;
+  align-items: center;
+  background: var(--paper);
+  border: 0.5px solid rgba(58,79,58,0.22);
+  border-radius: 999px;
+  padding: 7px;
+  opacity: 0.7;
+  box-shadow: 0 1px 3px rgba(31,28,23,0.10);
+  transition: opacity 0.2s ease;
+}
+.hc-badge-inner:hover,
+.hc-badge-inner:focus-within,
+.hc-badge-inner.open { opacity: 1; }
+.hc-badge-lock {
+  display: inline-flex;
+  align-items: center;
+  padding: 0;
+  background: none;
+  border: none;
+  color: var(--accent);
+  cursor: pointer;
+}
+.hc-badge-lock svg { display: block; }
+.hc-badge-body {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 0;
+  opacity: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  transition: max-width 0.25s ease, opacity 0.2s ease, margin 0.25s ease;
+}
+.hc-badge-inner:hover .hc-badge-body,
+.hc-badge-inner:focus-within .hc-badge-body,
+.hc-badge-inner.open .hc-badge-body {
+  max-width: 340px;
+  opacity: 1;
+  margin: 0 4px 0 10px;
+}
+.hc-badge-txt { color: var(--ink2); }
+.hc-badge-txt a { color: var(--accent); text-decoration: none; font-weight: 500; }
+.hc-badge-txt a:hover { text-decoration: underline; }
+.hc-badge-sep { width: 1px; height: 14px; background: rgba(31,28,23,0.14); }
+.hc-badge-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  background: none;
+  border: none;
+  font-family: var(--sans);
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--accent);
+  cursor: pointer;
+}
+.hc-badge-copy:hover { text-decoration: underline; }
+
 /* ─── Editor / management page ─── */
 .editor-main {
   flex: 1;

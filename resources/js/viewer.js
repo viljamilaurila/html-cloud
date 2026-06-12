@@ -88,93 +88,12 @@ async function main() {
 
   const html = new TextDecoder().decode(plaintext);
 
-  // A small floating lock pill in the bottom-right corner — "found if you seek,"
-  // never distracting. It's `position: fixed`, so it sits in its own layer and
-  // never reflows the host document (the old full-width footer mutated the body's
-  // layout, which collided with documents that had their own fixed bottom UI).
-  // At rest it's just a quiet lock glyph; on hover/focus/tap it expands to reveal
-  // the attribution and the Copy link control.
-  const badge = `
-<style>
-  #__hc__ {
-    position: fixed !important;
-    right: 16px !important;
-    bottom: 16px !important;
-    z-index: 2147483647 !important;
-    font-family: system-ui, -apple-system, sans-serif !important;
-    font-size: 12.5px !important;
-    line-height: 1.4 !important;
-  }
-  #__hc__ .hc-pill {
-    display: inline-flex !important;
-    align-items: center !important;
-    background: #fbf9f4 !important;
-    border: 0.5px solid rgba(58,79,58,0.22) !important;
-    border-radius: 999px !important;
-    padding: 7px !important;
-    opacity: .7 !important;
-    box-shadow: 0 1px 3px rgba(31,28,23,0.10) !important;
-    cursor: pointer !important;
-    transition: opacity .2s ease !important;
-  }
-  #__hc__ .hc-pill:hover, #__hc__ .hc-pill:focus-within, #__hc__ .hc-pill.hc-open { opacity: 1 !important; }
-  #__hc__ .hc-lock { display: inline-flex !important; align-items: center !important; color: #3a4f3a !important; }
-  #__hc__ .hc-lock svg { display: block !important; }
-  #__hc__ .hc-body {
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 10px !important;
-    max-width: 0 !important;
-    opacity: 0 !important;
-    overflow: hidden !important;
-    white-space: nowrap !important;
-    transition: max-width .25s ease, opacity .2s ease, margin .25s ease !important;
-  }
-  #__hc__ .hc-pill:hover .hc-body, #__hc__ .hc-pill:focus-within .hc-body, #__hc__ .hc-pill.hc-open .hc-body {
-    max-width: 340px !important;
-    opacity: 1 !important;
-    margin: 0 4px 0 10px !important;
-  }
-  #__hc__ .hc-txt { color: #5a5247 !important; }
-  #__hc__ a, #__hc__ .copy { color: #3a4f3a !important; text-decoration: none !important; font-weight: 500 !important; }
-  #__hc__ .copy { cursor: pointer !important; display: inline-flex !important; align-items: center !important; gap: 4px !important; }
-  #__hc__ .copy:hover { text-decoration: underline !important; }
-  #__hc__ .hc-sep { width: 1px !important; height: 14px !important; background: rgba(31,28,23,0.14) !important; }
-</style>
-<div id="__hc__">
-  <div class="hc-pill" tabindex="0">
-    <span class="hc-lock" role="button" tabindex="0" aria-label="Encrypted with html.cloud" onclick="if(!this.closest('.hc-pill').classList.toggle('hc-open'))this.blur()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="10" height="8" rx="1.5"/><path d="M5 7V5a3 3 0 0 1 6 0v2"/></svg></span>
-    <span class="hc-body">
-      <span class="hc-txt">Encrypted &middot; <a href="https://html.cloud" target="_blank" rel="noopener">html.cloud</a></span>
-      <span class="hc-sep"></span>
-      <span class="copy" role="button" tabindex="0" onclick="event.stopPropagation();parent.postMessage('hc:copy-link','*');var s=this.querySelector('.copy-label'),o=s.textContent;s.textContent='Link copied';setTimeout(function(){s.textContent=o},1800)"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="5" width="9" height="9" rx="1.5"/><path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2H3.5A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5"/></svg><span class="copy-label">Copy link</span></span>
-    </span>
-  </div>
-  <script>
-    (function () {
-      var hc = document.getElementById('__hc__');
-      // On touch there's no hover-out, so dismiss the expanded pill when the
-      // visitor taps anywhere outside it (and clear focus so :focus-within
-      // doesn't hold it open).
-      document.addEventListener('click', function (e) {
-        if (!hc.contains(e.target)) {
-          var pill = hc.querySelector('.hc-pill');
-          pill.classList.remove('hc-open');
-          if (document.activeElement && hc.contains(document.activeElement)) document.activeElement.blur();
-        }
-      });
-    })();
-  </script>
-</div>`;
-
-  // Append before </body> if present, otherwise at the end.
-  const injected = /<\/body>/i.test(html)
-    ? html.replace(/<\/body>/i, badge + '</body>')
-    : html + badge;
-
+  // Render the document exactly as authored — we no longer inject anything into
+  // the (untrusted, sandboxed) frame. The html.cloud badge lives in the parent
+  // viewer page instead (see setupBadge below), so the document's own scripts,
+  // overlays, and corner widgets can't cover, remove, or spoof it.
   // srcdoc works in sandboxed iframes without allow-same-origin.
-  // blob: URLs require same-origin and go silently blank in our sandbox.
-  frame.srcdoc = injected;
+  frame.srcdoc = html;
   frame.classList.remove('hidden');
   loadScreen.classList.add('hidden');
 
@@ -184,15 +103,11 @@ async function main() {
     try { sessionStorage.setItem(SS_KEY, fragment); } catch { /* ignore */ }
   }
 
-  // The address bar is now key-free. The "Copy link" control lives inside the
-  // sandboxed iframe (the footer badge), but the key is kept out of that frame —
-  // so the badge asks us (the parent, which holds the key) to copy the full link.
+  // The address bar is now key-free, so the parent page is the only place that
+  // still holds the full share link. Reveal the floating badge and wire its
+  // Copy link control directly to it.
   const shareUrl = `${window.location.origin}/v/${docId}#${b64url(viewKeyRaw)}`;
-  window.addEventListener('message', (e) => {
-    if (e.source === frame.contentWindow && e.data === 'hc:copy-link') {
-      copyToClipboard(shareUrl);
-    }
-  });
+  setupBadge(shareUrl);
 
   // Creator previewing their own file: remind them to share via Copy link,
   // since the address bar no longer carries the key.
@@ -207,6 +122,46 @@ async function main() {
     document.getElementById('owner-dismiss').addEventListener('click', () => notice.remove());
     notice.classList.remove('hidden');
   }
+}
+
+// The floating lock pill that lives in the parent viewer page (above the iframe).
+// Quiet at rest — just a lock glyph; on hover/focus/tap it expands to reveal the
+// attribution and Copy link. Because it's outside the sandboxed frame it can't be
+// covered, removed, or spoofed by the document.
+function setupBadge(shareUrl) {
+  const badge     = document.getElementById('hc-badge');
+  if (!badge) return;
+  const inner     = badge.querySelector('.hc-badge-inner');
+  const lock      = badge.querySelector('.hc-badge-lock');
+  const copy      = badge.querySelector('.hc-badge-copy');
+  const copyLabel = badge.querySelector('.hc-badge-copy-label');
+
+  badge.classList.remove('hidden');
+
+  const collapse = () => {
+    inner.classList.remove('open');
+    lock.setAttribute('aria-expanded', 'false');
+  };
+
+  // Touch has no hover-out, so the lock is a tap target that toggles the pill.
+  lock.addEventListener('click', () => {
+    const open = inner.classList.toggle('open');
+    lock.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (!open) lock.blur();
+  });
+
+  copy.addEventListener('click', () => {
+    copyToClipboard(shareUrl);
+    const original = copyLabel.textContent;
+    copyLabel.textContent = 'Link copied';
+    setTimeout(() => { copyLabel.textContent = original; }, 1800);
+  });
+
+  // Dismiss when the visitor turns to the document. Focus moving into the iframe
+  // blurs the parent window — the very case the old in-frame badge couldn't catch
+  // on touch — and a tap anywhere outside the badge collapses it too.
+  window.addEventListener('blur', collapse);
+  document.addEventListener('pointerdown', (e) => { if (!badge.contains(e.target)) collapse(); });
 }
 
 async function copyToClipboard(text) {

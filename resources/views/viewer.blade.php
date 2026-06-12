@@ -40,6 +40,22 @@
 
 <iframe id="content-frame" class="content-frame hidden" sandbox="allow-scripts allow-popups" title="Shared HTML file"></iframe>
 
+<div id="hc-badge" class="hc-badge hidden">
+  <div class="hc-badge-inner">
+    <button type="button" class="hc-badge-lock" aria-label="Encrypted — shared via html.cloud" aria-expanded="false">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="10" height="8" rx="1.5"/><path d="M5 7V5a3 3 0 0 1 6 0v2"/></svg>
+    </button>
+    <div class="hc-badge-body">
+      <span class="hc-badge-txt">Encrypted &middot; <a href="https://html.cloud" target="_blank" rel="noopener">html.cloud</a></span>
+      <span class="hc-badge-sep"></span>
+      <button type="button" class="hc-badge-copy">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="5" width="9" height="9" rx="1.5"/><path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2H3.5A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5"/></svg>
+        <span class="hc-badge-copy-label">Copy link</span>
+      </button>
+    </div>
+  </div>
+</div>
+
 <script>
   window.__DOC_ID__ = @json($doc->id);
 </script>
