@@ -1,4 +1,5 @@
 import { importViewKey, decryptBytes, unpackCiphertext, b64url, b64urlDecode } from './crypto.js';
+import { getUpload } from './uploads-store.js';
 
 const docId       = window.__DOC_ID__;
 const loadScreen  = document.getElementById('loading-screen');
@@ -17,19 +18,25 @@ function showError(title, body) {
   errorScreen.classList.remove('hidden');
 }
 
-// Read the key from the URL fragment if present, then strip it (and any query,
-// such as the ?owner marker) from the address bar immediately — so the key can't
-// leak via screen-sharing, history, or Referer.
-// On a reload — where the fragment is already gone — fall back to the per-tab cache.
-function takeKeyFragment() {
+// Read the key from the URL fragment if present. We do NOT strip it here — that
+// depends on the document's "sensitive" flag, which we only learn after fetching.
+// Shareable (default): the key stays in the address bar so it's a working share
+// link. Sensitive: stripKeyFromAddressBar() removes it once we know.
+// On a reload of a stripped (sensitive) doc the fragment is gone, so fall back to
+// the per-tab cache.
+function readKeyFragment() {
   const fromHash = window.location.hash.slice(1);
-  if (fromHash) {
-    history.replaceState(null, '', window.location.pathname);
-    return { fragment: fromHash, fromHash: true };
-  }
+  if (fromHash) return { fragment: fromHash, fromHash: true };
   let stored = '';
   try { stored = sessionStorage.getItem(SS_KEY) || ''; } catch { /* sessionStorage unavailable */ }
   return { fragment: stored, fromHash: false };
+}
+
+// For sensitive docs: cache the key for this tab (so a reload still works) and
+// remove it from the address bar, so it can't leak via screen-sharing or history.
+function stripKeyFromAddressBar(fragment) {
+  try { sessionStorage.setItem(SS_KEY, fragment); } catch { /* ignore */ }
+  history.replaceState(null, '', window.location.pathname);
 }
 
 // Shown when there's no key at all — the most common confusion, since the key
@@ -49,12 +56,7 @@ function showMissingKeyError() {
 }
 
 async function main() {
-  // The editor's "Open" button tags its link with ?owner so we can remind the
-  // creator (the person most likely to re-share from the address bar) to copy
-  // the link properly. Read it before takeKeyFragment() strips the query.
-  const isOwner = new URLSearchParams(location.search).has('owner');
-
-  const { fragment, fromHash } = takeKeyFragment();
+  const { fragment, fromHash } = readKeyFragment();
   if (!fragment) {
     return showMissingKeyError();
   }
@@ -86,55 +88,85 @@ async function main() {
     return showError('Wrong key', 'The key in this link doesn\'t match the file. Make sure you\'re using the full, unmodified share link.');
   }
 
+  // Sensitive docs hide the key from the address bar; shareable docs (default)
+  // leave it there so the address bar itself is a working share link.
+  if (doc.sensitive && fromHash) {
+    stripKeyFromAddressBar(fragment);
+  }
+
   const html = new TextDecoder().decode(plaintext);
 
-  // Render the document exactly as authored — we no longer inject anything into
-  // the (untrusted, sandboxed) frame. The html.cloud badge lives in the parent
-  // viewer page instead (see setupBadge below), so the document's own scripts,
-  // overlays, and corner widgets can't cover, remove, or spoof it.
+  // Render the document exactly as authored — we never inject anything into the
+  // (untrusted, sandboxed) frame. The html.cloud badge lives in the parent viewer
+  // page instead (see setupBadge below), so the document's own scripts, overlays,
+  // and corner widgets can't cover, remove, or spoof it.
   // srcdoc works in sandboxed iframes without allow-same-origin.
   frame.srcdoc = html;
   frame.classList.remove('hidden');
   loadScreen.classList.add('hidden');
 
-  // The key decrypted cleanly — remember it for this tab so a reload still works
-  // even though the address bar no longer carries it.
-  if (fromHash) {
-    try { sessionStorage.setItem(SS_KEY, fragment); } catch { /* ignore */ }
-  }
-
-  // The address bar is now key-free, so the parent page is the only place that
-  // still holds the full share link. Reveal the floating badge and wire its
-  // Copy link control directly to it.
+  // The floating badge always offers Copy link. If this device uploaded the doc,
+  // it also offers Manage — reconstructed from the device-local registry, so the
+  // powerful edit key never has to live in the shareable address bar.
   const shareUrl = `${window.location.origin}/v/${docId}#${b64url(viewKeyRaw)}`;
-  setupBadge(shareUrl);
+  const owned    = getUpload(docId);
+  const manageUrl = owned ? `${window.location.origin}/e/${docId}#${owned.editKey}` : null;
+  setupBadge(shareUrl, manageUrl);
 
-  // Creator previewing their own file: remind them to share via Copy link,
-  // since the address bar no longer carries the key.
-  if (isOwner) {
-    const notice = document.getElementById('owner-notice');
-    const copyBtn = document.getElementById('owner-copy');
-    copyBtn.addEventListener('click', () => {
-      copyToClipboard(shareUrl);
-      copyBtn.textContent = 'Copied';
-      setTimeout(() => { copyBtn.textContent = 'Copy link'; }, 1800);
-    });
-    document.getElementById('owner-dismiss').addEventListener('click', () => notice.remove());
-    notice.classList.remove('hidden');
+  // Just uploaded from this tab? Greet the creator once, and explain sharing.
+  let justUploaded = false;
+  try { justUploaded = sessionStorage.getItem('hc_just_uploaded') === docId; } catch { /* ignore */ }
+  if (justUploaded) {
+    try { sessionStorage.removeItem('hc_just_uploaded'); } catch { /* ignore */ }
+    showUploadToast(shareUrl, doc.sensitive);
   }
+}
+
+// One-time confirmation shown to the creator right after upload.
+function showUploadToast(shareUrl, sensitive) {
+  const toast = document.getElementById('upload-toast');
+  if (!toast) return;
+  const sub     = document.getElementById('upload-toast-sub');
+  const copyBtn = document.getElementById('upload-toast-copy');
+
+  sub.textContent = sensitive
+    ? 'Share it with Copy link — the key stays hidden from the address bar.'
+    : 'Your link is in the address bar — or use Copy link.';
+
+  copyBtn.addEventListener('click', () => {
+    copyToClipboard(shareUrl);
+    copyBtn.textContent = 'Copied';
+    setTimeout(() => { copyBtn.textContent = 'Copy link'; }, 1800);
+  });
+
+  const dismiss = () => toast.classList.add('upload-toast-leaving');
+  document.getElementById('upload-toast-dismiss').addEventListener('click', dismiss);
+
+  requestAnimationFrame(() => toast.classList.remove('hidden'));
+  setTimeout(dismiss, 9000); // auto-dismiss; never blocks the document
 }
 
 // The floating lock pill that lives in the parent viewer page (above the iframe).
 // Quiet at rest — just a lock glyph; on hover/focus/tap it expands to reveal the
 // attribution and Copy link. Because it's outside the sandboxed frame it can't be
 // covered, removed, or spoofed by the document.
-function setupBadge(shareUrl) {
+function setupBadge(shareUrl, manageUrl) {
   const badge     = document.getElementById('hc-badge');
   if (!badge) return;
   const inner     = badge.querySelector('.hc-badge-inner');
   const lock      = badge.querySelector('.hc-badge-lock');
   const copy      = badge.querySelector('.hc-badge-copy');
   const copyLabel = badge.querySelector('.hc-badge-copy-label');
+  const manage    = badge.querySelector('.hc-badge-manage');
+  const txt       = badge.querySelector('.hc-badge-txt');
+
+  // Owner-only: this device uploaded the doc. Make that clear ("Your document")
+  // and offer a Manage link — both only ever appear on the uploader's device.
+  if (manageUrl && manage) {
+    if (txt) txt.textContent = 'Your document';
+    manage.href = manageUrl;
+    manage.classList.remove('hidden');
+  }
 
   badge.classList.remove('hidden');
 

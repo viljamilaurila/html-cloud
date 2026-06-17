@@ -3,6 +3,7 @@ import {
   encryptBytes, encryptViewKeyWithEditKey, computeEditAuth,
   packCiphertext, b64url,
 } from './crypto.js';
+import { saveUpload } from './uploads-store.js';
 
 const MAX_SIZE = 10 * 1024 * 1024; // 10 MB
 
@@ -68,7 +69,10 @@ async function handleFile(file) {
     return;
   }
 
+  const sensitive = !!document.getElementById('sensitive-toggle')?.checked;
+
   dropzone.classList.add('hidden');
+  document.getElementById('upload-options')?.classList.add('hidden');
   uploadingState.classList.remove('hidden');
 
   try {
@@ -100,6 +104,7 @@ async function handleFile(file) {
         edit_auth:           editAuth,
         expires_in:          EXPIRES_IN,
         size:                plaintext.length,
+        sensitive,
       }),
     });
 
@@ -111,10 +116,21 @@ async function handleFile(file) {
 
     const { id } = await res.json();
 
-    // Redirect to the editor page — the fragment contains the edit key.
-    // This URL is the permanent management page; the user should bookmark it.
+    const viewFrag = b64url(viewKeyRaw);
     const editFrag = b64url(editKeyRaw);
-    window.location.href = `/e/${id}#${editFrag}`;
+
+    // Remember this upload on THIS device only (never sent to the server) so the
+    // owner can find it again and reach Manage — see uploads-store.js.
+    saveUpload({ id, viewKey: viewFrag, editKey: editFrag, label: file.name, sensitive });
+
+    // One-shot flag so the viewer can greet the creator with an "uploaded —
+    // here's how to share" toast (shown once, only on this device/tab).
+    try { sessionStorage.setItem('hc_just_uploaded', id); } catch { /* ignore */ }
+
+    // Land straight on the live document. In the default (shareable) mode the
+    // address bar is the working share link; sensitive docs strip it in-viewer.
+    // The edit key stays out of this URL — it lives in the device registry.
+    window.location.href = `/v/${id}#${viewFrag}`;
   } catch (err) {
     console.error(err);
     uploadingState.classList.add('hidden');

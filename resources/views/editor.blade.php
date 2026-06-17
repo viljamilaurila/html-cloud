@@ -43,7 +43,7 @@
           Copy
         </button>
       </div>
-      <p class="share-card-hint" id="share-card-hint" style="opacity:0">Always share with <strong>Copy</strong>. The key lives after the <code>#</code> and is hidden from the address bar — a link copied from there won’t open.</p>
+      <p class="share-card-hint" id="share-card-hint" style="opacity:0">Share with <strong>Copy</strong> or <strong>Open</strong>. The key after the <code>#</code> is what unlocks the file — keep the link complete.</p>
       <div class="expiry-info-row" id="expiry-row" style="opacity:0">
         <span id="expiry-text"></span>
         <div class="expiry-chips">
@@ -52,6 +52,13 @@
           <button class="expiry-chip-sm" data-value="never">Never</button>
         </div>
       </div>
+      <label class="sensitive-row" id="sensitive-row" style="opacity:0">
+        <input type="checkbox" id="sensitive-toggle">
+        <span class="sensitive-row-text">
+          Extra-private link
+          <span class="sensitive-row-hint">Hides the key from the address bar so it can’t be seen on screen-shares. Share only with Copy/Open.</span>
+        </span>
+      </label>
     </div>
 
     <!-- Replace file -->

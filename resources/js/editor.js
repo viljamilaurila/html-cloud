@@ -77,15 +77,38 @@ async function init() {
   const shareUrl  = `${location.origin}/v/${docId}#${b64url(viewKeyRaw)}`;
   const manageUrl = window.location.href;
 
-  // Show share link. The copied/displayed link stays clean; only the "Open"
-  // button tags the URL with ?owner so the viewer can recognise the creator
-  // and remind them to share via Copy link rather than the address bar.
+  // Show share link. Both the displayed link and "Open" point at the same clean
+  // viewer URL; the viewer recognises the owner from the device-local registry.
   shareUrlEl.textContent = shareUrl;
-  document.getElementById('open-share').href =
-    `${location.origin}/v/${docId}?owner=1#${b64url(viewKeyRaw)}`;
+  document.getElementById('open-share').href = shareUrl;
   shareActions.style.opacity = '1';
   shareActions.style.pointerEvents = 'auto';
   document.getElementById('share-card-hint').style.opacity = '1';
+
+  // Sensitive toggle — strips the key from the viewer's address bar.
+  const sensitiveToggle = document.getElementById('sensitive-toggle');
+  const sensitiveRow    = document.getElementById('sensitive-row');
+  sensitiveToggle.checked = !!doc.sensitive;
+  sensitiveRow.style.opacity = '1';
+  sensitiveToggle.addEventListener('change', async () => {
+    const csrf = document.querySelector('meta[name="csrf-token"]').content;
+    sensitiveToggle.disabled = true;
+    try {
+      const r = await fetch(`/api/documents/${docId}/settings`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf },
+        body: JSON.stringify({ sensitive: sensitiveToggle.checked, edit_key: b64url(editKeyRaw) }),
+      });
+      if (!r.ok) throw new Error();
+      const { sensitive } = await r.json();
+      sensitiveToggle.checked = sensitive;
+    } catch {
+      sensitiveToggle.checked = !sensitiveToggle.checked; // revert on failure
+      console.error('Could not update setting');
+    } finally {
+      sensitiveToggle.disabled = false;
+    }
+  });
 
   // Show management link
   document.getElementById('manage-url').textContent = manageUrl;

@@ -24,5 +24,9 @@ Route::view('/share-ai-presentation', 'pages.use.ai-presentation')->name('use.pr
 Route::view('/send-private-client-report', 'pages.use.client-report')->name('use.report');
 Route::view('/share-internal-document', 'pages.use.internal-document')->name('use.internal');
 
+// "Uploaded from this device" — a client-side list built from localStorage.
+// No DB: the page is static; the registry lives only in the visitor's browser.
+Route::view('/uploads', 'uploads')->name('uploads');
+
 Route::get('/v/{id}', [DocumentController::class, 'viewer'])->name('viewer');
 Route::get('/e/{id}', [DocumentController::class, 'editor'])->name('editor');

@@ -10,4 +10,5 @@ Route::post('/documents', [DocumentController::class, 'store'])->middleware('thr
 Route::get('/documents/{id}', [DocumentController::class, 'show']);
 Route::put('/documents/{id}', [DocumentController::class, 'update']);
 Route::patch('/documents/{id}/expiry', [DocumentController::class, 'updateExpiry']);
+Route::patch('/documents/{id}/settings', [DocumentController::class, 'updateSettings']);
 Route::delete('/documents/{id}', [DocumentController::class, 'destroy']);

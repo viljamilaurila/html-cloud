@@ -17,10 +17,12 @@ class Document extends Model
         'edit_auth',
         'expires_at',
         'size',
+        'sensitive',
     ];
 
     protected $casts = [
         'expires_at' => 'datetime',
+        'sensitive'  => 'boolean',
     ];
 
     public function isExpired(): bool

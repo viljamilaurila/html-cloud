@@ -29,6 +29,7 @@
       <nav class="footer-links-col">
         <span class="footer-links-label">More</span>
         <a href="{{ route('home') }}">Home</a>
+        <a href="{{ route('uploads') }}">Uploaded from this device</a>
         <a href="{{ route('security') }}">How encryption works</a>
         <a href="{{ route('cli') }}">CLI — share from the terminal</a>
         <a href="{{ route('mcp') }}">Connect to Claude (MCP)</a>

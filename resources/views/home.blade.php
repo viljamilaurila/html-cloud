@@ -42,6 +42,14 @@
       <div class="dropzone-hover-overlay" aria-hidden="true">Drop to encrypt &amp; share</div>
     </div>
 
+    <label class="upload-option" id="upload-options">
+      <input type="checkbox" id="sensitive-toggle">
+      <span class="upload-option-text">
+        Extra-private link
+        <span class="upload-option-hint">Hides the key from the address bar so it can’t be seen on screen-shares. Share only with the Copy button.</span>
+      </span>
+    </label>
+
     <div class="uploading-state hidden" id="uploading-state">
       <div class="uploading-spinner"></div>
       <span class="uploading-text">Encrypting &amp; uploading…</span>

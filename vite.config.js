@@ -10,6 +10,7 @@ export default defineConfig({
                 'resources/js/upload.js',
                 'resources/js/viewer.js',
                 'resources/js/editor.js',
+                'resources/js/uploads-page.js',
             ],
             refresh: true,
         }),

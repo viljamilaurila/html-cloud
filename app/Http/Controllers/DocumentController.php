@@ -48,6 +48,7 @@ class DocumentController extends Controller
             'edit_auth'          => 'required|string|size:64|regex:/^[0-9a-f]+$/',
             'expires_in'         => 'nullable|in:7,30,never',
             'size'               => 'required|integer|min:1|max:' . self::MAX_SIZE_BYTES,
+            'sensitive'          => 'nullable|boolean',
         ]);
 
         if (strlen($request->ciphertext) > self::MAX_SIZE_BYTES * 2) {
@@ -68,6 +69,7 @@ class DocumentController extends Controller
             'edit_auth'          => $request->edit_auth,
             'expires_at'         => $expiresAt,
             'size'               => $request->size,
+            'sensitive'          => $request->boolean('sensitive'),
         ]);
 
         SyncDocumentCount::dispatch();
@@ -93,6 +95,7 @@ class DocumentController extends Controller
             'encrypted_view_key' => $doc->encrypted_view_key,
             'expires_at'         => $doc->expires_at?->toIso8601String(),
             'size'               => $doc->size,
+            'sensitive'          => (bool) $doc->sensitive,
         ]);
     }
 
@@ -156,6 +159,28 @@ class DocumentController extends Controller
         return response()->json([
             'expires_at' => $doc->fresh()->expires_at?->toIso8601String(),
         ]);
+    }
+
+    // PATCH /api/documents/{id}/settings  — change document settings (requires valid editKey)
+    public function updateSettings(Request $request, string $id): JsonResponse
+    {
+        $doc = Document::find($id);
+        if (! $doc || $doc->isExpired()) {
+            return response()->json(['error' => 'Not found or expired'], 404);
+        }
+
+        $request->validate([
+            'sensitive' => 'required|boolean',
+            'edit_key'  => 'required|string',
+        ]);
+
+        if (! $this->verifyEditKey($request->edit_key, $doc->edit_auth)) {
+            return response()->json(['error' => 'Invalid edit key'], 403);
+        }
+
+        $doc->update(['sensitive' => $request->boolean('sensitive')]);
+
+        return response()->json(['sensitive' => (bool) $doc->fresh()->sensitive]);
     }
 
     // DELETE /api/documents/{id}
