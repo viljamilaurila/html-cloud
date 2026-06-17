@@ -28,5 +28,7 @@ Route::view('/share-internal-document', 'pages.use.internal-document')->name('us
 // No DB: the page is static; the registry lives only in the visitor's browser.
 Route::view('/uploads', 'uploads')->name('uploads');
 
-Route::get('/v/{id}', [DocumentController::class, 'viewer'])->name('viewer');
+Route::get('/v/{id}/{slug?}', [DocumentController::class, 'viewer'])
+    ->where('slug', '[A-Za-z0-9-]+')
+    ->name('viewer');
 Route::get('/e/{id}', [DocumentController::class, 'editor'])->name('editor');

@@ -19,14 +19,21 @@ class DocumentController extends Controller
         return response()->view('home');
     }
 
-    // GET /v/{id}
-    public function viewer(string $id): Response
+    // GET /v/{id}/{slug?}
+    // The slug is cosmetic — only {id} identifies the document. It exists so the
+    // link is self-describing and so link previews (WhatsApp, Slack, …) can show
+    // a title, which crawlers read from the server-rendered meta tags (they never
+    // get the #key). Nothing about the slug is stored; it's humanised per-request.
+    public function viewer(string $id, ?string $slug = null): Response
     {
         $doc = Document::find($id);
         if (! $doc || $doc->isExpired()) {
             return response()->view('expired', [], 404);
         }
-        return response()->view('viewer', ['doc' => $doc]);
+        return response()->view('viewer', [
+            'doc'       => $doc,
+            'slugTitle' => $slug ?: null, // shown verbatim, in slug form
+        ]);
     }
 
     // GET /e/{id}

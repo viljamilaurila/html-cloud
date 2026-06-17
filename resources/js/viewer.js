@@ -96,22 +96,41 @@ async function main() {
 
   const html = new TextDecoder().decode(plaintext);
 
-  // Render the document exactly as authored — we never inject anything into the
-  // (untrusted, sandboxed) frame. The html.cloud badge lives in the parent viewer
-  // page instead (see setupBadge below), so the document's own scripts, overlays,
-  // and corner widgets can't cover, remove, or spoof it.
+  // Paint the parent page (and the frame's letterbox area) to match the document's
+  // own background, so a short document doesn't sit on a mismatched backdrop. The
+  // frame is sandboxed/cross-origin, so the parent can't read its styles — instead
+  // the only thing we add to the document is a tiny READ-ONLY script that reports
+  // its computed body background via postMessage. (e.origin is "null" for an opaque
+  // sandbox, so we trust by source, not origin.) Everything else renders as authored.
+  window.addEventListener('message', (e) => {
+    if (e.source !== frame.contentWindow || !e.data || typeof e.data.__hcbg !== 'string') return;
+    const c = e.data.__hcbg;
+    if (c && c !== 'transparent' && c !== 'rgba(0, 0, 0, 0)') {
+      document.body.style.background = c;
+      frame.style.background = c;
+    }
+  });
+
+  const bgReporter =
+    '<scr' + 'ipt>(function(){function s(){try{parent.postMessage({__hcbg:getComputedStyle(document.body).backgroundColor},"*")}catch(e){}}' +
+    'if(document.readyState!=="loading")s();else addEventListener("DOMContentLoaded",s);addEventListener("load",s)})()<\/scr' + 'ipt>';
+  const injected = /<head[^>]*>/i.test(html)
+    ? html.replace(/<head[^>]*>/i, (m) => m + bgReporter)
+    : bgReporter + html;
+
   // srcdoc works in sandboxed iframes without allow-same-origin.
-  frame.srcdoc = html;
+  frame.srcdoc = injected;
   frame.classList.remove('hidden');
   loadScreen.classList.add('hidden');
 
   // The floating badge always offers Copy link. If this device uploaded the doc,
-  // it also offers Manage — reconstructed from the device-local registry, so the
-  // powerful edit key never has to live in the shareable address bar.
-  const shareUrl = `${window.location.origin}/v/${docId}#${b64url(viewKeyRaw)}`;
-  const owned    = getUpload(docId);
-  const manageUrl = owned ? `${window.location.origin}/e/${docId}#${owned.editKey}` : null;
-  setupBadge(shareUrl, manageUrl);
+  // it also links to "Your uploads", where management lives. Nothing about the
+  // edit key needs to ride along here.
+  // Preserve the cosmetic slug from the address bar so re-shared links keep it.
+  const slugSeg  = location.pathname.split('/')[3] || '';
+  const viewPath = slugSeg ? `/v/${docId}/${slugSeg}` : `/v/${docId}`;
+  const shareUrl = `${window.location.origin}${viewPath}#${b64url(viewKeyRaw)}`;
+  setupBadge(shareUrl, !!getUpload(docId));
 
   // Just uploaded from this tab? Greet the creator once, and explain sharing.
   let justUploaded = false;
@@ -150,7 +169,7 @@ function showUploadToast(shareUrl, sensitive) {
 // Quiet at rest — just a lock glyph; on hover/focus/tap it expands to reveal the
 // attribution and Copy link. Because it's outside the sandboxed frame it can't be
 // covered, removed, or spoofed by the document.
-function setupBadge(shareUrl, manageUrl) {
+function setupBadge(shareUrl, isOwner) {
   const badge     = document.getElementById('hc-badge');
   if (!badge) return;
   const inner     = badge.querySelector('.hc-badge-inner');
@@ -158,13 +177,10 @@ function setupBadge(shareUrl, manageUrl) {
   const copy      = badge.querySelector('.hc-badge-copy');
   const copyLabel = badge.querySelector('.hc-badge-copy-label');
   const manage    = badge.querySelector('.hc-badge-manage');
-  const txt       = badge.querySelector('.hc-badge-txt');
 
-  // Owner-only: this device uploaded the doc. Make that clear ("Your document")
-  // and offer a Manage link — both only ever appear on the uploader's device.
-  if (manageUrl && manage) {
-    if (txt) txt.textContent = 'Your document';
-    manage.href = manageUrl;
+  // Owner-only (this device uploaded it): surface the "Your uploads" link, where
+  // management lives. The badge text stays neutral for everyone.
+  if (isOwner && manage) {
     manage.classList.remove('hidden');
   }
 

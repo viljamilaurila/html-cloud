@@ -874,6 +874,30 @@ html, body {
   margin: 0 0 28px;
 }
 .uploads-list { display: flex; flex-direction: column; gap: 10px; }
+
+/* Secondary upload affordance below the list */
+.uploads-add { margin-top: 40px; }
+.uploads-add-label {
+  margin: 0 0 12px;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink3);
+}
+.uploads-add .dropzone-secondary {
+  min-height: 0;
+  flex: none;
+  margin-top: 0;
+  max-width: 100%;
+  padding: 22px 24px;
+  gap: 10px;
+  background: transparent;
+  border-color: var(--rule);
+}
+.uploads-add .dropzone-secondary .dropzone-icon { width: 40px; height: 40px; }
+.uploads-add .dropzone-secondary .dropzone-label { font-size: 16px; }
+.uploads-add .upload-option { margin-left: 0; margin-right: 0; max-width: 100%; }
 .upload-item {
   display: flex;
   align-items: center;

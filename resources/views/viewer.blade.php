@@ -1,7 +1,7 @@
 @extends('layout')
-@section('title', 'html.cloud')
+@section('title', $slugTitle ? $slugTitle . ' — html.cloud' : 'html.cloud')
 @section('robots', 'noindex, nofollow')
-@section('og_title', 'An encrypted file shared via html.cloud')
+@section('og_title', $slugTitle ?: 'An encrypted file shared via html.cloud')
 @section('og_description', 'Open it with the complete link — including the part after the “#”. That part is the decryption key; without it the file can’t be unlocked, and not even html.cloud can recover it.')
 
 @section('content')
@@ -57,9 +57,9 @@
         <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="5" width="9" height="9" rx="1.5"/><path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2H3.5A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5"/></svg>
         <span class="hc-badge-copy-label">Copy link</span>
       </button>
-      <a class="hc-badge-manage hidden" href="#">
-        <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h4l.5 2.2 2-.8 2 3.4-1.6 1.5 1.6 1.5-2 3.4-2-.8L10 14H6l-.5-2.2-2 .8-2-3.4 1.6-1.5L1.5 6.2l2-3.4 2 .8z"/><circle cx="8" cy="8" r="2.2"/></svg>
-        Manage
+      <a class="hc-badge-manage hidden" href="{{ route('uploads') }}">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="12" height="3.5" rx="1"/><rect x="2" y="9" width="12" height="3.5" rx="1"/></svg>
+        Your uploads
       </a>
     </div>
   </div>

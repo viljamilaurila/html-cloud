@@ -7,6 +7,19 @@ import { saveUpload } from './uploads-store.js';
 
 const MAX_SIZE = 10 * 1024 * 1024; // 10 MB
 
+// Cosmetic, URL-safe slug from the filename. It rides in the share link purely
+// so previews show a title — it's never stored and never used to look up the doc.
+function slugify(name) {
+  return name
+    .replace(/\.html?$/i, '')
+    .normalize("NFKD").replace(/[\u0300-\u036f]/g, "") // strip accents: ä -> a
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 60)
+    .replace(/-+$/, '');
+}
+
 const dropzone       = document.getElementById('dropzone');
 const fileInput      = document.getElementById('file-input');
 const uploadingState = document.getElementById('uploading-state');
@@ -119,9 +132,13 @@ async function handleFile(file) {
     const viewFrag = b64url(viewKeyRaw);
     const editFrag = b64url(editKeyRaw);
 
+    // Sensitive docs keep the filename out of the URL/preview entirely; shareable
+    // docs get a cosmetic slug so links are self-describing and preview a title.
+    const slug = sensitive ? '' : slugify(file.name);
+
     // Remember this upload on THIS device only (never sent to the server) so the
     // owner can find it again and reach Manage — see uploads-store.js.
-    saveUpload({ id, viewKey: viewFrag, editKey: editFrag, label: file.name, sensitive });
+    saveUpload({ id, viewKey: viewFrag, editKey: editFrag, label: file.name, slug, sensitive });
 
     // One-shot flag so the viewer can greet the creator with an "uploaded —
     // here's how to share" toast (shown once, only on this device/tab).
@@ -130,7 +147,8 @@ async function handleFile(file) {
     // Land straight on the live document. In the default (shareable) mode the
     // address bar is the working share link; sensitive docs strip it in-viewer.
     // The edit key stays out of this URL — it lives in the device registry.
-    window.location.href = `/v/${id}#${viewFrag}`;
+    const viewPath = slug ? `/v/${id}/${slug}` : `/v/${id}`;
+    window.location.href = `${viewPath}#${viewFrag}`;
   } catch (err) {
     console.error(err);
     uploadingState.classList.add('hidden');

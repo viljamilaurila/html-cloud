@@ -2,6 +2,7 @@ import {
   importViewKey, encryptBytes, encryptViewKeyWithEditKey,
   decryptViewKeyWithEditKey, packCiphertext, b64url, b64urlDecode,
 } from './crypto.js';
+import { getUpload } from './uploads-store.js';
 
 if (!window.isSecureContext || !window.crypto?.subtle) {
   document.getElementById('editor-ui').innerHTML = `
@@ -74,7 +75,11 @@ async function init() {
     return;
   }
 
-  const shareUrl  = `${location.origin}/v/${docId}#${b64url(viewKeyRaw)}`;
+  // Re-attach the cosmetic slug if this device remembers it (shareable docs only).
+  const owned    = getUpload(docId);
+  const slug     = (!doc.sensitive && owned && owned.slug) ? owned.slug : '';
+  const viewPath = slug ? `/v/${docId}/${slug}` : `/v/${docId}`;
+  const shareUrl  = `${location.origin}${viewPath}#${b64url(viewKeyRaw)}`;
   const manageUrl = window.location.href;
 
   // Show share link. Both the displayed link and "Open" point at the same clean

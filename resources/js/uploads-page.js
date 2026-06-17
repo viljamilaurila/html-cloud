@@ -33,7 +33,7 @@ function render() {
           ${meta ? `<span class="upload-item-meta">${esc(meta)}</span>` : ''}
         </div>
         <div class="upload-item-actions">
-          <a class="link-btn link-btn-ghost-sm" href="/v/${esc(u.id)}#${esc(u.viewKey)}" target="_blank" rel="noopener">Open</a>
+          <a class="link-btn link-btn-ghost-sm" href="/v/${esc(u.id)}${u.slug ? '/' + esc(u.slug) : ''}#${esc(u.viewKey)}" target="_blank" rel="noopener">Open</a>
           <a class="link-btn link-btn-ghost-sm" href="/e/${esc(u.id)}#${esc(u.editKey)}">Manage</a>
           <button type="button" class="upload-item-forget" data-forget="${esc(u.id)}">Forget</button>
         </div>
