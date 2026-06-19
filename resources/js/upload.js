@@ -1,24 +1,5 @@
-import {
-  generateViewKey, generateEditKey, exportViewKey,
-  encryptBytes, encryptViewKeyWithEditKey, computeEditAuth,
-  packCiphertext, b64url,
-} from './crypto.js';
+import { shareDocument, slugify, viewPath, MAX_SIZE } from './share-core.js';
 import { saveUpload } from './uploads-store.js';
-
-const MAX_SIZE = 10 * 1024 * 1024; // 10 MB
-
-// Cosmetic, URL-safe slug from the filename. It rides in the share link purely
-// so previews show a title — it's never stored and never used to look up the doc.
-function slugify(name) {
-  return name
-    .replace(/\.html?$/i, '')
-    .normalize("NFKD").replace(/[\u0300-\u036f]/g, "") // strip accents: ä -> a
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 60)
-    .replace(/-+$/, '');
-}
 
 const dropzone       = document.getElementById('dropzone');
 const fileInput      = document.getElementById('file-input');
@@ -91,46 +72,14 @@ async function handleFile(file) {
   try {
     const plaintext = new Uint8Array(await file.arrayBuffer());
 
-    // 1. Generate keys
-    const viewKey     = await generateViewKey();
-    const editKeyRaw  = await generateEditKey();
-    const viewKeyRaw  = await exportViewKey(viewKey);
-
-    // 2. Encrypt content
-    const { iv, ciphertext } = await encryptBytes(viewKey, plaintext);
-    const packed             = packCiphertext(iv, ciphertext);
-
-    // 3. Encrypt viewKey with editKey (server stores this, can't read it)
-    const encryptedViewKey = await encryptViewKeyWithEditKey(viewKeyRaw, editKeyRaw);
-
-    // 4. Auth hash (server verifies edit requests against this)
-    const editAuth = await computeEditAuth(editKeyRaw);
-
-    // 5. Upload
+    // Encrypt locally and upload ciphertext only — shared with the CLI and the
+    // browser extension via share-core.js so the wire contract never diverges.
     const csrf = document.querySelector('meta[name="csrf-token"]').content;
-    const res  = await fetch('/api/documents', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf },
-      body: JSON.stringify({
-        ciphertext:          packed,
-        encrypted_view_key:  encryptedViewKey,
-        edit_auth:           editAuth,
-        expires_in:          EXPIRES_IN,
-        size:                plaintext.length,
-        sensitive,
-      }),
+    const { id, viewFrag, editFrag } = await shareDocument(plaintext, {
+      expiresIn: EXPIRES_IN,
+      sensitive,
+      headers: { 'X-CSRF-TOKEN': csrf },
     });
-
-    if (!res.ok) {
-      if (res.status === 429) throw new Error('Too many uploads — please wait a few minutes and try again.');
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err.error || 'Upload failed');
-    }
-
-    const { id } = await res.json();
-
-    const viewFrag = b64url(viewKeyRaw);
-    const editFrag = b64url(editKeyRaw);
 
     // Sensitive docs keep the filename out of the URL/preview entirely; shareable
     // docs get a cosmetic slug so links are self-describing and preview a title.
@@ -147,8 +96,7 @@ async function handleFile(file) {
     // Land straight on the live document. In the default (shareable) mode the
     // address bar is the working share link; sensitive docs strip it in-viewer.
     // The edit key stays out of this URL — it lives in the device registry.
-    const viewPath = slug ? `/v/${id}/${slug}` : `/v/${id}`;
-    window.location.href = `${viewPath}#${viewFrag}`;
+    window.location.href = `${viewPath(id, slug)}#${viewFrag}`;
   } catch (err) {
     console.error(err);
     uploadingState.classList.add('hidden');

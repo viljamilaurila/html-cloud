@@ -9,6 +9,7 @@
   "files": [
     "bin/",
     "crypto.js",
+    "share-core.js",
     "README.md"
   ],
   "engines": {

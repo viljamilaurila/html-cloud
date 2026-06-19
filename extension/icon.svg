@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <!-- html.cloud mark: the floating padlock, brand accent green on cream -->
+  <rect width="128" height="128" rx="28" fill="#3a4f3a"/>
+  <g fill="none" stroke="#f5f2ec" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="38" y="58" width="52" height="44" rx="9"/>
+    <path d="M51 58 V47 a13 13 0 0 1 26 0 V58"/>
+  </g>
+  <circle cx="64" cy="76" r="5" fill="#f5f2ec"/>
+  <path d="M64 79 V88" fill="none" stroke="#f5f2ec" stroke-width="6" stroke-linecap="round"/>
+</svg>

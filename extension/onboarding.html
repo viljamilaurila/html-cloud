@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>html.cloud — setup</title>
+  <style>
+    :root { color-scheme: light; }
+    body {
+      margin: 0; min-height: 100vh; display: grid; place-items: center;
+      font: 15px/1.6 -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      color: #1a1a1a; background: #faf9f7;
+    }
+    .card {
+      max-width: 460px; margin: 32px; padding: 32px;
+      background: #fff; border: 1px solid rgba(0,0,0,.08); border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0,0,0,.06);
+    }
+    h1 { font-size: 20px; margin: 0 0 4px; }
+    .sub { color: #6b6b6b; margin: 0 0 24px; font-size: 14px; }
+    .status {
+      display: flex; align-items: center; gap: 10px; padding: 12px 14px;
+      border-radius: 10px; font-size: 14px; margin-bottom: 20px;
+    }
+    .status.pending { background: #fdf6ec; color: #8a5a1f; }
+    .status.ready { background: #edf7f0; color: #1f7a3d; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; flex: 0 0 auto; }
+    .pending .dot { background: #d89b3c; }
+    .ready .dot { background: #1f7a3d; }
+    ol { padding-left: 20px; margin: 0 0 24px; }
+    li { margin-bottom: 8px; }
+    button {
+      font: inherit; font-weight: 600; color: #fff; background: #1a1a1a;
+      border: 0; border-radius: 10px; padding: 11px 18px; cursor: pointer;
+    }
+    button:hover { background: #000; }
+    .ready-only, .pending-only { display: none; }
+    body[data-state="ready"] .ready-only { display: block; }
+    body[data-state="pending"] .pending-only { display: block; }
+    code { background: #f0efed; padding: 1px 6px; border-radius: 5px; font-size: 13px; }
+  </style>
+</head>
+<body data-state="pending">
+  <div class="card">
+    <h1>One quick setup step</h1>
+    <p class="sub">So the Share button can appear on local HTML files.</p>
+
+    <div class="status pending pending-only">
+      <span class="dot"></span> File access is <strong>off</strong> — not set up yet
+    </div>
+    <div class="status ready ready-only">
+      <span class="dot"></span> File access is <strong>on</strong> — you're all set
+    </div>
+
+    <div class="pending-only">
+      <p>Chrome requires you to allow this extension to see local files. It's one toggle:</p>
+      <ol>
+        <li>Open the extension's details page</li>
+        <li>Turn on <strong>“Allow access to file URLs”</strong></li>
+        <li>Come back here — this page updates automatically</li>
+      </ol>
+      <button id="open-details">Open extension details</button>
+    </div>
+
+    <div class="ready-only">
+      <p>Open any <code>.html</code> file from your computer and click the floating
+      <strong>Share to html.cloud</strong> button. Your shares also appear under
+      <strong>Your uploads</strong> on html.cloud.</p>
+    </div>
+  </div>
+  <script src="onboarding.js"></script>
+</body>
+</html>

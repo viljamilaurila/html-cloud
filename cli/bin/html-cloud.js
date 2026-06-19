@@ -12,13 +12,7 @@ import { readFileSync } from 'node:fs';
 import { basename } from 'node:path';
 import { parseArgs } from 'node:util';
 
-import {
-  generateViewKey, generateEditKey, exportViewKey,
-  encryptBytes, encryptViewKeyWithEditKey, computeEditAuth,
-  packCiphertext, b64url,
-} from '../crypto.js';
-
-const MAX_SIZE = 10 * 1024 * 1024; // 10 MB, matches the server limit
+import { shareDocument, MAX_SIZE } from '../share-core.js';
 
 const HELP = `
 html-cloud — private HTML file sharing, encrypted before upload
@@ -98,43 +92,20 @@ if (input === '-') {
 if (plaintext.length === 0) fail('input is empty');
 if (plaintext.length > MAX_SIZE) fail('file is too large (max 10 MB)');
 
-// 1. Generate keys locally — these never leave this process except inside the printed links.
-const viewKey    = await generateViewKey();
-const editKeyRaw = await generateEditKey();
-const viewKeyRaw = await exportViewKey(viewKey);
-
-// 2. Encrypt content and wrap the view key with the edit key.
-const { iv, ciphertext } = await encryptBytes(viewKey, plaintext);
-const packed             = packCiphertext(iv, ciphertext);
-const encryptedViewKey   = await encryptViewKeyWithEditKey(viewKeyRaw, editKeyRaw);
-const editAuth           = await computeEditAuth(editKeyRaw);
-
-// 3. Upload ciphertext only.
-let res;
+// Encrypt locally and upload ciphertext only — shared with the website and the
+// browser extension via share-core.js. Keys are generated inside and returned
+// as URL fragments; they never leave this process except in the printed links.
+let id, viewFrag, editFrag;
 try {
-  res = await fetch(`${baseUrl}/api/documents`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      ciphertext:         packed,
-      encrypted_view_key: encryptedViewKey,
-      edit_auth:          editAuth,
-      expires_in:         expires,
-      size:               plaintext.length,
-    }),
-  });
-} catch {
-  fail(`could not reach ${baseUrl}`);
+  ({ id, viewFrag, editFrag } = await shareDocument(plaintext, { expiresIn: expires, baseUrl }));
+} catch (err) {
+  // fetch throws a TypeError when the host is unreachable; anything else is an
+  // Error we raised with a ready-to-print message (server error, rate limit…).
+  if (err instanceof TypeError) fail(`could not reach ${baseUrl}`);
+  fail(err.message.toLowerCase());
 }
 
-if (!res.ok) {
-  if (res.status === 429) fail('too many uploads — please wait a few minutes and try again');
-  const err = await res.json().catch(() => ({}));
-  fail(err.error || err.message || `upload failed (HTTP ${res.status})`);
-}
-
-const { id } = await res.json();
-const shareLink = `${baseUrl}/v/${id}#${b64url(viewKeyRaw)}`;
+const shareLink = `${baseUrl}/v/${id}#${viewFrag}`;
 
 // Copy only in interactive use — never alter the clipboard from scripts/pipes.
 const copied = !args.values['no-copy'] && process.stdout.isTTY && copyToClipboard(shareLink);
@@ -145,7 +116,7 @@ Share link (anyone with this can view)${copied ? ' — copied to clipboard' : ''
   ${shareLink}
 
 Edit link (keep private — replace, change expiry, delete):
-  ${baseUrl}/e/${id}#${b64url(editKeyRaw)}
+  ${baseUrl}/e/${id}#${editFrag}
 
 Encrypted locally with AES-256-GCM · ${expiryNote} · the server never saw the keys
 `.trim());
