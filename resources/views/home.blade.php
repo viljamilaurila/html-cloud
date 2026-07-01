@@ -21,18 +21,14 @@
 @endpush
 
 @section('content')
-<div class="shell">
+<div class="shell home-swiss">
   @include('partials.topbar')
 
   <main class="home-main">
     <h1 class="headline">Share an HTML page in seconds. <em>Private by design.</em></h1>
 
     <div class="dropzone" id="dropzone">
-      <div class="dropzone-icon">
-        <svg width="28" height="28" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M10 13V4M6 8l4-4 4 4M4 14v2a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-2"/>
-        </svg>
-      </div>
+      <div class="dropzone-art" aria-hidden="true">@include('partials.illustrations.drop-file')</div>
       <div class="dropzone-label">Drop an HTML file here</div>
       <div class="dropzone-sub">
         or <label for="file-input" class="file-link">choose from your computer</label>

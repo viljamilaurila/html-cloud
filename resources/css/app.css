@@ -1680,3 +1680,143 @@ img.content-image {
   line-height: 1.5;
   color: var(--ink3);
 }
+
+/* ─── PROTOTYPE: "Swiss signal" homepage theme (scoped to .home-swiss) ─── */
+/* Bright, high-contrast, oversized grotesk type, one loud accent. Scoped so
+   every other page keeps the V1 Editorial look — remove .home-swiss to revert. */
+.home-swiss {
+  --accent: #2348ff;
+  --accent-soft: rgba(35, 72, 255, 0.09);
+  --ink: #0a0a0a;
+  --ink2: #3a3a3a;
+  --ink3: #6b6b6b;
+  --rule: rgba(10, 10, 10, 0.12);
+  --rule-strong: rgba(10, 10, 10, 0.30);
+  --radius: 8px;
+  background: #ffffff;
+  font-family: "Inter", var(--sans);
+}
+.home-swiss .topbar {
+  background: #ffffff;
+  border-bottom: 1px solid var(--rule);
+}
+.home-swiss .wordmark {
+  gap: 0;
+  align-items: baseline;
+  color: #0a0a0a;
+  text-decoration: none;
+}
+.home-swiss .wordmark svg { display: none; }
+.home-swiss .wordmark::before,
+.home-swiss .wordmark::after {
+  font-family: "Inter", var(--sans);
+  font-weight: 800;
+  font-size: 22px;
+  letter-spacing: -0.03em;
+}
+.home-swiss .wordmark::before { content: "html"; }
+.home-swiss .wordmark::after { content: ".cloud"; color: var(--accent); }
+.home-swiss .home-main {
+  align-items: stretch;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 22px 40px 76px;
+}
+.home-swiss .headline {
+  font-family: "Inter", var(--sans);
+  text-align: left;
+  font-size: 54px;
+  line-height: 1.0;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  max-width: 660px;
+  margin: 18px 0 0;
+  color: #0a0a0a;
+}
+.home-swiss .headline em {
+  position: relative;
+  isolation: isolate;
+  font-style: italic;
+  color: #ffffff;
+  display: inline-block;
+  padding: 2px 18px 4px;
+  margin-top: 10px;
+  transform: rotate(-1deg);
+}
+.home-swiss .headline em::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--accent);
+  border-radius: 3px;
+  transform: skewX(-9deg);
+}
+.home-swiss .dropzone {
+  background: #ffffff;
+  border: 1.6px solid #0a0a0a;
+  border-radius: 8px;
+  min-height: 340px;
+  padding: 44px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  text-align: center;
+}
+.home-swiss .dropzone.drag-over {
+  border-color: var(--accent);
+  border-style: solid;
+  background: #f5f7ff;
+}
+.home-swiss .dropzone-hover-overlay {
+  font-family: "Inter", var(--sans);
+  font-weight: 700;
+  font-size: 22px;
+  color: var(--accent);
+  background: rgba(245, 247, 255, 0.92);
+  border-radius: 8px;
+}
+.home-swiss .dropzone-art {
+  width: 128px;
+  color: #0a0a0a;
+}
+.home-swiss .dropzone-art svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  color: #0a0a0a;
+  animation: hc-bob 2.6s ease-in-out infinite;
+}
+@keyframes hc-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+.home-swiss .dropzone.drag-over .dropzone-art svg {
+  animation: none;
+  transform: translateY(10px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-swiss .dropzone-art svg { animation: none; }
+}
+.home-swiss .dropzone-label {
+  font-family: "Inter", var(--sans);
+  font-weight: 700;
+  font-size: 30px;
+  letter-spacing: -0.02em;
+  color: #0a0a0a;
+}
+.home-swiss .file-link {
+  display: inline-block;
+  background: var(--accent);
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 13px;
+  padding: 8px 14px;
+  border-radius: 6px;
+  margin-left: 4px;
+}
+.home-swiss .file-link:hover { background: #1b3ae0; }
