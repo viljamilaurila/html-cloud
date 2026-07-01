@@ -54,9 +54,10 @@
   <h2 class="content-h2">Why not just send the file?</h2>
   <p class="content-p">
     A Claude artifact is a self-contained HTML file, which is awkward to pass around. Emailing it as an
-    attachment often gets the file blocked or flagged; dropping it on a public host puts it at a URL
-    anyone could stumble onto. html.cloud is built for exactly this: a private link that opens the page,
-    encrypted so that only the people you send it to can read it.
+    attachment often gets the file blocked or flagged; dropping it on a public host like
+    <a href="{{ route('vs.netlify') }}">Netlify Drop</a> puts it at a public URL anyone could stumble
+    onto. html.cloud is built for exactly this: a private link that opens the page, encrypted so that
+    only the people you send it to can read it.
   </p>
 </section>
 

@@ -1661,3 +1661,22 @@ img.content-image {
 .content-image-container {
   margin-bottom: 14px;
 }
+
+/* Competitor screenshot on comparison pages */
+.vs-shot {
+  margin: 18px 0 4px;
+}
+.vs-shot-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius);
+  border: 1px solid var(--rule);
+  box-shadow: 0 1px 3px rgba(31, 28, 23, 0.08);
+}
+.vs-shot-cap {
+  margin-top: 8px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ink3);
+}

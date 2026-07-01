@@ -59,6 +59,24 @@
   </p>
 </section>
 
+<section class="content-section">
+  <h2 class="content-h2">Why not the company wiki or a Drive link?</h2>
+  <p class="content-p">
+    The usual homes for internal HTML each have a catch. A <strong>wiki or intranet</strong> often can't
+    render a self-contained HTML file with its own scripts and styles — it strips them, so your dashboard
+    or runbook arrives broken. A <strong>Google Drive or SharePoint link</strong> keeps the file intact
+    but pulls the reader into an account and a permissions dialog, and it stores your document in
+    readable form on someone else's servers. html.cloud renders the real file exactly as built and holds
+    only ciphertext, so it's a fit for the in-between case: something you need a colleague to <em>see</em>
+    right now — not something that belongs in a permanent, access-controlled knowledge base.
+  </p>
+  <p class="content-p">
+    Because the link is the credential, treat it like one: send it over a channel your team already
+    trusts (not a public post), and set an expiry on anything sensitive so an old link can't be reused
+    months later.
+  </p>
+</section>
+
 @include('partials.how-it-works')
 
 @include('partials.privacy-note')

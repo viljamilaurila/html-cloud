@@ -59,6 +59,19 @@
   </p>
 </section>
 
+<section class="content-section">
+  <h2 class="content-h2">Why not a PDF attachment or a client portal?</h2>
+  <p class="content-p">
+    A <strong>PDF</strong> flattens an interactive report — the sortable tables, the live charts, the
+    tooltips your HTML deliverable was built to show — into a static page, and it still lands in an inbox
+    or a synced folder where it lives forever with no way to pull it back. A <strong>client portal</strong>
+    solves confidentiality but asks the client to create an account and learn your tool just to read one
+    document, which is friction most clients resent. html.cloud sits in between: the full interactive
+    report opens straight from a link, it's encrypted so it isn't sitting on a public URL, and when the
+    engagement is over you delete it or let the expiry retire it — no account for anyone, on either side.
+  </p>
+</section>
+
 @include('partials.how-it-works')
 
 @include('partials.privacy-note')

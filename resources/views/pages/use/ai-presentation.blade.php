@@ -59,6 +59,20 @@
   </p>
 </section>
 
+<section class="content-section">
+  <h2 class="content-h2">Why not export to PDF or rebuild it in Google Slides?</h2>
+  <p class="content-p">
+    The whole point of an AI-built HTML deck is that it's <em>alive</em> — reveal.js transitions, a chart
+    that animates as you advance, a demo embedded on a slide. Export it to <strong>PDF</strong> and all of
+    that collapses into flat images. Rebuild it in <strong>Google Slides or PowerPoint</strong> and you
+    throw away the hours the AI just saved you, copying content by hand and still losing the interactive
+    parts. Sending the raw <code>.html</code> file works but leans on the recipient to download and trust
+    a loose file, and email providers often block it. html.cloud keeps the deck exactly as generated and
+    puts it one click away: the recipient opens the link and presents, or clicks through, in their own
+    browser — nothing to install, nothing to rebuild.
+  </p>
+</section>
+
 @include('partials.how-it-works')
 
 @include('partials.privacy-note')

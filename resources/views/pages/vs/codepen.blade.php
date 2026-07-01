@@ -1,9 +1,9 @@
 @extends('pages.content')
 
-@section('title', 'html.cloud vs CodePen — private file delivery vs public code show-and-tell')
-@section('description', 'html.cloud vs CodePen: CodePen is a public front-end editor for sharing and iterating code; html.cloud privately delivers a finished HTML file through a client-side-encrypted link with no account. Comparison table, when to use each, and an FAQ.')
+@section('title', 'html.cloud vs CodePen — send a finished HTML file privately vs a public code playground')
+@section('description', 'CodePen is a front-end playground where Pens are public by default and private Pens need a PRO plan (from $8/mo); it shows the recipient an editor and source. html.cloud sends one finished HTML file as a private, browser-encrypted link that opens as the rendered page — no account. Pricing, a real scenario, and an FAQ.')
 @section('og_title', 'html.cloud vs CodePen')
-@section('og_description', 'CodePen shares your code publicly for show-and-tell. html.cloud delivers a finished HTML file privately, encrypted in your browser. Here is how they differ.')
+@section('og_description', 'CodePen shows your source in a public editor; private Pens are a paid feature. html.cloud delivers a finished HTML file privately as a rendered page, encrypted, no account. Here is how they differ.')
 @section('canonical', config('app.url') . '/vs/codepen')
 
 @push('head')
@@ -14,18 +14,18 @@
   "mainEntity": [
     {
       "@@type": "Question",
+      "name": "Are CodePen Pens private, and does it cost anything?",
+      "acceptedAnswer": { "@@type": "Answer", "text": "On CodePen's free tier, Pens are public by default and listed on your profile and in search. Private Pens are a PRO feature — any paid plan unlocks them, starting at 8 USD per month (the Starter plan). html.cloud is private at no cost: the file is encrypted in your browser and the key lives in the link's fragment, which never reaches the server." }
+    },
+    {
+      "@@type": "Question",
+      "name": "Does the recipient see my source code or the finished page?",
+      "acceptedAnswer": { "@@type": "Answer", "text": "CodePen is built to show source — the recipient lands in an editor with your HTML, CSS, and JS visible alongside a preview. html.cloud shows only the rendered page; the recipient opens the link and sees the finished result, not the code behind it." }
+    },
+    {
+      "@@type": "Question",
       "name": "What is the difference between html.cloud and CodePen?",
-      "acceptedAnswer": { "@@type": "Answer", "text": "CodePen is a social front-end editor for writing, showing, and iterating HTML, CSS, and JavaScript — the code itself is the point, and pens are public by default. html.cloud delivers a finished, self-contained HTML file privately: the recipient sees the rendered page, the file is encrypted in your browser, and no account is needed." }
-    },
-    {
-      "@@type": "Question",
-      "name": "Are CodePen pens private?",
-      "acceptedAnswer": { "@@type": "Answer", "text": "On CodePen, pens are public by default; private pens require a paid PRO plan. html.cloud links are private by design — the file is encrypted client-side and the key lives in the URL fragment, which is never sent to the server." }
-    },
-    {
-      "@@type": "Question",
-      "name": "Can I share an AI-generated HTML file with CodePen?",
-      "acceptedAnswer": { "@@type": "Answer", "text": "You can paste code into a pen, but CodePen is built around editing and showing source code publicly. To privately hand a finished AI-generated HTML file (a report, presentation, or dashboard) to a specific person, html.cloud is the better fit: drop the file, get a private encrypted link." }
+      "acceptedAnswer": { "@@type": "Answer", "text": "CodePen is a social front-end playground for writing, showing, and iterating code, with a community and live editing. html.cloud does one thing: privately deliver a finished, self-contained HTML file to a specific person through an encrypted link, with no account and nothing public." }
     }
   ]
 }
@@ -42,10 +42,34 @@
 ])
 
 <p class="content-lead">
-  <strong>CodePen</strong> is a public front-end playground for writing and showing <em>code</em>.
-  <strong>html.cloud</strong> privately delivers a <em>finished</em> HTML file — the recipient sees
-  the rendered page, not the source — encrypted in your browser, with no account.
+  Both can turn HTML into something you send with a link, which is why they come up together — but they
+  point in opposite directions. <strong>CodePen</strong> is a playground for the <em>code</em>: it puts
+  the recipient in an editor, shows the source, and lists your work publicly unless you pay for privacy.
+  <strong>html.cloud</strong> is for the <em>result</em>: it takes one finished HTML file, encrypts it in
+  your browser, and gives you a private link that opens the rendered page — no editor, no account,
+  nothing listed.
 </p>
+
+@include('partials.vs-screenshot', [
+  'src'     => 'screenshots/codepen.webp',
+  'alt'     => "Screenshot of the CodePen homepage with the headline 'The best place to build, test, and discover front-end code' and a live HTML, SCSS, and JS code editor preview.",
+  'caption' => "CodePen's homepage — a social front-end editor for building and showing code, with Pens public by default unless you upgrade to PRO.",
+  'width'   => 1200,
+  'height'  => 744,
+])
+
+<section class="content-section">
+  <h2 class="content-h2">A scenario that tells them apart</h2>
+  <p class="content-p">
+    Suppose an AI just generated a polished HTML dashboard and you want your manager to look at it. Put
+    it in a Pen and, on the free tier, it's a public URL on your CodePen profile and in search, opened in
+    an editor where your manager sees the raw code first and the result second — to keep it off the public
+    web you'd upgrade to PRO. Drop the same file on html.cloud and the link opens straight to the
+    dashboard, private to whoever you send it to, with the decryption key living in the link's
+    <code class="accent">#</code> fragment and never touching the server. One is for showing how it's
+    built; the other is for handing over the thing itself.
+  </p>
+</section>
 
 <section class="content-section">
   <h2 class="content-h2">At a glance</h2>
@@ -56,26 +80,24 @@
     <tbody>
       <tr><td>What it's for</td><td class="col-us">Privately delivering a finished HTML file</td><td>Writing, showing &amp; iterating front-end code</td></tr>
       <tr><td>What the recipient sees</td><td class="col-us">The rendered page</td><td>An editor with your source code + preview</td></tr>
-      <tr><td>Default visibility</td><td class="col-us">Private — only people with the link</td><td>Public; private pens need a paid plan</td></tr>
+      <tr><td>Default visibility</td><td class="col-us">Private — only people with the link</td><td>Public &amp; listed on your profile / in search</td></tr>
       <tr><td>Privacy model</td><td class="col-us">Client-side AES-256-GCM; we store only ciphertext</td><td>Code stored and shown in plaintext</td></tr>
-      <tr><td>Account</td><td class="col-us">None</td><td>Account needed to save and manage pens</td></tr>
+      <tr><td>Cost of privacy</td><td class="col-us">Free — the link is the secret</td><td>Private Pens need PRO (from $8/mo)</td></tr>
+      <tr><td>Account</td><td class="col-us">None</td><td>Account needed to save and manage Pens</td></tr>
       <tr><td>Live editing / community</td><td class="col-us">No — replace the file via a private edit link</td><td>Yes — in-browser editing, embeds, a community</td></tr>
     </tbody>
   </table>
 </section>
 
 <section class="content-section">
-  <h2 class="content-h2">When to use which</h2>
+  <h2 class="content-h2">Where CodePen is the better tool</h2>
   <p class="content-p">
-    <strong>Use CodePen</strong> when the <em>code</em> is the point: prototyping in the browser,
-    sharing a technique, embedding a live demo in an article, teaching, or collaborating with other
-    developers. It's a great place to show how something is built.
-  </p>
-  <p class="content-p">
-    <strong>Use html.cloud</strong> when the <em>result</em> is the point and it needs to stay private:
-    handing a client or colleague a finished HTML report, presentation, or dashboard. They open a link
-    and see the page — no editor, no public listing, no sign-in — and the file is encrypted before it
-    ever leaves your device.
+    If the <em>code</em> is the point, CodePen wins and html.cloud isn't even in the running. Prototyping
+    in the browser, sharing a CSS technique, embedding a live editable demo in an article, teaching, pair
+    programming, browsing what others have built — that's what CodePen is for, and it's excellent at it.
+    html.cloud has no editor, no embeds, and no community; it can't show or teach code. Reach for it only
+    at the end of that journey, when you have a finished HTML file and need to hand it to a specific
+    person without publishing it or showing them the source.
   </p>
 </section>
 
@@ -83,21 +105,22 @@
   <h2 class="content-h2">FAQ</h2>
   <div class="faq">
     <details class="faq-item">
+      <summary>Are CodePen Pens private, and does it cost anything?</summary>
+      <p>On the free tier, Pens are public by default and appear on your profile and in search. Private
+        Pens are a PRO feature — any paid plan unlocks them, from $8/mo (Starter). html.cloud is private at
+        no cost: encrypted in your browser, with the key in the link's <code class="accent">#</code>
+        fragment, never sent to the server.</p>
+    </details>
+    <details class="faq-item">
+      <summary>Does the recipient see my source or the finished page?</summary>
+      <p>CodePen shows source — the recipient lands in an editor with your code visible next to a preview.
+        html.cloud shows only the rendered page; they open the link and see the finished result.</p>
+    </details>
+    <details class="faq-item">
       <summary>What's the difference between html.cloud and CodePen?</summary>
-      <p>CodePen is a social editor for writing and showing code publicly. html.cloud delivers a finished
-        HTML file privately — the recipient sees the rendered page, the file is encrypted in your browser,
-        and no account is needed.</p>
-    </details>
-    <details class="faq-item">
-      <summary>Are CodePen pens private?</summary>
-      <p>Pens are public by default; private pens require a paid PRO plan. html.cloud links are private by
-        design — encrypted client-side with the key in the URL fragment, never sent to the server.</p>
-    </details>
-    <details class="faq-item">
-      <summary>Can I share an AI-generated HTML file with CodePen?</summary>
-      <p>You can paste code into a pen, but CodePen centres on editing and showing source publicly. To hand
-        a finished AI-generated file to a specific person privately, html.cloud fits better: drop the file,
-        get a private encrypted link.</p>
+      <p>CodePen is a social playground for writing and showing code, with a community and live editing.
+        html.cloud does one thing: privately deliver a finished HTML file to a specific person via an
+        encrypted link, with no account and nothing public.</p>
     </details>
   </div>
 </section>
