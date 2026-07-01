@@ -4,7 +4,7 @@
 @extends('layout')
 
 @section('content')
-<div class="shell @yield('shellClass')">
+<div class="shell @yield('shellClass', 'swiss-page')">
   @include('partials.topbar')
 
   <main class="content-main">
