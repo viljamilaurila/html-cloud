@@ -1840,3 +1840,37 @@ img.content-image {
   font-weight: 700;
   letter-spacing: -0.02em;
 }
+
+/* ─── Stronger Swiss treatment for opted-in content pages (.swiss-page) ─── */
+.swiss-page { background: #ffffff; }
+.swiss-page .sx-hero .sx-eyebrow { color: var(--accent); }
+.swiss-page .sx-lede,
+.swiss-page .sx-story-lead,
+.swiss-page .sx-j-legend,
+.swiss-page .sx-story-after {
+  font-family: "Inter", var(--sans);
+}
+.swiss-page .sx-j-loc {
+  font-family: "Inter", var(--sans);
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: -0.02em;
+}
+.swiss-page .sx-bignum {
+  font-family: "Inter", var(--sans);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+.swiss-page .sx-kicker {
+  font-family: "Inter", var(--sans);
+  font-style: normal;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+.swiss-page .sx-j-card { border-radius: 8px; }
+.swiss-page .sx-j-card.device { background: #ffffff; border: 1px solid #e4e4e4; }
+.swiss-page .sx-j-card.server { border-radius: 8px; }
+.swiss-page .sx-linkcard { background: #ffffff; border-radius: 8px; border-color: #e4e4e4; }
+.swiss-page .sx-linkcard-head { border-bottom-color: #e4e4e4; }
+.swiss-page .sx-story { border-radius: 10px; }
+.swiss-page .sx-arc-label { background: #ffffff; }

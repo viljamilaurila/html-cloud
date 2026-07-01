@@ -1,5 +1,7 @@
 @extends('pages.content')
 
+@section('shellClass', 'swiss-page')
+
 @section('title', 'How html.cloud encryption works — zero-knowledge, client-side encrypted file sharing')
 @section('description', 'How html.cloud encrypts HTML files in your browser with AES-256-GCM before upload. The decryption key lives in the URL fragment and never reaches our servers — we store only ciphertext. Plain-English summary plus the technical detail and an honest threat model.')
 @section('og_title', 'How html.cloud encryption works')

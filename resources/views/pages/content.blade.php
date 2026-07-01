@@ -4,7 +4,7 @@
 @extends('layout')
 
 @section('content')
-<div class="shell">
+<div class="shell @yield('shellClass')">
   @include('partials.topbar')
 
   <main class="content-main">
