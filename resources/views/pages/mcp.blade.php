@@ -104,7 +104,7 @@
     <li class="step">
       <span class="step-num">2</span>
       <div class="step-body">
-        <p><strong>Double-click the downloaded file.</strong> Claude Desktop opens and offers to install it. (If it doesn't, open Claude's <em>Settings → Extensions</em> and drag the file in.)</p>
+        <p><strong>Double-click the downloaded file.</strong> Claude Desktop opens and offers to install it. (If it doesn't, open Claude's <em>Settings → Extensions</em>, click <em>Advanced settings</em>, and use <em>Install Extension…</em> under <em>Extension Developer</em> to pick the file — that works even when drag-and-drop doesn't.)</p>
       </div>
     </li>
     <li class="step">
@@ -172,6 +172,10 @@
     <details class="faq-item">
       <summary>Can I change or remove a page after sharing?</summary>
       <p>Yes. Every share comes with a private edit link. Open it to replace the page (the share link stays the same), change when it expires, or delete it right away.</p>
+    </details>
+    <details class="faq-item">
+      <summary>Why doesn't it show up in Cowork?</summary>
+      <p>That's a current Claude Desktop limitation, not something you did wrong. Cowork sessions don't yet load locally installed extensions like this one, so the tool only appears in regular chats. Ask for your share link in a normal conversation — or paste the finished HTML into one and ask Claude to share it. When Anthropic adds extension support to Cowork, this will start working there without any changes.</p>
     </details>
     <details class="faq-item">
       <summary>Prefer to do it yourself?</summary>

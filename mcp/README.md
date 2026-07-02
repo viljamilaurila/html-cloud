@@ -13,6 +13,21 @@ only ciphertext and cannot read it.
 
 ## Install
 
+### Claude Desktop (one-click)
+
+Download the packaged extension (a `.mcpb` file) from
+[html.cloud/mcp](https://html.cloud/mcp) and double-click it. If Claude Desktop
+doesn't offer to install it, open *Settings → Extensions*, click *Advanced
+settings*, and use *Install Extension…* under *Extension Developer* to pick the
+file — dragging the file into the window is unreliable and may just attach it
+to the chat.
+
+> **Note:** Claude Desktop currently exposes locally installed extensions in
+> regular chats only — the tool won't appear in Cowork sessions yet. That's a
+> Claude Desktop limitation, not a configuration problem.
+
+### Other MCP clients
+
 Add it to your MCP client. For Claude Desktop, in `claude_desktop_config.json`:
 
 ```json
