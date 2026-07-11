@@ -1,7 +1,7 @@
 @extends('pages.content')
 
-@section('title', 'Share a Claude artifact privately — encrypted link, no account')
-@section('description', 'Claude built you an HTML artifact — a report, dashboard, or mini-app. Drop it on html.cloud and get a private link to send anyone, encrypted in your browser before upload, with no account. Here is how, plus an FAQ.')
+@section('title', 'How to share a Claude artifact privately (no account needed)')
+@section('description', 'Claude built you an HTML artifact — a report, dashboard, or mini-app. Don\'t publish it to a public URL: drop it on html.cloud for a private, encrypted link anyone can open in a browser, no account on either side. Steps, how it compares to Claude\'s Publish button, and an FAQ.')
 @section('og_title', 'Share a Claude artifact privately')
 @section('og_description', 'Drop a Claude HTML artifact and get a private, encrypted link — no account, no public URL. Only people you send the link to can open it.')
 @section('canonical', config('app.url') . '/share-claude-artifact')
@@ -26,7 +26,24 @@
       "@@type": "Question",
       "name": "Do I or the recipient need an account?",
       "acceptedAnswer": { "@@type": "Answer", "text": "Neither. There is no sign-up. You drop the file and share the link; anyone with the link can open it." }
+    },
+    {
+      "@@type": "Question",
+      "name": "Why not just use Claude's Publish button?",
+      "acceptedAnswer": { "@@type": "Answer", "text": "Publishing puts the artifact at a public URL — right for things meant to be public, but anyone the link reaches can view it and it is not encrypted. html.cloud encrypts the file in your browser before upload, so only people with your link can read it, and the link can expire or be deleted." }
     }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@@type": "HowTo",
+  "name": "How to share a Claude artifact privately",
+  "step": [
+    { "@@type": "HowToStep", "name": "Download the artifact from Claude", "text": "Open the artifact in Claude and download it as an HTML file — or copy the code and save it into a file ending in .html." },
+    { "@@type": "HowToStep", "name": "Drop the file on html.cloud", "text": "Your browser encrypts the file with AES-256-GCM before anything is uploaded and gives you a private link." },
+    { "@@type": "HowToStep", "name": "Send the link", "text": "The recipient opens the rendered page in any browser — no account, no download, no Claude access needed." }
   ]
 }
 </script>
@@ -61,7 +78,42 @@
   </p>
 </section>
 
-@include('partials.how-it-works')
+<section class="content-section">
+  <h2 class="content-h2">From Claude to a private link</h2>
+  <ol class="steps">
+    <li class="step">
+      <span class="step-num">1</span>
+      <p><strong>Get the artifact out of Claude.</strong> Open the artifact and download it as an HTML
+        file — or copy the code and save it into a file ending in <code class="accent">.html</code>.
+        Any Claude plan works; there's nothing to configure.</p>
+    </li>
+    <li class="step">
+      <span class="step-num">2</span>
+      <p><strong>Drop it on html.cloud.</strong> Your browser encrypts the file with AES-256-GCM before
+        anything is uploaded, then hands you a private link. The decryption key sits after the
+        <code class="accent">#</code> in that link and never reaches our servers.</p>
+    </li>
+    <li class="step">
+      <span class="step-num">3</span>
+      <p><strong>Send the link.</strong> The recipient sees the artifact as a working page in any
+        browser — no account, no download, no Claude access needed. Set the link to expire, or replace
+        the file later without changing the link.</p>
+    </li>
+  </ol>
+</section>
+
+<section class="content-section">
+  <h2 class="content-h2">What about Claude's Publish button?</h2>
+  <p class="content-p">
+    Claude can publish an artifact to a public URL, and for something meant to be public that's the
+    right tool. The difference is exposure: a published artifact is viewable by anyone the link
+    reaches — forwarded, pasted into a chat, or found later — and the file sits on the host's servers
+    in readable form. html.cloud is the opposite default: the file is encrypted <em>before</em> it
+    leaves your machine, we store only ciphertext, and the link can expire or be deleted when the
+    conversation is over. For a client deliverable, an internal dashboard, or anything with real data
+    in it, private-by-default is the safer starting point.
+  </p>
+</section>
 
 @include('partials.privacy-note')
 
@@ -83,6 +135,13 @@
       <summary>Do I or the recipient need an account?</summary>
       <p>Neither — there's no sign-up. You drop the file and share the link; anyone with the link can open
         it.</p>
+    </details>
+    <details class="faq-item">
+      <summary>Why not just use Claude's Publish button?</summary>
+      <p>Publishing puts the artifact at a public URL — right for things meant to be public, but anyone
+        the link reaches can view it and it isn't encrypted. html.cloud encrypts the file in your browser
+        before upload, so only people with your link can read it, and the link can expire or be
+        deleted.</p>
     </details>
   </div>
 </section>

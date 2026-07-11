@@ -44,6 +44,9 @@ class SitemapController extends Controller
             if (in_array($uri, ['sitemap.xml', 'up'], true)) {
                 continue; // skip self and the framework health check
             }
+            if ($uri === 'uploads') {
+                continue; // page is noindex (device-local registry)
+            }
 
             $locs[url($uri === '/' ? '/' : '/' . $uri)] = true;
         }
