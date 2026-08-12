@@ -742,15 +742,25 @@ html, body {
 .hc-badge-inner:hover .hc-badge-body,
 .hc-badge-inner:focus-within .hc-badge-body,
 .hc-badge-inner.open .hc-badge-body {
-  max-width: 340px;
+  /* Widened for the Download action. Viewport-capped so the pill, which grows
+     leftward from right:16px, can never run off the left edge. */
+  max-width: min(520px, calc(100vw - 88px));
   opacity: 1;
   margin: 0 4px 0 10px;
+}
+/* Too narrow for attribution and three actions at once: the lock glyph keeps the
+   branding (and carries the full label for screen readers), so drop the text and
+   keep the actions reachable. */
+@media (max-width: 620px) {
+  .hc-badge-txt,
+  .hc-badge-txt + .hc-badge-sep { display: none; }
 }
 .hc-badge-txt { color: var(--ink2); }
 .hc-badge-txt a { color: var(--accent); text-decoration: none; font-weight: 500; }
 .hc-badge-txt a:hover { text-decoration: underline; }
 .hc-badge-sep { width: 1px; height: 14px; background: var(--rule); }
-.hc-badge-copy {
+.hc-badge-copy,
+.hc-badge-download {
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -762,8 +772,17 @@ html, body {
   font-weight: 500;
   color: var(--accent);
   cursor: pointer;
+  white-space: nowrap;
 }
-.hc-badge-copy:hover { text-decoration: underline; }
+.hc-badge-copy:hover,
+.hc-badge-download:hover { text-decoration: underline; }
+.hc-badge-download::before {
+  content: "";
+  width: 1px;
+  height: 14px;
+  background: var(--rule);
+  margin-right: 6px;
+}
 .hc-badge-manage {
   display: inline-flex;
   align-items: center;

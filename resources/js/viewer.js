@@ -123,14 +123,18 @@ async function main() {
   frame.classList.remove('hidden');
   loadScreen.classList.add('hidden');
 
-  // The floating badge always offers Copy link. If this device uploaded the doc,
-  // it also links to "Your uploads", where management lives. Nothing about the
-  // edit key needs to ride along here.
+  // The floating badge always offers Copy link and Download. If this device
+  // uploaded the doc, it also links to "Your uploads", where management lives.
+  // Nothing about the edit key needs to ride along here.
   // Preserve the cosmetic slug from the address bar so re-shared links keep it.
   const slugSeg  = location.pathname.split('/')[3] || '';
   const viewPath = slugSeg ? `/v/${docId}/${slugSeg}` : `/v/${docId}`;
   const shareUrl = `${window.location.origin}${viewPath}#${b64url(viewKeyRaw)}`;
-  setupBadge(shareUrl, !!getUpload(docId));
+  const upload   = getUpload(docId);
+
+  // Hand the badge the ORIGINAL plaintext, not `injected` — the bg reporter is
+  // our rendering instrumentation and must never end up in the saved file.
+  setupBadge(shareUrl, !!upload, () => downloadDocument(plaintext, downloadFilename(upload, slugSeg)));
 
   // Just uploaded from this tab? Greet the creator once, and explain sharing.
   let justUploaded = false;
@@ -139,6 +143,32 @@ async function main() {
     try { sessionStorage.removeItem('hc_just_uploaded'); } catch { /* ignore */ }
     showUploadToast(shareUrl, doc.sensitive);
   }
+}
+
+// Save the document to disk. Everything happens on bytes we already hold in
+// memory — no server round-trip, nothing to ask permission for, and the file
+// lands byte-identical to what was uploaded.
+function downloadDocument(bytes, filename) {
+  const url = URL.createObjectURL(new Blob([bytes], { type: 'text/html;charset=utf-8' }));
+  const a = Object.assign(document.createElement('a'), { href: url, download: filename });
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  // Revoke a tick later, once the browser has claimed the blob.
+  setTimeout(() => URL.revokeObjectURL(url), 0);
+}
+
+// The server never learns the original filename — storing it would leak the one
+// descriptive thing about an otherwise opaque record — so recover the best name
+// available, in order: the device-local upload registry (exact, but only on the
+// uploader's own machine), then the cosmetic slug in the URL, then the doc id.
+function downloadFilename(upload, slugSeg) {
+  const raw = upload?.label || (slugSeg ? `${slugSeg}.html` : `html-cloud-${docId}.html`);
+  // The label comes from localStorage, so treat it as untrusted: keep the last
+  // path segment only, and drop anything a filesystem would object to.
+  const base = raw.split(/[\\/]/).pop().replace(/[<>:"|?*]/g, '').trim();
+  if (!base || base === '.html') return `html-cloud-${docId}.html`;
+  return /\.html?$/i.test(base) ? base : `${base}.html`;
 }
 
 // One-time confirmation shown to the creator right after upload.
@@ -167,15 +197,18 @@ function showUploadToast(shareUrl, sensitive) {
 
 // The floating lock pill that lives in the parent viewer page (above the iframe).
 // Quiet at rest — just a lock glyph; on hover/focus/tap it expands to reveal the
-// attribution and Copy link. Because it's outside the sandboxed frame it can't be
-// covered, removed, or spoofed by the document.
-function setupBadge(shareUrl, isOwner) {
+// attribution, Copy link and Download. Because it's outside the sandboxed frame
+// it can't be covered, removed, or spoofed by the document — which is also why
+// Download lives here rather than in a control the document could impersonate.
+function setupBadge(shareUrl, isOwner, onDownload) {
   const badge     = document.getElementById('hc-badge');
   if (!badge) return;
   const inner     = badge.querySelector('.hc-badge-inner');
   const lock      = badge.querySelector('.hc-badge-lock');
   const copy      = badge.querySelector('.hc-badge-copy');
   const copyLabel = badge.querySelector('.hc-badge-copy-label');
+  const download  = badge.querySelector('.hc-badge-download');
+  const dlLabel   = badge.querySelector('.hc-badge-download-label');
   const manage    = badge.querySelector('.hc-badge-manage');
 
   // Owner-only (this device uploaded it): surface the "Your uploads" link, where
@@ -203,6 +236,13 @@ function setupBadge(shareUrl, isOwner) {
     const original = copyLabel.textContent;
     copyLabel.textContent = 'Link copied';
     setTimeout(() => { copyLabel.textContent = original; }, 1800);
+  });
+
+  download.addEventListener('click', () => {
+    onDownload();
+    const original = dlLabel.textContent;
+    dlLabel.textContent = 'Saved';
+    setTimeout(() => { dlLabel.textContent = original; }, 1800);
   });
 
   // Dismiss when the visitor turns to the document. Focus moving into the iframe
