@@ -108,7 +108,7 @@
   </main>
 </div>
 
-<script>
+<script @if ($nonce = Illuminate\Support\Facades\Vite::cspNonce()) nonce="{{ $nonce }}" @endif>
   window.__DOC_ID__ = @json($doc->id);
   window.__EXPIRES_AT__ = @json($doc->expires_at?->toIso8601String());
 </script>
