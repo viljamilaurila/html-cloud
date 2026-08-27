@@ -9,8 +9,31 @@
 <script type="application/ld+json">
 {
   "@@context": "https://schema.org",
+  "@@type": "WebSite",
+  "name": "html.cloud",
+  "alternateName": ["html cloud", "HTML Cloud", "htmlcloud"],
+  "url": "{{ config('app.url') }}"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@@type": "Organization",
+  "name": "html.cloud",
+  "url": "{{ config('app.url') }}",
+  "logo": "{{ config('app.url') }}/apple-touch-icon.png",
+  "sameAs": [
+    "https://github.com/viljamilaurila/html-cloud",
+    "https://www.npmjs.com/package/html-cloud"
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
   "@@type": "WebApplication",
   "name": "html.cloud",
+  "alternateName": "html cloud",
   "url": "{{ config('app.url') }}",
   "description": "Private HTML file sharing. Drop an HTML file and get a shareable link — encrypted in your browser with AES-256-GCM before upload. Only people with the link can read the file.",
   "applicationCategory": "Utilities",
