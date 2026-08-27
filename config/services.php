@@ -41,8 +41,5 @@ return [
     | production. The tag is only ever rendered on pages that cannot carry a
     | decryption key; see resources/views/partials/gtag.blade.php.
     */
-    'google_ads' => [
-        'id' => env('GOOGLE_ADS_ID'),
-    ],
 
 ];

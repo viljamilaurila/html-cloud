@@ -125,14 +125,15 @@ executed at runtime.
 - **Sold to third parties:** No.
 - **Used for purposes unrelated to the core feature:** No.
 - **Tracking / analytics:** None.
-- **Privacy policy URL:** host `extension/PRIVACY.md` (e.g. https://html.cloud/extension-privacy)
+- **Privacy policy URL:** https://html.cloud/extension-privacy (live copy of `extension/PRIVACY.md`)
 
 ---
 
 ## Assets still needed before submitting
 
-- [ ] Icon you’re happy with (current one is a placeholder)
+- [x] Icon — brand cloud + upload arrow, white on accent blue (`icon.svg`,
+      PNGs regenerated via `make-icons.mjs`)
 - [ ] At least one 1280×800 or 640×400 screenshot — show the floating Share
       button on a local HTML file, and the “Shared ✓” state
 - [ ] A 440×280 small promo tile (optional but recommended)
-- [ ] Hosted privacy policy URL (see PRIVACY.md)
+- [x] Hosted privacy policy URL — https://html.cloud/extension-privacy

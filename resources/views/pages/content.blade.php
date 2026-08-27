@@ -3,12 +3,6 @@
      and put their body in @section('page'). --}}
 @extends('layout')
 
-{{-- Analytics lives here rather than in layout.blade.php: the viewer and editor
-     also extend that layout, and their URLs carry decryption keys. --}}
-@push('head')
-@include('partials.gtag')
-@endpush
-
 @section('content')
 <div class="shell @yield('shellClass', 'swiss-page')">
   @include('partials.topbar')

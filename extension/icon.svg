@@ -1,10 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
-  <!-- html.cloud mark: the floating padlock, brand accent green on cream -->
-  <rect width="128" height="128" rx="28" fill="#3a4f3a"/>
-  <g fill="none" stroke="#f5f2ec" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
-    <rect x="38" y="58" width="52" height="44" rx="9"/>
-    <path d="M51 58 V47 a13 13 0 0 1 26 0 V58"/>
+  <!-- html.cloud mark: hand-drawn cloud + upload arrow, white on brand accent blue -->
+  <rect width="128" height="128" rx="28" fill="#2348ff"/>
+  <g transform="translate(13.6 14.5) scale(2)" fill="none" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round">
+    <path stroke-width="4" d="M11.5 37 C5 36.5 3.5 28.5 9.5 26.5 C8.5 17.5 18 12.5 23.5 16.5 C27 8.5 39 9.5 40.5 18 C46.5 17.5 48.5 26.5 43.5 29.5 C46.5 32.5 44.5 37 39.5 36.9 C30 37.9 19 37.8 11.5 37 Z"/>
+    <path stroke-width="4.4" d="M24 33 L24 25"/>
+    <path stroke-width="2.4" fill="#ffffff" d="M24 18.6 L17.6 27.2 L30.4 27.2 Z"/>
   </g>
-  <circle cx="64" cy="76" r="5" fill="#f5f2ec"/>
-  <path d="M64 79 V88" fill="none" stroke="#f5f2ec" stroke-width="6" stroke-linecap="round"/>
 </svg>

@@ -41,9 +41,6 @@
   "offers": { "@@type": "Offer", "price": "0", "priceCurrency": "USD" }
 }
 </script>
-{{-- Safe here: the key is generated client-side and only ever lives in JS memory
-     and the DOM on this page — never in the URL. See partials/gtag.blade.php. --}}
-@include('partials.gtag')
 @endpush
 
 @section('content')
