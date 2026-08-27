@@ -7,6 +7,8 @@
   <title>@yield('title', 'html.cloud — Private HTML file sharing')</title>
   <meta name="description" content="@yield('description', 'Share an HTML file with a private link. Encrypted in your browser before upload — only people with your link can read it. Not even us. No sign-up.')">
   <meta name="robots" content="@yield('robots', 'index, follow')">
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0e0f13" media="(prefers-color-scheme: dark)">
 
   <!-- Open Graph -->
   <meta property="og:type" content="website">
