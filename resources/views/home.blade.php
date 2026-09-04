@@ -6,6 +6,7 @@
 @section('canonical', config('app.url'))
 
 @push('head')
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&display=swap" rel="stylesheet">
 <script type="application/ld+json">
 {
   "@@context": "https://schema.org",
@@ -48,9 +49,28 @@
   @include('partials.topbar')
 
   <main class="home-main">
-    <h1 class="headline">Share an HTML file in seconds. <em>Private by design.</em></h1>
+    <div class="hero">
+      <h1 class="headline">Share an HTML file in seconds. <em>Private by design.</em></h1>
+      <div class="hero-art" aria-hidden="true">@include('partials.illustrations.hero-window')</div>
+    </div>
 
     <div class="dropzone" id="dropzone">
+      {{-- handwritten aside in the left margin; its arrow crosses the border into the zone.
+           Hidden on viewports without a margin (see CSS). The bold label is the real instruction. --}}
+      <div class="dropzone-note" aria-hidden="true">
+        <span class="dropzone-note-text">drop it here</span>
+        <svg class="dropzone-note-arrow" viewBox="0 0 210 100" fill="none" stroke="currentColor"
+             stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8 8 C24 60 92 96 196 66"/>
+          <path d="M180 48 L198 66 L178 82"/>
+        </svg>
+      </div>
+      <span class="dropzone-tag" aria-hidden="true">one .html file · up to 10 MB</span>
+      @foreach (['top:22%;left:17%', 'top:28%;right:15%;transition-delay:.06s', 'bottom:24%;left:27%;transition-delay:.12s', 'bottom:30%;right:23%;transition-delay:.09s'] as $pos)
+        <span class="dropzone-spark" style="{{ $pos }}" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1c1 5 3 7 8 8-5 1-7 3-8 8-1-5-3-7-8-8 5-1 7-3 8-8z"/></svg>
+        </span>
+      @endforeach
       <div class="dropzone-art" aria-hidden="true">@include('partials.illustrations.drop-file')</div>
       <div class="dropzone-label">Drop an HTML file here</div>
       <div class="dropzone-sub">
@@ -58,16 +78,8 @@
         <input type="file" id="file-input" accept=".html,.htm" style="display:none">
       </div>
 
-      <div class="dropzone-hover-overlay" aria-hidden="true">Drop to encrypt &amp; share</div>
+      <div class="dropzone-hover-overlay" aria-hidden="true"><span>Drop to encrypt &amp; share</span></div>
     </div>
-
-    <label class="upload-option" id="upload-options">
-      <input type="checkbox" id="sensitive-toggle">
-      <span class="upload-option-text">
-        Extra-private link
-        <span class="upload-option-hint">Hides the key from the address bar so it can’t be seen on screen-shares. Share only with the Copy button.</span>
-      </span>
-    </label>
 
     <div class="uploading-state hidden" id="uploading-state">
       <div class="uploading-spinner"></div>

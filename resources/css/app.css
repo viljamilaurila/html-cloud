@@ -80,6 +80,7 @@ html, body {
   text-decoration: none;
 }
 .wordmark .cloud-mark { color: var(--accent); flex-shrink: 0; }
+.wordmark .site-logo { display: block; flex-shrink: 0; }
 .wordmark-text { display: flex; align-items: baseline; gap: 2px; }
 .wordmark-html {
   font-family: var(--serif);
@@ -855,7 +856,7 @@ html, body {
 }
 .upload-toast-x:hover { color: var(--ink); }
 
-/* ─── Upload option (sensitive toggle on home) ─── */
+/* ─── Upload option (sensitive toggle on the uploads page) ─── */
 .upload-option {
   display: flex;
   align-items: flex-start;
@@ -1730,8 +1731,17 @@ img.content-image {
   font-family: "Inter", var(--sans);
 }
 .home-swiss .topbar {
-  background: var(--bg);
+  background: var(--paper);
   border-bottom: 1px solid var(--rule);
+}
+.home-swiss .topbar-link {
+  background: var(--bg);
+  border-color: var(--rule);
+}
+.home-swiss .topbar-link:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-on);
 }
 .wordmark {
   gap: 0;
@@ -1739,6 +1749,7 @@ img.content-image {
   color: var(--ink);
   text-decoration: none;
 }
+.wordmark .site-logo { display: none; }
 .wordmark::before,
 .wordmark::after {
   font-family: "Inter", var(--sans);
@@ -1755,6 +1766,20 @@ img.content-image {
   margin: 0 auto;
   padding: 22px 40px 76px;
 }
+.home-swiss .hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px 40px;
+  margin-top: 18px;
+}
+.home-swiss .hero-art {
+  width: 272px;
+  max-width: 100%;
+  color: var(--ink);
+  transform: rotate(2deg);
+}
+.home-swiss .hero-art svg { width: 100%; height: auto; color: var(--ink); }
 .home-swiss .headline {
   font-family: "Inter", var(--sans);
   text-align: left;
@@ -1763,7 +1788,7 @@ img.content-image {
   font-weight: 800;
   letter-spacing: -0.035em;
   max-width: 660px;
-  margin: 18px 0 0;
+  margin: 0;
   color: var(--ink);
 }
 .home-swiss .headline em {
@@ -1785,10 +1810,14 @@ img.content-image {
   border-radius: 3px;
   transform: skewX(-9deg);
 }
+/* Sketchbook drop zone: wobbly hand-drawn border on a dotted grid, a handwritten
+   aside with an arrow, a tag that peeks over the edge, sparkles while dragging. */
 .home-swiss .dropzone {
-  background: var(--bg);
-  border: 1.6px solid var(--ink);
-  border-radius: 8px;
+  background:
+    radial-gradient(var(--rule) 1px, transparent 1.2px) 0 0 / 18px 18px,
+    var(--bg);
+  border: 2px solid var(--ink);
+  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
   min-height: 340px;
   padding: 44px 32px;
   display: flex;
@@ -1801,19 +1830,95 @@ img.content-image {
 .home-swiss .dropzone.drag-over {
   border-color: var(--accent);
   border-style: solid;
-  background: var(--accent-soft);
+  background-color: var(--accent-soft);
 }
+/* While dragging: the label + button fade out and an accent pill takes their place,
+   so the sparkles and the tilting file stay visible instead of being veiled. */
 .home-swiss .dropzone-hover-overlay {
   font-family: "Inter", var(--sans);
   font-weight: 700;
-  font-size: 22px;
-  color: var(--accent);
-  background: var(--overlay);
-  border-radius: 8px;
+  font-size: 20px;
+  color: var(--accent-on);
+  background: transparent;
+  border-radius: inherit;
+  align-items: flex-end;
+  padding-bottom: 78px;
 }
+.home-swiss .dropzone-hover-overlay span {
+  background: var(--accent);
+  padding: 12px 22px;
+  border-radius: 999px;
+  transform: rotate(-1.5deg);
+}
+.home-swiss .dropzone-label,
+.home-swiss .dropzone-sub { transition: opacity 0.15s; }
+.home-swiss .dropzone.drag-over .dropzone-label,
+.home-swiss .dropzone.drag-over .dropzone-sub { opacity: 0; }
+.home-swiss .dropzone-note {
+  position: absolute;
+  top: 16px;
+  left: -200px;
+  width: 280px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  color: var(--ink2);
+  pointer-events: none;
+  transform: rotate(-6deg);
+  transform-origin: left top;
+  transition: transform 0.25s cubic-bezier(.34,1.56,.64,1);
+}
+.home-swiss .dropzone-note-text {
+  font-family: "Caveat", "Segoe Print", "Bradley Hand", cursive;
+  font-weight: 700;
+  font-size: 32px;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  margin-left: 6px;
+}
+.home-swiss .dropzone-note-arrow {
+  width: 214px;
+  height: auto;
+  margin: 2px 0 0 46px;
+  color: var(--accent);
+}
+/* Below this width the page gutter is narrower than the note, so it goes away. */
+@media (max-width: 1200px) {
+  .home-swiss .dropzone-note { display: none; }
+}
+.home-swiss .dropzone-tag {
+  position: absolute;
+  right: 44px;
+  bottom: -15px;
+  padding: 5px 12px;
+  background: var(--bg);
+  border: 2px solid var(--ink);
+  border-radius: 4px;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  transform: rotate(3deg);
+  transition: transform 0.25s cubic-bezier(.34,1.56,.64,1);
+}
+.home-swiss .dropzone-spark {
+  position: absolute;
+  width: 24px;
+  color: var(--accent);
+  opacity: 0;
+  transform: scale(0.4);
+  transition: opacity 0.2s, transform 0.35s cubic-bezier(.34,1.56,.64,1);
+}
+.home-swiss .dropzone-spark svg { display: block; width: 100%; height: auto; }
+.home-swiss .dropzone.drag-over .dropzone-spark { opacity: 1; transform: scale(1); }
+.home-swiss .dropzone.drag-over .dropzone-note { transform: rotate(-10deg) scale(1.05); }
+.home-swiss .dropzone.drag-over .dropzone-tag { transform: rotate(6deg) scale(1.06); }
 .home-swiss .dropzone-art {
   width: 128px;
   color: var(--ink);
+  transform: rotate(-4deg);
+  transition: transform 0.3s cubic-bezier(.34,1.56,.64,1);
 }
 .home-swiss .dropzone-art svg {
   display: block;
@@ -1830,6 +1935,7 @@ img.content-image {
   animation: none;
   transform: translateY(10px);
 }
+.home-swiss .dropzone.drag-over .dropzone-art { transform: rotate(4deg) scale(1.06); }
 @media (prefers-reduced-motion: reduce) {
   .home-swiss .dropzone-art svg { animation: none; }
 }
@@ -1846,12 +1952,13 @@ img.content-image {
   color: var(--accent-on);
   text-decoration: none;
   font-weight: 600;
-  font-size: 13px;
-  padding: 8px 14px;
-  border-radius: 6px;
-  margin-left: 4px;
+  font-size: 15px;
+  padding: 11px 18px;
+  border-radius: 8px;
+  margin-left: 6px;
+  transition: background 0.15s ease, transform 0.15s ease;
 }
-.home-swiss .file-link:hover { background: var(--accent-strong); }
+.home-swiss .file-link:hover { background: var(--accent-strong); transform: translateY(-1px); }
 .home-swiss .home-info {
   margin-top: 96px;
   padding-top: 36px;
@@ -1986,7 +2093,14 @@ img.content-image {
 .home-swiss .home-route-us .home-route-mark,
 .home-swiss .home-route-us .home-route-who { color: var(--accent); }
 
+/* Below ~900px the hero art either squeezes the headline or floats alone under it,
+   so it goes; small screens are mostly here to read, not to upload. */
+@media (max-width: 900px) {
+  .home-swiss .hero { grid-template-columns: 1fr; }
+  .home-swiss .hero-art { display: none; }
+}
 @media (max-width: 720px) {
+  .home-swiss .dropzone-tag { right: 18px; font-size: 11px; }
   .home-swiss .home-facts { grid-template-columns: repeat(2, 1fr); gap: 20px 20px; }
   .home-swiss .home-uses { grid-template-columns: 1fr; }
   .home-swiss .home-route { grid-template-columns: 20px 1fr; }
