@@ -80,7 +80,6 @@ html, body {
   text-decoration: none;
 }
 .wordmark .cloud-mark { color: var(--accent); flex-shrink: 0; }
-.wordmark .site-logo { display: block; flex-shrink: 0; }
 .wordmark-text { display: flex; align-items: baseline; gap: 2px; }
 .wordmark-html {
   font-family: var(--serif);
@@ -1740,7 +1739,6 @@ img.content-image {
   color: var(--ink);
   text-decoration: none;
 }
-.wordmark .site-logo { display: none; }
 .wordmark::before,
 .wordmark::after {
   font-family: "Inter", var(--sans);
