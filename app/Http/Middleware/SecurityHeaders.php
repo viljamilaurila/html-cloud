@@ -63,7 +63,7 @@ class SecurityHeaders
      */
     private function needsCsp(Request $request): bool
     {
-        return ! $request->is('v/*') && ! Vite::isRunningHot();
+        return ! $request->routeIs('viewer') && ! Vite::isRunningHot();
     }
 
     private function policy(string $nonce): string

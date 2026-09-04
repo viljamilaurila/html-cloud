@@ -24,15 +24,7 @@ class SiteSecurityTest extends TestCase
 
     private function makeDocument(): Document
     {
-        return Document::create([
-            'id'                 => 'testdoc12345',
-            'ciphertext'         => 'ZmFrZQ==',
-            'encrypted_view_key' => 'ZmFrZQ==',
-            'edit_auth'          => str_repeat('a', 64),
-            'expires_at'         => null,
-            'size'               => 42,
-            'sensitive'          => false,
-        ]);
+        return Document::factory()->permanent()->create();
     }
 
     public function test_no_page_loads_a_third_party_script(): void
@@ -100,11 +92,11 @@ class SiteSecurityTest extends TestCase
     public function test_upload_counts_survive_document_expiry(): void
     {
         $payload = [
-            'ciphertext'         => 'ZmFrZQ==',
+            'ciphertext' => 'ZmFrZQ==',
             'encrypted_view_key' => 'ZmFrZQ==',
-            'edit_auth'          => str_repeat('b', 64),
-            'expires_in'         => '7',
-            'size'               => 42,
+            'edit_auth' => str_repeat('b', 64),
+            'expires_in' => '7',
+            'size' => 42,
         ];
         $this->postJson('/api/documents', $payload)->assertCreated();
         $this->postJson('/api/documents', $payload)->assertCreated();
@@ -112,7 +104,7 @@ class SiteSecurityTest extends TestCase
         $this->assertSame(2, DailyStat::find(now()->toDateString())->uploads);
 
         Document::query()->update(['expires_at' => now()->subDay()]);
-        $this->artisan('documents:prune')->assertSuccessful();
+        $this->artisan('model:prune')->assertSuccessful();
 
         $this->assertSame(0, Document::count());
         $this->assertSame(2, DailyStat::find(now()->toDateString())->uploads);

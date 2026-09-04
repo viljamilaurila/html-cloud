@@ -35,11 +35,4 @@ return [
         ],
     ],
 
-    /*
-    | Google Ads conversion / remarketing tag (gtag.js). Leave GOOGLE_ADS_ID
-    | unset and no tag is emitted at all — that is the default everywhere except
-    | production. The tag is only ever rendered on pages that cannot carry a
-    | decryption key; see resources/views/partials/gtag.blade.php.
-    */
-
 ];

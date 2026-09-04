@@ -63,10 +63,11 @@ async function handleFile(file) {
     return;
   }
 
-  const sensitive = !!document.getElementById('sensitive-toggle')?.checked;
+  // Home uploads are always shareable links; the extra-private (fragment-stripping)
+  // mode can still be switched on from the document's edit page.
+  const sensitive = false;
 
   dropzone.classList.add('hidden');
-  document.getElementById('upload-options')?.classList.add('hidden');
   uploadingState.classList.remove('hidden');
 
   try {
@@ -74,11 +75,9 @@ async function handleFile(file) {
 
     // Encrypt locally and upload ciphertext only — shared with the CLI and the
     // browser extension via share-core.js so the wire contract never diverges.
-    const csrf = document.querySelector('meta[name="csrf-token"]').content;
     const { id, viewFrag, editFrag } = await shareDocument(plaintext, {
       expiresIn: EXPIRES_IN,
       sensitive,
-      headers: { 'X-CSRF-TOKEN': csrf },
     });
 
     // Sensitive docs keep the filename out of the URL/preview entirely; shareable
