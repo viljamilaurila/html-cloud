@@ -73,7 +73,7 @@ export async function encryptDocument(plaintext) {
  * @param {string}   [opts.expiresIn='30']  '7' | '30' | 'never'
  * @param {boolean}  [opts.sensitive]       omitted from the body when undefined
  * @param {string}   [opts.baseUrl='']      '' = same-origin; absolute for CLI/extension
- * @param {object}   [opts.headers={}]      extra request headers (e.g. CSRF on the site)
+ * @param {object}   [opts.headers={}]      extra request headers (extension, CLI)
  * @param {Function} [opts.fetchImpl=fetch] injectable fetch (background worker / Node)
  * @returns {Promise<{ id: string, viewFrag: string, editFrag: string }>}
  */

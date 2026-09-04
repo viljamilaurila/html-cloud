@@ -2,4 +2,5 @@
 
 use Illuminate\Support\Facades\Schedule;
 
-Schedule::command('documents:prune')->daily();
+// Hard-deletes expired documents (App\Models\Document is MassPrunable).
+Schedule::command('model:prune')->daily();

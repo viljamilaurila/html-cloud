@@ -96,12 +96,11 @@ async function init() {
   sensitiveToggle.checked = !!doc.sensitive;
   sensitiveRow.style.opacity = '1';
   sensitiveToggle.addEventListener('change', async () => {
-    const csrf = document.querySelector('meta[name="csrf-token"]').content;
     sensitiveToggle.disabled = true;
     try {
       const r = await fetch(`/api/documents/${docId}/settings`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sensitive: sensitiveToggle.checked, edit_key: b64url(editKeyRaw) }),
       });
       if (!r.ok) throw new Error();
@@ -144,11 +143,10 @@ async function init() {
   // Expiry change
   document.querySelectorAll('.expiry-chip-sm').forEach(chip => {
     chip.addEventListener('click', async () => {
-      const csrf = document.querySelector('meta[name="csrf-token"]').content;
       try {
         const r = await fetch(`/api/documents/${docId}/expiry`, {
           method: 'PATCH',
-          headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ expires_in: chip.dataset.value, edit_key: b64url(editKeyRaw) }),
         });
         if (!r.ok) throw new Error();
@@ -172,11 +170,10 @@ async function init() {
   // Delete
   document.getElementById('delete-btn').addEventListener('click', async () => {
     if (!confirm('Delete this document? The share link will stop working immediately.')) return;
-    const csrf = document.querySelector('meta[name="csrf-token"]').content;
     try {
       const r = await fetch(`/api/documents/${docId}`, {
         method: 'DELETE',
-        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ edit_key: b64url(editKeyRaw) }),
       });
       if (r.status === 403) { alert('Invalid edit key.'); return; }
@@ -207,10 +204,9 @@ async function replaceFile(file, viewKeyRaw) {
     const packed = packCiphertext(iv, ciphertext);
     const encryptedViewKey = await encryptViewKeyWithEditKey(viewKeyRaw, editKeyRaw);
 
-    const csrf = document.querySelector('meta[name="csrf-token"]').content;
     const r = await fetch(`/api/documents/${docId}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         ciphertext: packed,
         encrypted_view_key: encryptedViewKey,

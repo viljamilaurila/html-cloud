@@ -36,7 +36,6 @@
         <a href="https://github.com/viljamilaurila/html-cloud" rel="noopener" target="_blank">Source on GitHub ↗</a>
       </nav>
     </div>
-    @php $documentCount = cache('document_count') @endphp
     <p class="footer-copy">
       &copy; {{ date('Y') }} html.cloud
       @if ($documentCount)

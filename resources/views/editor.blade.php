@@ -108,12 +108,12 @@
   </main>
 </div>
 
-<script @if ($nonce = Illuminate\Support\Facades\Vite::cspNonce()) nonce="{{ $nonce }}" @endif>
+<script nonce="{{ Vite::cspNonce() }}">
   window.__DOC_ID__ = @json($doc->id);
   window.__EXPIRES_AT__ = @json($doc->expires_at?->toIso8601String());
 </script>
 @endsection
 
 @push('scripts')
-@vite('resources/js/editor.js')</script>
+@vite('resources/js/editor.js')
 @endpush

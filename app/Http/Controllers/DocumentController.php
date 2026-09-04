@@ -2,232 +2,136 @@
 
 namespace App\Http\Controllers;
 
-use App\Jobs\SyncDocumentCount;
+use App\Enums\Expiry;
 use App\Models\DailyStat;
 use App\Models\Document;
-use Illuminate\Http\Request;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Response;
-use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
+use Illuminate\Validation\Rule;
 
+/**
+ * Writes (update, expiry, settings, destroy) are guarded by the VerifyEditKey
+ * middleware on their routes; a missing or expired {document} is a 404 before
+ * any method here runs (see Document::resolveRouteBinding).
+ */
 class DocumentController extends Controller
 {
-    private const MAX_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB
+    private const MAX_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB of plaintext
 
-    // GET /
-    public function home(): Response
-    {
-        return response()->view('home');
-    }
+    // Base64 of 10 MB plus IV and tag is ~13.4M characters. Capping at 14 MB
+    // keeps the value inside MySQL's 16 MB mediumText column, so an oversized
+    // upload fails validation instead of being truncated or erroring on insert.
+    private const MAX_CIPHERTEXT_CHARS = 14 * 1024 * 1024;
 
-    // GET /v/{id}/{slug?}
-    // The slug is cosmetic — only {id} identifies the document. It exists so the
-    // link is self-describing and so link previews (WhatsApp, Slack, …) can show
-    // a title, which crawlers read from the server-rendered meta tags (they never
-    // get the #key). Nothing about the slug is stored; it's humanised per-request.
-    public function viewer(string $id, ?string $slug = null): Response
+    // GET /v/{document}/{slug?}
+    // The slug is cosmetic — only {document} identifies the file. It exists so
+    // the link is self-describing and so link previews (WhatsApp, Slack, …) can
+    // show a title, which crawlers read from the server-rendered meta tags (they
+    // never get the #key). Nothing about the slug is stored.
+    public function viewer(Document $document, ?string $slug = null): View
     {
-        $doc = Document::find($id);
-        if (! $doc || $doc->isExpired()) {
-            return response()->view('expired', [], 404);
-        }
-        return response()->view('viewer', [
-            'doc'       => $doc,
-            'slugTitle' => $slug ?: null, // shown verbatim, in slug form
+        return view('viewer', [
+            'doc' => $document,
+            'slugTitle' => $slug, // shown verbatim, in slug form
         ]);
     }
 
-    // GET /e/{id}
-    public function editor(string $id): Response
+    // GET /e/{document}
+    public function editor(Document $document): View
     {
-        $doc = Document::find($id);
-        if (! $doc || $doc->isExpired()) {
-            return response()->view('expired', [], 404);
-        }
-        return response()->view('editor', ['doc' => $doc]);
+        return view('editor', ['doc' => $document]);
     }
 
-    // POST /api/documents  — upload encrypted blob
+    // POST /api/documents — upload an encrypted blob
     public function store(Request $request): JsonResponse
     {
-        $request->validate([
-            'ciphertext'         => 'required|string',
-            'encrypted_view_key' => 'required|string|max:1000',
-            'edit_auth'          => 'required|string|size:64|regex:/^[0-9a-f]+$/',
-            'expires_in'         => 'nullable|in:7,30,never',
-            'size'               => 'required|integer|min:1|max:' . self::MAX_SIZE_BYTES,
-            'sensitive'          => 'nullable|boolean',
+        $data = $request->validate([
+            ...$this->payloadRules(),
+            'edit_auth' => ['required', 'string', 'size:64', 'regex:/^[0-9a-f]+$/'],
+            'expires_in' => ['nullable', Rule::enum(Expiry::class)],
+            'sensitive' => ['nullable', 'boolean'],
         ]);
 
-        if (strlen($request->ciphertext) > self::MAX_SIZE_BYTES * 2) {
-            return response()->json(['error' => 'Payload too large'], 413);
-        }
-
-        $id = $this->generateId();
-        $expiresAt = match ($request->input('expires_in', '30')) {
-            '7'  => now()->addDays(7),
-            '30' => now()->addDays(30),
-            default => null,
-        };
-
-        Document::create([
-            'id'                 => $id,
-            'ciphertext'         => $request->ciphertext,
-            'encrypted_view_key' => $request->encrypted_view_key,
-            'edit_auth'          => $request->edit_auth,
-            'expires_at'         => $expiresAt,
-            'size'               => $request->size,
-            'sensitive'          => $request->boolean('sensitive'),
+        $document = Document::create([
+            ...Arr::only($data, ['ciphertext', 'encrypted_view_key', 'edit_auth', 'size']),
+            'id' => Document::generateId(),
+            'expires_at' => ($request->enum('expires_in', Expiry::class) ?? Expiry::Month)->expiresAt(),
+            'sensitive' => $request->boolean('sensitive'),
         ]);
 
         DailyStat::recordUpload();
-        SyncDocumentCount::dispatch();
 
-        return response()->json(['id' => $id], 201);
+        return response()->json(['id' => $document->id], 201);
     }
 
-    // GET /api/documents/{id}  — fetch metadata + ciphertext for decryption
-    public function show(string $id): JsonResponse
+    // GET /api/documents/{document} — ciphertext plus what the client needs to decrypt it
+    public function show(Document $document): JsonResponse
     {
-        $doc = Document::find($id);
-        if (! $doc || $doc->isExpired()) {
-            return response()->json(['error' => 'Not found or expired'], 404);
-        }
-
-        if (! $doc->ciphertext) {
+        if ($document->ciphertext === null) {
             return response()->json(['error' => 'Content missing'], 404);
         }
 
         return response()->json([
-            'id'                 => $doc->id,
-            'ciphertext'         => $doc->ciphertext,
-            'encrypted_view_key' => $doc->encrypted_view_key,
-            'expires_at'         => $doc->expires_at?->toIso8601String(),
-            'size'               => $doc->size,
-            'sensitive'          => (bool) $doc->sensitive,
+            'id' => $document->id,
+            'ciphertext' => $document->ciphertext,
+            'encrypted_view_key' => $document->encrypted_view_key,
+            'expires_at' => $document->expires_at?->toIso8601String(),
+            'size' => $document->size,
+            'sensitive' => $document->sensitive,
         ]);
     }
 
-    // PUT /api/documents/{id}  — replace content (requires valid editKey)
-    public function update(Request $request, string $id): JsonResponse
+    // PUT /api/documents/{document} — replace content
+    public function update(Request $request, Document $document): JsonResponse
     {
-        $doc = Document::find($id);
-        if (! $doc || $doc->isExpired()) {
-            return response()->json(['error' => 'Not found or expired'], 404);
-        }
-
-        $request->validate([
-            'ciphertext'         => 'required|string',
-            'encrypted_view_key' => 'required|string|max:1000',
-            'edit_key'           => 'required|string',
-            'size'               => 'required|integer|min:1|max:' . self::MAX_SIZE_BYTES,
-        ]);
-
-        if (! $this->verifyEditKey($request->edit_key, $doc->edit_auth)) {
-            return response()->json(['error' => 'Invalid edit key'], 403);
-        }
-
-        if (strlen($request->ciphertext) > self::MAX_SIZE_BYTES * 2) {
-            return response()->json(['error' => 'Payload too large'], 413);
-        }
-
-        $doc->update([
-            'ciphertext'         => $request->ciphertext,
-            'encrypted_view_key' => $request->encrypted_view_key,
-            'size'               => $request->size,
-        ]);
+        $document->update($request->validate($this->payloadRules()));
 
         return response()->json(['ok' => true]);
     }
 
-    // PATCH /api/documents/{id}/expiry  — change expiry
-    public function updateExpiry(Request $request, string $id): JsonResponse
+    // PATCH /api/documents/{document}/expiry
+    public function updateExpiry(Request $request, Document $document): JsonResponse
     {
-        $doc = Document::find($id);
-        if (! $doc || $doc->isExpired()) {
-            return response()->json(['error' => 'Not found or expired'], 404);
-        }
+        $request->validate(['expires_in' => ['required', Rule::enum(Expiry::class)]]);
 
-        $request->validate([
-            'expires_in' => 'required|in:7,30,never',
-            'edit_key'   => 'required|string',
+        $document->update([
+            'expires_at' => $request->enum('expires_in', Expiry::class)->expiresAt(),
         ]);
 
-        if (! $this->verifyEditKey($request->edit_key, $doc->edit_auth)) {
-            return response()->json(['error' => 'Invalid edit key'], 403);
-        }
-
-        $doc->update([
-            'expires_at' => match ($request->expires_in) {
-                '7'  => now()->addDays(7),
-                '30' => now()->addDays(30),
-                default => null,
-            },
-        ]);
-
-        return response()->json([
-            'expires_at' => $doc->fresh()->expires_at?->toIso8601String(),
-        ]);
+        return response()->json(['expires_at' => $document->expires_at?->toIso8601String()]);
     }
 
-    // PATCH /api/documents/{id}/settings  — change document settings (requires valid editKey)
-    public function updateSettings(Request $request, string $id): JsonResponse
+    // PATCH /api/documents/{document}/settings
+    public function updateSettings(Request $request, Document $document): JsonResponse
     {
-        $doc = Document::find($id);
-        if (! $doc || $doc->isExpired()) {
-            return response()->json(['error' => 'Not found or expired'], 404);
-        }
+        $request->validate(['sensitive' => ['required', 'boolean']]);
 
-        $request->validate([
-            'sensitive' => 'required|boolean',
-            'edit_key'  => 'required|string',
-        ]);
+        $document->update(['sensitive' => $request->boolean('sensitive')]);
 
-        if (! $this->verifyEditKey($request->edit_key, $doc->edit_auth)) {
-            return response()->json(['error' => 'Invalid edit key'], 403);
-        }
-
-        $doc->update(['sensitive' => $request->boolean('sensitive')]);
-
-        return response()->json(['sensitive' => (bool) $doc->fresh()->sensitive]);
+        return response()->json(['sensitive' => $document->sensitive]);
     }
 
-    // DELETE /api/documents/{id}
-    public function destroy(Request $request, string $id): JsonResponse
+    // DELETE /api/documents/{document}
+    public function destroy(Document $document): JsonResponse
     {
-        $doc = Document::find($id);
-        if (! $doc) {
-            return response()->json(['error' => 'Not found'], 404);
-        }
-
-        $request->validate(['edit_key' => 'required|string']);
-
-        if (! $this->verifyEditKey($request->edit_key, $doc->edit_auth)) {
-            return response()->json(['error' => 'Invalid edit key'], 403);
-        }
-
-        $doc->delete();
-
-        SyncDocumentCount::dispatch();
+        $document->delete();
 
         return response()->json(['ok' => true]);
     }
 
-    private function generateId(): string
+    /**
+     * The encrypted payload itself, shared by upload and replace.
+     *
+     * @return array<string, array<int, string|Rule>>
+     */
+    private function payloadRules(): array
     {
-        do {
-            $id = Str::random(8);
-        } while (Document::find($id));
-        return $id;
-    }
-
-    private function verifyEditKey(string $editKey, string $storedHash): bool
-    {
-        $std     = str_replace(['-', '_'], ['+', '/'], $editKey);
-        $decoded = base64_decode($std, true);
-        if ($decoded === false) {
-            return false;
-        }
-        return hash_equals($storedHash, hash('sha256', $decoded));
+        return [
+            'ciphertext' => ['required', 'string', 'max:'.self::MAX_CIPHERTEXT_CHARS],
+            'encrypted_view_key' => ['required', 'string', 'max:1000'],
+            'size' => ['required', 'integer', 'min:1', 'max:'.self::MAX_SIZE_BYTES],
+        ];
     }
 }

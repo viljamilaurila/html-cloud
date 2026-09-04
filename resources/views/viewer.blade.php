@@ -75,5 +75,5 @@
 @endsection
 
 @push('scripts')
-@vite('resources/js/viewer.js')</script>
+@vite('resources/js/viewer.js')
 @endpush

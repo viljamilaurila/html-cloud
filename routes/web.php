@@ -4,7 +4,7 @@ use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\SitemapController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', [DocumentController::class, 'home'])->name('home');
+Route::view('/', 'home')->name('home');
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 
 // Content / discoverability pages (static, no DB).
@@ -29,7 +29,9 @@ Route::view('/share-internal-document', 'pages.use.internal-document')->name('us
 // No DB: the page is static; the registry lives only in the visitor's browser.
 Route::view('/uploads', 'uploads')->name('uploads');
 
-Route::get('/v/{id}/{slug?}', [DocumentController::class, 'viewer'])
+// {document} binds only live documents; missing or expired ones render the
+// "expired" page with a 404 (see bootstrap/app.php).
+Route::get('/v/{document}/{slug?}', [DocumentController::class, 'viewer'])
     ->where('slug', '[A-Za-z0-9-]+')
     ->name('viewer');
-Route::get('/e/{id}', [DocumentController::class, 'editor'])->name('editor');
+Route::get('/e/{document}', [DocumentController::class, 'editor'])->name('editor');
