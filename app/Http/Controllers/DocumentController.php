@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\SyncDocumentCount;
+use App\Models\DailyStat;
 use App\Models\Document;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -79,6 +80,7 @@ class DocumentController extends Controller
             'sensitive'          => $request->boolean('sensitive'),
         ]);
 
+        DailyStat::recordUpload();
         SyncDocumentCount::dispatch();
 
         return response()->json(['id' => $id], 201);
