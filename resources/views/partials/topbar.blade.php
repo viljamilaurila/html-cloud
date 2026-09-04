@@ -1,7 +1,5 @@
 <header class="topbar">
-  <a href="/" class="wordmark" aria-label="html.cloud">
-    @include('partials.logo', ['height' => 26])
-  </a>
+  <a href="/" class="wordmark" aria-label="html.cloud"></a>
   <div class="topbar-right">
     <a href="{{ route('uploads') }}" class="topbar-link">Your uploads</a>
     <span class="topbar-tagline">{{ $tagline ?? 'encrypted in your browser' }}</span>

@@ -5,9 +5,7 @@
 @section('content')
 <div class="shell">
   <header class="topbar">
-    <a href="/" class="wordmark" aria-label="html.cloud">
-      @include('partials.logo', ['height' => 26])
-    </a>
+    <a href="/" class="wordmark" aria-label="html.cloud"></a>
     <span class="topbar-tagline">encrypted in your browser</span>
   </header>
 
