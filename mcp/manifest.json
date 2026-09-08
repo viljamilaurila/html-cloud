@@ -2,9 +2,9 @@
   "manifest_version": "0.2",
   "name": "html-cloud-mcp",
   "display_name": "html.cloud — share HTML privately",
-  "version": "0.1.0",
-  "description": "Let Claude share the HTML it makes for you as a private, encrypted link. No account.",
-  "long_description": "Adds a tool that turns HTML Claude generates — a page, report, presentation, or invitation — into a private share link. The HTML is encrypted with AES-256-GCM on your computer before anything is uploaded, so html.cloud stores only ciphertext it cannot read. No account, no public URL. Each share also returns a private edit link to replace, re-expire, or delete the page.",
+  "version": "0.2.0",
+  "description": "Let Claude share the HTML it makes for you as a private, encrypted link — and update it later at the same link. No account.",
+  "long_description": "Adds a tool that turns HTML Claude generates — a page, report, presentation, or invitation — into a private share link. The HTML is encrypted with AES-256-GCM on your computer before anything is uploaded, so html.cloud stores only ciphertext it cannot read. No account, no public URL. Each share also returns a private edit link, and Claude can use it to update the page in place — ask for a change and the same share link shows the new version.",
   "author": {
     "name": "Viljami Laurila",
     "url": "https://html.cloud"
@@ -28,6 +28,10 @@
     {
       "name": "share_html",
       "description": "Share a self-contained HTML document as a private, encrypted link."
+    },
+    {
+      "name": "update_html",
+      "description": "Replace the content behind an existing share using its private edit link; the share link stays the same."
     }
   ],
   "keywords": ["html", "share", "encrypted", "zero-knowledge", "private", "ai-generated", "artifact"],

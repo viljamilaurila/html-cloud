@@ -1,18 +1,48 @@
 /**
- * Encrypt an HTML string locally and upload only the ciphertext to html.cloud.
+ * Encrypt HTML locally and upload (or replace) only the ciphertext on html.cloud.
  *
- * The crypto module is imported from the published `html-cloud` package so the
- * MCP server, the CLI, and the web client all share one implementation — the
+ * The crypto and the encrypt-then-upload sequence are imported from the
+ * published `html-cloud` package so the MCP server, the CLI, the browser
+ * extension and the web client all share one implementation — the
  * zero-knowledge model must never fork across them.
  */
 
 import {
-  generateViewKey, generateEditKey, exportViewKey,
-  encryptBytes, encryptViewKeyWithEditKey, computeEditAuth,
-  packCiphertext, b64url,
-} from 'html-cloud/crypto.js';
+  shareDocument, updateDocument, parseEditLink, MAX_SIZE,
+} from 'html-cloud/share-core.js';
 
-export const MAX_SIZE = 10 * 1024 * 1024; // 10 MB, matches the server limit
+export { MAX_SIZE };
+
+const EXPIRES = ['7', '30', 'never'];
+
+function resolveBaseUrl(baseUrl) {
+  return (baseUrl ?? process.env.HTML_CLOUD_URL ?? 'https://html.cloud').replace(/\/+$/, '');
+}
+
+function encodeHtml(html) {
+  const plaintext = new TextEncoder().encode(html);
+  if (plaintext.length === 0) throw new Error('html is empty');
+  if (plaintext.length > MAX_SIZE) throw new Error('html is too large (max 10 MB)');
+  return plaintext;
+}
+
+/** fetch throws a TypeError when the host is unreachable — say so plainly. */
+async function reaching(baseUrl, work) {
+  try {
+    return await work();
+  } catch (err) {
+    if (err instanceof TypeError) throw new Error(`could not reach ${baseUrl}`);
+    throw err;
+  }
+}
+
+function links(baseUrl, { id, viewFrag, editFrag }) {
+  return {
+    id,
+    shareUrl: `${baseUrl}/v/${id}#${viewFrag}`,
+    editUrl:  `${baseUrl}/e/${id}#${editFrag}`,
+  };
+}
 
 /**
  * @param {string} html        The HTML content to share.
@@ -23,54 +53,33 @@ export const MAX_SIZE = 10 * 1024 * 1024; // 10 MB, matches the server limit
  */
 export async function shareHtml(html, opts = {}) {
   const expires = opts.expires ?? '30';
-  if (!['7', '30', 'never'].includes(expires)) {
+  if (!EXPIRES.includes(expires)) {
     throw new Error(`expires must be 7, 30 or never (got "${expires}")`);
   }
-  const baseUrl = (opts.baseUrl ?? process.env.HTML_CLOUD_URL ?? 'https://html.cloud')
-    .replace(/\/+$/, '');
+  const baseUrl   = resolveBaseUrl(opts.baseUrl);
+  const plaintext = encodeHtml(html);
 
-  const plaintext = new TextEncoder().encode(html);
-  if (plaintext.length === 0) throw new Error('html is empty');
-  if (plaintext.length > MAX_SIZE) throw new Error('html is too large (max 10 MB)');
+  const result = await reaching(baseUrl, () =>
+    shareDocument(plaintext, { expiresIn: expires, baseUrl }));
 
-  // Keys are generated here and never sent to the server.
-  const viewKey    = await generateViewKey();
-  const editKeyRaw = await generateEditKey();
-  const viewKeyRaw = await exportViewKey(viewKey);
+  return { ...links(baseUrl, result), expires };
+}
 
-  const { iv, ciphertext } = await encryptBytes(viewKey, plaintext);
-  const packed             = packCiphertext(iv, ciphertext);
-  const encryptedViewKey   = await encryptViewKeyWithEditKey(viewKeyRaw, editKeyRaw);
-  const editAuth           = await computeEditAuth(editKeyRaw);
+/**
+ * Replace the content behind an existing share. The edit link (returned by
+ * shareHtml) proves ownership; the share link stays the same because the new
+ * HTML is encrypted under the document's existing view key.
+ *
+ * @param {string} editLink  The private https://html.cloud/e/{id}#{key} link.
+ * @param {string} html      The new, full HTML document.
+ * @returns {Promise<{id:string, shareUrl:string, editUrl:string}>}
+ */
+export async function updateHtml(editLink, html) {
+  const { baseUrl, id, editFrag } = parseEditLink(editLink);
+  const plaintext = encodeHtml(html);
 
-  let res;
-  try {
-    res = await fetch(`${baseUrl}/api/documents`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        ciphertext:         packed,
-        encrypted_view_key: encryptedViewKey,
-        edit_auth:          editAuth,
-        expires_in:         expires,
-        size:               plaintext.length,
-      }),
-    });
-  } catch {
-    throw new Error(`could not reach ${baseUrl}`);
-  }
+  const result = await reaching(baseUrl, () =>
+    updateDocument(id, editFrag, plaintext, { baseUrl }));
 
-  if (!res.ok) {
-    if (res.status === 429) throw new Error('too many uploads — please wait a few minutes and try again');
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.error || err.message || `upload failed (HTTP ${res.status})`);
-  }
-
-  const { id } = await res.json();
-  return {
-    id,
-    shareUrl: `${baseUrl}/v/${id}#${b64url(viewKeyRaw)}`,
-    editUrl:  `${baseUrl}/e/${id}#${b64url(editKeyRaw)}`,
-    expires,
-  };
+  return links(baseUrl, result);
 }

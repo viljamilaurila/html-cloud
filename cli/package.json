@@ -1,6 +1,6 @@
 {
   "name": "html-cloud",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Share an HTML file privately from the command line. Encrypted with AES-256-GCM before upload — the server stores only ciphertext. No account.",
   "type": "module",
   "bin": {

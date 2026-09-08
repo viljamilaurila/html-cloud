@@ -1,7 +1,7 @@
 {
   "name": "html-cloud-mcp",
-  "version": "0.1.0",
-  "description": "MCP server for html.cloud — let Claude and other AI assistants share generated HTML as a private, end-to-end encrypted link. No account, server stores only ciphertext.",
+  "version": "0.2.0",
+  "description": "MCP server for html.cloud — let Claude and other AI assistants share generated HTML as a private, end-to-end encrypted link, and update it later at the same link. No account, server stores only ciphertext.",
   "type": "module",
   "bin": {
     "html-cloud-mcp": "bin/html-cloud-mcp.js"
@@ -37,7 +37,7 @@
   "license": "MIT",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.0",
-    "html-cloud": "^0.1.0",
+    "html-cloud": "^0.2.0",
     "zod": "^3.23.0"
   }
 }

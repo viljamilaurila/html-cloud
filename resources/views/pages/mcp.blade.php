@@ -8,7 +8,7 @@
 
 @php
   // Versioned GitHub release asset — stable across future releases.
-  $mcpbUrl = 'https://github.com/viljamilaurila/html-cloud/releases/download/mcp-v0.1.0/html-cloud.mcpb';
+  $mcpbUrl = 'https://github.com/viljamilaurila/html-cloud/releases/download/mcp-v0.2.0/html-cloud.mcpb';
 @endphp
 
 @push('head')
@@ -33,7 +33,7 @@
     {
       "@@type": "Question",
       "name": "What does this let Claude do?",
-      "acceptedAnswer": { "@@type": "Answer", "text": "After a one-time install, Claude can take HTML it made for you — a page, report, presentation, or invitation — and turn it into a private share link in the same conversation. The file is encrypted before upload, so html.cloud stores only ciphertext it cannot read, and no account is needed." }
+      "acceptedAnswer": { "@@type": "Answer", "text": "After a one-time install, Claude can take HTML it made for you — a page, report, presentation, or invitation — and turn it into a private share link in the same conversation. Ask for a change afterwards and Claude updates the page at the same link. The file is encrypted before upload, so html.cloud stores only ciphertext it cannot read, and no account is needed." }
     },
     {
       "@@type": "Question",
@@ -126,6 +126,12 @@
     private <em>edit link</em> with each share, so you can replace, re-expire, or delete the
     page anytime.
   </p>
+  <p class="content-p">Changed your mind about something? Keep talking:</p>
+  <pre class="content-codeblock"><code>Make the title bigger and add a section on next steps, then update the page.</code></pre>
+  <p class="content-p">
+    Claude revises the HTML and updates the page in place. The share link you already
+    sent stays exactly the same — whoever opens it now sees the new version.
+  </p>
 </section>
 
 <section class="content-section">
@@ -171,7 +177,7 @@
     </details>
     <details class="faq-item">
       <summary>Can I change or remove a page after sharing?</summary>
-      <p>Yes. Every share comes with a private edit link. Open it to replace the page (the share link stays the same), change when it expires, or delete it right away.</p>
+      <p>Yes. Just ask Claude to change the page — it updates it at the same share link, so nobody needs a new one. Every share also comes with a private edit link you can open yourself to replace the page, change when it expires, or delete it right away.</p>
     </details>
     <details class="faq-item">
       <summary>Why doesn't it show up in Cowork?</summary>

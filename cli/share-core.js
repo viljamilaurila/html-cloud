@@ -10,9 +10,9 @@
  */
 
 import {
-  generateViewKey, generateEditKey, exportViewKey,
-  encryptBytes, encryptViewKeyWithEditKey, computeEditAuth,
-  packCiphertext, b64url,
+  generateViewKey, generateEditKey, exportViewKey, importViewKey,
+  encryptBytes, encryptViewKeyWithEditKey, decryptViewKeyWithEditKey,
+  computeEditAuth, packCiphertext, b64url, b64urlDecode,
 } from './crypto.js';
 
 export const MAX_SIZE = 10 * 1024 * 1024; // 10 MB — also enforced server-side
@@ -35,6 +35,30 @@ export function slugify(name) {
 /** Build the viewer path. A slug, when present, makes the link self-describing. */
 export function viewPath(id, slug) {
   return slug ? `/v/${id}/${slug}` : `/v/${id}`;
+}
+
+/**
+ * Split an edit link (`https://host/e/{id}#{editKey}`) into the pieces a
+ * client needs to talk to the server about that document. The key stays in
+ * the fragment, exactly where the link carries it — it is never sent anywhere
+ * except as the `edit_key` proof inside an authorized write.
+ *
+ * @param {string} link
+ * @returns {{ baseUrl: string, id: string, editFrag: string }}
+ */
+export function parseEditLink(link) {
+  let url;
+  try {
+    url = new URL(String(link).trim());
+  } catch {
+    throw new Error('Not a valid edit link.');
+  }
+  const match    = url.pathname.match(/^\/e\/([A-Za-z0-9]+)\/?$/);
+  const editFrag = url.hash.slice(1);
+  if (!match || !editFrag) {
+    throw new Error('Not an edit link — expected the private https://html.cloud/e/{id}#{key} link.');
+  }
+  return { baseUrl: url.origin, id: match[1], editFrag };
 }
 
 /**
@@ -105,4 +129,70 @@ export async function shareDocument(plaintext, {
 
   const { id } = await res.json();
   return { id, viewFrag, editFrag };
+}
+
+/**
+ * Replace the content of an existing document. The new plaintext is encrypted
+ * under the document's *existing* view key (unwrapped locally with the edit
+ * key), so every share link already handed out keeps working unchanged. Only
+ * the edit-key holder can do this; the server still sees only ciphertext.
+ *
+ * @param {string}     id         Document id from the edit link.
+ * @param {string}     editFrag   base64url edit key from after the # in the edit link.
+ * @param {Uint8Array} plaintext
+ * @param {object}     [opts]                  Same transport options as shareDocument.
+ * @param {string}     [opts.baseUrl='']
+ * @param {object}     [opts.headers={}]
+ * @param {Function}   [opts.fetchImpl=fetch]
+ * @returns {Promise<{ id: string, viewFrag: string, editFrag: string }>}
+ */
+export async function updateDocument(id, editFrag, plaintext, {
+  baseUrl = '',
+  headers = {},
+  fetchImpl = fetch,
+} = {}) {
+  let editKeyRaw;
+  try {
+    editKeyRaw = b64urlDecode(editFrag);
+  } catch {
+    throw new Error('Invalid edit key.');
+  }
+
+  const current = await fetchImpl(`${baseUrl}/api/documents/${id}`, { headers });
+  if (current.status === 404) {
+    throw new Error('Document not found — it may have expired or been deleted.');
+  }
+  if (!current.ok) {
+    throw new Error(`Could not load document (HTTP ${current.status})`);
+  }
+  const { encrypted_view_key: encryptedViewKey } = await current.json();
+
+  let viewKeyRaw;
+  try {
+    viewKeyRaw = await decryptViewKeyWithEditKey(encryptedViewKey, editKeyRaw);
+  } catch {
+    throw new Error('Invalid edit key for this document.');
+  }
+
+  const viewKey = await importViewKey(viewKeyRaw);
+  const { iv, ciphertext } = await encryptBytes(viewKey, plaintext);
+
+  const res = await fetchImpl(`${baseUrl}/api/documents/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...headers },
+    body: JSON.stringify({
+      ciphertext:         packCiphertext(iv, ciphertext),
+      encrypted_view_key: await encryptViewKeyWithEditKey(viewKeyRaw, editKeyRaw),
+      edit_key:           b64url(editKeyRaw),
+      size:               plaintext.length,
+    }),
+  });
+
+  if (!res.ok) {
+    if (res.status === 403) throw new Error('Invalid edit key for this document.');
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || err.message || `Update failed (HTTP ${res.status})`);
+  }
+
+  return { id, viewFrag: b64url(viewKeyRaw), editFrag: b64url(editKeyRaw) };
 }

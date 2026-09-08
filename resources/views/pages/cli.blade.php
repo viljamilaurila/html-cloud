@@ -42,6 +42,11 @@
     },
     {
       "@@type": "Question",
+      "name": "Can I update a file after sharing it?",
+      "acceptedAnswer": { "@@type": "Answer", "text": "Yes. Run npx html-cloud newfile.html --update <edit-link>, using the private edit link printed when you first shared. The new file is encrypted under the document's existing key, so the share link you already sent stays the same and shows the new version." }
+    },
+    {
+      "@@type": "Question",
       "name": "Can I pipe HTML into it from another tool?",
       "acceptedAnswer": { "@@type": "Answer", "text": "Yes. Pass - as the filename to read from stdin, e.g. my-generator | npx html-cloud -. This makes it easy to share AI-generated HTML straight from a script or build step." }
     },
@@ -98,6 +103,16 @@ Encrypted locally with AES-256-GCM · expires in 30 days · the server never saw
 </section>
 
 <section class="content-section">
+  <h2 class="content-h2">Update a file you already shared</h2>
+  <p class="content-p">
+    Pass the edit link from an earlier run with <code>--update</code>. The new file is
+    encrypted under the document's existing key, so the share link you already sent
+    stays the same and now shows the new version. Expiry is left as it was.
+  </p>
+  <pre class="content-codeblock"><code>npx html-cloud ./report.html --update "https://html.cloud/e/kT4eN7xQ#9dKw2mPv…"</code></pre>
+</section>
+
+<section class="content-section">
   <h2 class="content-h2">Options</h2>
   <table class="content-table">
     <thead>
@@ -105,6 +120,7 @@ Encrypted locally with AES-256-GCM · expires in 30 days · the server never saw
     </thead>
     <tbody>
       <tr><td><code>--expires 7|30|never</code></td><td>Days until the link expires</td><td><code>30</code></td></tr>
+      <tr><td><code>--update &lt;edit-link&gt;</code></td><td>Replace the content behind an existing share; the share link stays the same</td><td>—</td></tr>
       <tr><td><code>--no-copy</code></td><td>Don't copy the share link to the clipboard</td><td>copy is on</td></tr>
       <tr><td><code>--url &lt;base&gt;</code></td><td>Use a different server (or <code>$HTML_CLOUD_URL</code>)</td><td><code>https://html.cloud</code></td></tr>
     </tbody>

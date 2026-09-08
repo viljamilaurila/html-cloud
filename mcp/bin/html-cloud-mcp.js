@@ -2,10 +2,12 @@
 /**
  * html.cloud MCP server.
  *
- * Exposes a single tool, `share_html`, that an AI assistant can call to turn
- * HTML it generated (an artifact, report, presentation, dashboard, prototype)
- * into a private share link. The HTML is encrypted locally with AES-256-GCM
- * before upload — html.cloud stores only ciphertext and cannot read it.
+ * Exposes two tools. `share_html` turns HTML an AI assistant generated (an
+ * artifact, report, presentation, dashboard, prototype) into a private share
+ * link; `update_html` replaces the content behind an existing share so the
+ * same link shows the revised page. The HTML is encrypted locally with
+ * AES-256-GCM before upload — html.cloud stores only ciphertext and cannot
+ * read it.
  *
  * Transport: stdio. Run it from an MCP client config, e.g.
  *   { "command": "npx", "args": ["-y", "html-cloud-mcp"] }
@@ -15,11 +17,11 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod';
 
-import { shareHtml } from '../lib/share.js';
+import { shareHtml, updateHtml } from '../lib/share.js';
 
 const server = new McpServer({
   name: 'html-cloud',
-  version: '0.1.0',
+  version: '0.2.0',
 });
 
 server.registerTool(
@@ -31,9 +33,11 @@ server.registerTool(
       'dashboard, or prototype) as a private link. The HTML is encrypted locally ' +
       'with AES-256-GCM before upload — html.cloud stores only ciphertext and ' +
       'cannot read it, and no account is required. Returns a share link to give ' +
-      'to others and a private edit link (to replace, re-expire, or delete it). ' +
+      'to others and a private edit link. Keep the edit link: pass it to ' +
+      'update_html to change the page later without changing the share link. ' +
       'Use this whenever the user wants to privately share, send, or publish HTML ' +
-      'content you or they have generated.',
+      'content you or they have generated. For changes to something already ' +
+      'shared in this conversation, use update_html instead of sharing again.',
     inputSchema: {
       html: z
         .string()
@@ -63,6 +67,51 @@ server.registerTool(
       return {
         isError: true,
         content: [{ type: 'text', text: `Could not share: ${err.message}` }],
+      };
+    }
+  },
+);
+
+server.registerTool(
+  'update_html',
+  {
+    title: 'Update a shared HTML page',
+    description:
+      'Replace the content of an HTML page that was already shared with ' +
+      'share_html, using its private edit link. The share link stays exactly ' +
+      'the same, so anyone who already has it sees the new version. The new ' +
+      'HTML is encrypted locally with the same key as before; html.cloud never ' +
+      'sees the content. Use this when the user asks to change, fix, revise, or ' +
+      'add to a page you shared earlier in the conversation — pass the full ' +
+      'updated HTML document, not a diff.',
+    inputSchema: {
+      edit_link: z
+        .string()
+        .describe('The private edit link returned by share_html (https://html.cloud/e/{id}#{key}).'),
+      html: z
+        .string()
+        .describe('The complete, self-contained HTML document that replaces the current one.'),
+    },
+  },
+  async ({ edit_link, html }) => {
+    try {
+      const { shareUrl, editUrl } = await updateHtml(edit_link, html);
+      return {
+        content: [
+          {
+            type: 'text',
+            text:
+              'Updated (encrypted locally with AES-256-GCM; expiry unchanged). ' +
+              'The share link is the same as before, so anyone who has it now sees the new version.\n\n' +
+              `Share link (anyone with this can view):\n${shareUrl}\n\n` +
+              `Edit link (keep private — update again, change expiry, or delete):\n${editUrl}`,
+          },
+        ],
+      };
+    } catch (err) {
+      return {
+        isError: true,
+        content: [{ type: 'text', text: `Could not update: ${err.message}` }],
       };
     }
   },
