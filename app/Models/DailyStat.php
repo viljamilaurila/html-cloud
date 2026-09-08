@@ -23,12 +23,16 @@ class DailyStat extends Model
         ];
     }
 
+    /**
+     * The increment is qualified with the table name because Postgres also
+     * exposes the incoming row as "excluded", making a bare "uploads" ambiguous.
+     */
     public static function recordUpload(): void
     {
         static::upsert(
             [['date' => now()->toDateString(), 'uploads' => 1]],
             ['date'],
-            ['uploads' => DB::raw('uploads + 1')],
+            ['uploads' => DB::raw('daily_stats.uploads + 1')],
         );
     }
 }

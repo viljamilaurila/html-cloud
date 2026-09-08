@@ -54,6 +54,15 @@ class DocumentApiTest extends TestCase
         $this->assertSame(1, DailyStat::findOrFail(now()->toDateString())->uploads);
     }
 
+    public function test_second_upload_on_the_same_day_increments_the_daily_count(): void
+    {
+        $this->postJson('/api/documents', $this->uploadPayload())->assertCreated();
+        $this->postJson('/api/documents', $this->uploadPayload())->assertCreated();
+
+        $this->assertSame(2, DailyStat::findOrFail(now()->toDateString())->uploads);
+        $this->assertSame(1, DailyStat::count());
+    }
+
     public function test_upload_honours_expiry_and_sensitivity_options(): void
     {
         $week = $this->postJson('/api/documents', $this->uploadPayload(['expires_in' => '7', 'sensitive' => true]))->assertCreated();
