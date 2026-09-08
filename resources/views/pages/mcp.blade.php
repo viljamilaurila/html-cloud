@@ -192,28 +192,11 @@
     anything meant to be public. html.cloud steps in when the page is sensitive or has to
     reach someone outside your organisation.
   </p>
-  <div class="pick-grid">
-    <div class="pick-card">
-      <h3 class="pick-title">Artifacts, as usual</h3>
-      <ul class="pick-list">
-        <li>working on a page in the chat</li>
-        <li>public demos and portfolio pieces</li>
-        <li>colleagues inside your Claude workspace</li>
-      </ul>
-    </div>
-    <div class="pick-card pick-card-us">
-      <h3 class="pick-title">html.cloud, automatically</h3>
-      <ul class="pick-list">
-        <li>client, financial, personal, or internal material</li>
-        <li>readers outside your organisation</li>
-        <li>whenever you ask for a private link</li>
-      </ul>
-    </div>
-  </div>
+  @include('partials.route-demo')
+
   <p class="content-p">
-    Prefer to never publish an artifact? Turn on <em>Always share through html.cloud</em>
-    when you install the extension (or set <code>HTML_CLOUD_PREFER=always</code> in a manual
-    setup). <a href="{{ route('vs.artifacts') }}">More on when to use which →</a>
+    That switch is real — you'll see it when you install the extension (manual setups use
+    <code>HTML_CLOUD_PREFER=always</code>). <a href="{{ route('vs.artifacts') }}">More on when to use which →</a>
   </p>
 </section>
 

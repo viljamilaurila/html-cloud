@@ -1546,37 +1546,122 @@ html, body {
   .mcp-text { animation: none; opacity: 1; grid-template-rows: 1fr; }
 }
 
-/* "Which one?" pair of cards (MCP page, artifacts comparison). */
-.pick-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  gap: 14px;
+/* "Which one will Claude use?" — a mock of the extension's install switch that
+   reroutes four example requests. State lives in the checkbox: :has(:checked)
+   flips every row to html.cloud. */
+.route-demo {
   margin-top: 18px;
-}
-.pick-card {
   padding: 16px 18px 18px;
   background: var(--paper);
   border: 1px solid var(--rule);
+  border-radius: 16px;
+}
+.route-switch {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  background: var(--bg);
+  border: 1px solid var(--rule);
   border-radius: 12px;
+  cursor: pointer;
+  user-select: none;
 }
-.pick-card-us { border-color: var(--accent); background: var(--accent-soft); }
-.pick-title {
-  margin: 0 0 10px;
-  font-family: var(--sans);
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  color: var(--ink);
+.route-check {
+  position: absolute;
+  width: 1px; height: 1px;
+  opacity: 0;
+  pointer-events: none;
 }
-.pick-card-us .pick-title { color: var(--accent); }
-.pick-list {
-  margin: 0;
-  padding-left: 18px;
-  font-size: 14.5px;
-  line-height: 1.5;
+.route-toggle {
+  position: relative;
+  flex-shrink: 0;
+  width: 42px; height: 24px;
+  border-radius: 999px;
+  background: var(--rule-strong);
+  transition: background 0.25s;
+}
+.route-toggle::after {
+  content: "";
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.25);
+  transition: transform 0.25s cubic-bezier(.2,.8,.2,1.2);
+}
+.route-check:focus-visible + .route-toggle { outline: 2px solid var(--accent); outline-offset: 2px; }
+.route-demo:has(.route-check:checked) .route-toggle { background: var(--accent); }
+.route-demo:has(.route-check:checked) .route-toggle::after { transform: translateX(18px); }
+.route-switch-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.route-switch-label { font-size: 14.5px; font-weight: 500; color: var(--ink); }
+.route-hint { font-size: 12.5px; color: var(--ink3); }
+.route-hint-on { display: none; }
+.route-demo:has(.route-check:checked) .route-hint-off { display: none; }
+.route-demo:has(.route-check:checked) .route-hint-on { display: inline; color: var(--accent); }
+
+.route-rows { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
+.route-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+}
+.route-ask {
+  font-family: var(--serif);
+  font-size: 15px;
+  line-height: 1.35;
   color: var(--ink2);
 }
-.pick-list li + li { margin-top: 5px; }
+.route-arrow { color: var(--ink3); transition: color 0.3s; }
+.route-arrow-line {
+  stroke-dasharray: 4 5;
+  animation: route-flow 0.9s linear infinite;
+}
+@keyframes route-flow { to { stroke-dashoffset: -9; } }
+
+/* Both badges sit in the same cell; the inactive one fades out and drops a few px. */
+.route-dest { position: relative; display: grid; }
+.route-badge {
+  grid-area: 1 / 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 11px;
+  border-radius: 10px;
+  border: 1px solid var(--rule);
+  background: var(--bg);
+  color: var(--ink2);
+  transition: opacity 0.3s, transform 0.3s;
+}
+.route-badge > span { display: flex; flex-direction: column; line-height: 1.2; min-width: 0; }
+.route-badge b { font-size: 13.5px; font-weight: 600; color: inherit; }
+.route-badge small { font-size: 11px; color: var(--ink3); white-space: nowrap; }
+.route-badge svg { flex-shrink: 0; }
+.route-badge-cloud { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+.route-badge-cloud small { color: var(--accent); opacity: 0.8; }
+
+/* Default routing (switch off). */
+.route-default-artifact .route-badge-cloud,
+.route-default-cloud .route-badge-artifact { opacity: 0; transform: translateY(6px); pointer-events: none; }
+.route-default-cloud .route-arrow { color: var(--accent); }
+/* Switch on: everything goes to html.cloud. */
+.route-demo:has(.route-check:checked) .route-badge-artifact { opacity: 0; transform: translateY(-6px); pointer-events: none; }
+.route-demo:has(.route-check:checked) .route-badge-cloud { opacity: 1; transform: none; pointer-events: auto; }
+.route-demo:has(.route-check:checked) .route-arrow { color: var(--accent); }
+
+.route-demo + .content-p { margin-top: 16px; }
+
+@media (max-width: 560px) {
+  .route-row { grid-template-columns: 1fr; gap: 6px; padding-bottom: 8px; border-bottom: 1px solid var(--rule); }
+  .route-row:last-child { border-bottom: 0; padding-bottom: 0; }
+  .route-arrow { display: none; }
+  .route-badge small { white-space: normal; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .route-arrow-line { animation: none; }
+}
 
 /* Download button (MCP page). Scoped to .content-col to out-specify `.content-col a`. */
 .content-col a.btn-download {

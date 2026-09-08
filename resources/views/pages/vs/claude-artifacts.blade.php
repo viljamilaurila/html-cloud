@@ -49,24 +49,12 @@
 
 <section class="content-section">
   <h2 class="content-h2">A simple rule</h2>
-  <div class="pick-grid">
-    <div class="pick-card">
-      <h3 class="pick-title">Keep using artifacts when…</h3>
-      <ul class="pick-list">
-        <li>you're still working on the page and want it right there in the chat</li>
-        <li>the page is meant to be public — a demo, a portfolio piece, something you'd post anywhere</li>
-        <li>the readers are colleagues who can open it inside your Claude workspace</li>
-      </ul>
-    </div>
-    <div class="pick-card pick-card-us">
-      <h3 class="pick-title">Ask for html.cloud when…</h3>
-      <ul class="pick-list">
-        <li>the page holds client, financial, medical, personal, or internal material</li>
-        <li>the reader is outside your organisation and shouldn't need an account or a public URL</li>
-        <li>the link should expire, be replaceable, or be deletable when the conversation is over</li>
-      </ul>
-    </div>
-  </div>
+  <p class="content-p">
+    Keep using artifacts by default. html.cloud steps in when the page is sensitive or has to
+    reach someone outside your organisation — and you can make it the default for everything
+    with one switch when you install the extension.
+  </p>
+  @include('partials.route-demo')
 </section>
 
 <section class="content-section">
