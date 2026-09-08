@@ -21,6 +21,13 @@ Pipe straight from a generator:
 my-report-tool | npx html-cloud -
 ```
 
+Changed the file? Update it in place — the share link you already sent out
+now shows the new version:
+
+```sh
+npx html-cloud ./report.html --update "https://html.cloud/e/kT4eN7xQ#9dKw2mPv…"
+```
+
 ## Why this exists
 
 AI tools (Claude, ChatGPT, Gemini) produce self-contained HTML — presentations,
@@ -45,6 +52,7 @@ Read the full explainer: [html.cloud/security](https://html.cloud/security)
 | Option | Description | Default |
 |---|---|---|
 | `--expires <7\|30\|never>` | Days until the link expires | `30` |
+| `--update <edit-link>` | Replace the content behind an existing share (pass the edit link a previous run printed). The share link stays the same; expiry is unchanged | — |
 | `--url <base>` | Server base URL (or `$HTML_CLOUD_URL`) | `https://html.cloud` |
 | `--no-copy` | Don't copy the share link to the clipboard | copy is on |
 
@@ -54,6 +62,10 @@ piped or scripted, the clipboard is never touched.
 
 Limits: one `.html`/`.htm` file (or stdin), max 10 MB. Expiry can be changed
 later from the edit link.
+
+An update never changes the keys: the edit key unwraps the document's existing
+view key locally, the new file is encrypted under that same key, and only the
+ciphertext is replaced. That is why the old share link keeps working.
 
 ## Honest threat model
 

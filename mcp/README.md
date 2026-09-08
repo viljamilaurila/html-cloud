@@ -4,12 +4,17 @@ An [MCP](https://modelcontextprotocol.io) server that lets Claude and other AI
 assistants share the HTML they generate as a **private, end-to-end encrypted
 link** — no account, no public URL.
 
-The assistant calls one tool, `share_html`. The HTML is encrypted locally with
-AES-256-GCM before anything is uploaded; [html.cloud](https://html.cloud) stores
-only ciphertext and cannot read it.
+The assistant calls one tool, `share_html`, to share — and `update_html` to
+change a page it already shared, at the same link. The HTML is encrypted locally
+with AES-256-GCM before anything is uploaded; [html.cloud](https://html.cloud)
+stores only ciphertext and cannot read it.
 
 > "Make me a one-page summary of this and share it privately."
 > → the assistant generates the HTML, calls `share_html`, and replies with a link.
+>
+> "Actually, add a section on next steps."
+> → the assistant revises the HTML, calls `update_html` with the edit link, and
+> the link you already sent shows the new version.
 
 ## Install
 
@@ -49,7 +54,7 @@ claude mcp add html-cloud -- npx -y html-cloud-mcp
 
 Requires Node.js 20+.
 
-## The tool
+## The tools
 
 ### `share_html`
 
@@ -59,7 +64,20 @@ Requires Node.js 20+.
 | `expires` | `7` \| `30` \| `never` | Days until the link expires. Default `30`. |
 
 Returns a **share link** (give it to anyone you want to read the file) and a
-private **edit link** (replace the file, change the expiry, or delete it).
+private **edit link** (update the file, change the expiry, or delete it).
+
+### `update_html`
+
+| Argument | Type | Description |
+|---|---|---|
+| `edit_link` | string (required) | The private edit link `share_html` returned. |
+| `html` | string (required) | The complete HTML document that replaces the current one. |
+
+Replaces the content behind an existing share. The **share link stays the
+same** and the expiry is untouched, so anyone who already has the link sees
+the new version. The edit key unwraps the document's existing view key locally,
+the new HTML is encrypted under that same key, and only ciphertext is sent —
+the server never sees the content, before or after.
 
 ## How the encryption works
 
