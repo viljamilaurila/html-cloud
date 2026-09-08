@@ -43,6 +43,26 @@ class SiteSecurityTest extends TestCase
         }
     }
 
+    public function test_no_page_loads_a_third_party_stylesheet_or_font(): void
+    {
+        $doc = $this->makeDocument();
+
+        foreach ([...self::PAGES, "/v/{$doc->id}", "/e/{$doc->id}"] as $path) {
+            $response = $this->get($path)->assertOk();
+
+            preg_match_all('/<link[^>]+href="([^"]+)"/i', $response->getContent(), $m);
+            foreach ($m[1] as $href) {
+                $this->assertStringNotContainsString('//', str_replace(config('app.url'), '', $href),
+                    "{$path} links an external resource: {$href}");
+            }
+
+            // Fonts are self-hosted, so the policy has no reason to name Google.
+            $csp = (string) $response->headers->get('Content-Security-Policy');
+            $this->assertStringNotContainsString('googleapis', $csp);
+            $this->assertStringNotContainsString('gstatic', $csp);
+        }
+    }
+
     public function test_every_page_except_the_viewer_sends_a_strict_csp(): void
     {
         $doc = $this->makeDocument();

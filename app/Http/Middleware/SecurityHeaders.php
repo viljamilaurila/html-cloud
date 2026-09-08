@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * Referrer-Policy is belt-and-braces: browsers never put the fragment in a
  * Referer header, so the key cannot leak that way, but `no-referrer` also stops
- * the bare document id in /v/{id} reaching third parties (Google Fonts).
+ * the bare document id in /v/{id} reaching any third party.
  */
 class SecurityHeaders
 {
@@ -72,8 +72,8 @@ class SecurityHeaders
             "default-src 'self'",
             "script-src 'self' 'nonce-{$nonce}'",
             // 'unsafe-inline' covers style="" attributes, which nonces cannot.
-            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-            "font-src 'self' https://fonts.gstatic.com",
+            "style-src 'self' 'unsafe-inline'",
+            "font-src 'self'",
             "img-src 'self' data:",
             "connect-src 'self'",
             "base-uri 'self'",

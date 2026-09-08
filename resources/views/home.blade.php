@@ -6,7 +6,8 @@
 @section('canonical', config('app.url'))
 
 @push('head')
-<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+{{-- The hero headline (the page's LCP element) is set in Inter; preloading it lets the browser fetch the font before it has parsed the stylesheet. --}}
+<link rel="preload" href="{{ Vite::asset('resources/fonts/inter-variable-latin.woff2') }}" as="font" type="font/woff2" crossorigin>
 <script type="application/ld+json">
 {
   "@@context": "https://schema.org",

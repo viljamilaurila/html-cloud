@@ -1,3 +1,5 @@
+@import "./fonts.css";
+
 /* ─── Design tokens: Swiss signal (light + auto dark) ─── */
 :root {
   --bg:          #ffffff;
@@ -1087,7 +1089,6 @@ html, body {
 .footer-copy {
   font-size: 11px;
   color: var(--ink3);
-  opacity: 0.7;
   margin: 14px 0 0;
 }
 
@@ -2190,8 +2191,14 @@ img.content-image {
   margin: 0 0 12px;
   max-width: 620px;
 }
-.home-swiss .home-info-p a { color: var(--accent); text-decoration: none; }
-.home-swiss .home-info-p a:hover { text-decoration: underline; }
+.home-swiss .home-info-p a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.15em;
+  text-decoration-color: color-mix(in srgb, var(--accent) 45%, transparent);
+}
+.home-swiss .home-info-p a:hover { text-decoration-color: currentColor; }
 
 /* Spec strip: four hard facts, Swiss-table style */
 .home-swiss .home-facts {
