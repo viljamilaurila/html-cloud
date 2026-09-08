@@ -27,4 +27,15 @@ class HomePageTest extends TestCase
         $response->assertDontSee('sensitive-toggle', false);
         $response->assertDontSee('Extra-private link', false);
     }
+
+    public function test_home_page_preloads_the_headline_font(): void
+    {
+        $response = $this->get('/');
+
+        $response->assertOk();
+        $this->assertMatchesRegularExpression(
+            '/<link rel="preload" href="[^"]*\/build\/assets\/inter-variable-latin-[^"]+\.woff2" as="font" type="font\/woff2" crossorigin>/',
+            $response->getContent(),
+        );
+    }
 }
