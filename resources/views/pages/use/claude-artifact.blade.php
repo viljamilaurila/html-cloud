@@ -111,7 +111,8 @@
     in readable form. html.cloud is the opposite default: the file is encrypted <em>before</em> it
     leaves your machine, we store only ciphertext, and the link can expire or be deleted when the
     conversation is over. For a client deliverable, an internal dashboard, or anything with real data
-    in it, private-by-default is the safer starting point.
+    in it, private-by-default is the safer starting point. They don't compete —
+    <a href="{{ route('vs.artifacts') }}">here's a simple rule for when to use which</a>.
   </p>
 </section>
 

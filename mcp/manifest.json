@@ -2,13 +2,14 @@
   "manifest_version": "0.2",
   "name": "html-cloud-mcp",
   "display_name": "html.cloud — share HTML privately",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Let Claude share the HTML it makes for you as a private, encrypted link — and update it later at the same link. No account.",
   "long_description": "Adds a tool that turns HTML Claude generates — a page, report, presentation, or invitation — into a private share link. The HTML is encrypted with AES-256-GCM on your computer before anything is uploaded, so html.cloud stores only ciphertext it cannot read. No account, no public URL. Each share also returns a private edit link, and Claude can use it to update the page in place — ask for a change and the same share link shows the new version.",
   "author": {
     "name": "Viljami Laurila",
     "url": "https://html.cloud"
   },
+  "icon": "icon.png",
   "homepage": "https://html.cloud/mcp",
   "documentation": "https://html.cloud/mcp",
   "repository": {
@@ -21,7 +22,17 @@
     "mcp_config": {
       "command": "node",
       "args": ["${__dirname}/bin/html-cloud-mcp.js"],
-      "env": {}
+      "env": {
+        "HTML_CLOUD_PREFER": "${user_config.always_use}"
+      }
+    }
+  },
+  "user_config": {
+    "always_use": {
+      "type": "boolean",
+      "title": "Always share through html.cloud",
+      "description": "On: whenever you ask Claude to share or publish HTML, it uses html.cloud (encrypted, private link) instead of Claude's own artifact publishing. Off: Claude uses html.cloud for sensitive content and for anything going to people outside your organisation, and its built-in options for casual pages.",
+      "default": false
     }
   },
   "tools": [

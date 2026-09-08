@@ -1,6 +1,6 @@
 {
   "name": "html-cloud-mcp",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "MCP server for html.cloud — let Claude and other AI assistants share generated HTML as a private, end-to-end encrypted link, and update it later at the same link. No account, server stores only ciphertext.",
   "type": "module",
   "bin": {

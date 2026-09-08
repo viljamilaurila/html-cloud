@@ -8,7 +8,7 @@
 
 @php
   // Versioned GitHub release asset — stable across future releases.
-  $mcpbUrl = 'https://github.com/viljamilaurila/html-cloud/releases/download/mcp-v0.2.0/html-cloud.mcpb';
+  $mcpbUrl = 'https://github.com/viljamilaurila/html-cloud/releases/download/mcp-v0.3.0/html-cloud.mcpb';
 @endphp
 
 @push('head')
@@ -65,21 +65,72 @@
   <strong>No saving files, no account, no setup files.</strong>
 </p>
 
-<div class="mcp-demo" aria-label="Example conversation with Claude">
-  <div class="mcp-turn">
+<div class="mcp-demo" id="mcp-demo" aria-label="Example conversation with Claude">
+  <div class="mcp-turn mcp-anim" style="--t: .4s">
     <span class="mcp-who">You</span>
     <div class="mcp-msg mcp-msg-you">
       This proposal looks great. Can you share it privately so I can send the client a link?
     </div>
   </div>
-  <div class="mcp-turn">
+  <div class="mcp-turn mcp-anim" style="--t: 1.5s; --t2: 3.1s">
     <span class="mcp-who">Claude</span>
     <div class="mcp-msg mcp-msg-claude">
-      Here's a private link to the proposal — anyone you send it to can open it, and it expires in 30 days:
-      <span class="mcp-demo-link">html.cloud/v/kT4eN7xQ#b3FvXy…</span>
+      <span class="mcp-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+      <div class="mcp-text"><div>
+        Here's a private link to the proposal — anyone you send it to can open it, and it expires in 30 days:
+        <span class="mcp-demo-link">html.cloud/v/kT4eN7xQ#b3FvXy…</span>
+      </div></div>
     </div>
   </div>
+  <div class="mcp-turn mcp-anim" style="--t: 5.4s">
+    <span class="mcp-who">You</span>
+    <div class="mcp-msg mcp-msg-you">
+      Perfect. Could you make the title bigger and add a short “next steps” section at the end?
+    </div>
+  </div>
+  <div class="mcp-turn mcp-anim" style="--t: 6.5s; --t2: 8.3s">
+    <span class="mcp-who">Claude</span>
+    <div class="mcp-msg mcp-msg-claude">
+      <span class="mcp-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+      <div class="mcp-text"><div>
+        Done — I updated the page in place. The link is the same one, so the client will see the new version:
+        <span class="mcp-demo-link">html.cloud/v/kT4eN7xQ#b3FvXy… <span class="mcp-demo-tag">same link</span></span>
+      </div></div>
+    </div>
+  </div>
+  <button type="button" class="mcp-replay mcp-anim" style="--t: 9.4s" hidden>
+    <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 8a5.5 5.5 0 1 0 1.6-3.9"/><path d="M2.5 2.5v3h3"/></svg>
+    Replay
+  </button>
 </div>
+<script nonce="{{ Vite::cspNonce() }}">
+(() => {
+  // Progressive: without JS the conversation plays once on load. With JS it
+  // waits until the card is on screen, and gets a Replay button.
+  const demo = document.getElementById('mcp-demo');
+  const replay = demo.querySelector('.mcp-replay');
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  demo.classList.add('is-waiting');
+  new IntersectionObserver((entries, observer) => {
+    if (!entries.some(e => e.isIntersecting)) return;
+    demo.classList.remove('is-waiting');
+    observer.disconnect();
+  }, { threshold: 0.2 }).observe(demo);
+
+  replay.hidden = false;
+  replay.addEventListener('click', () => {
+    const running = document.getAnimations?.().filter(a => demo.contains(a.effect.target)) ?? [];
+    if (running.length) {
+      running.forEach(a => { a.cancel(); a.play(); }); // back to time zero, delays included
+      return;
+    }
+    demo.classList.add('is-reset');
+    void demo.offsetWidth; // flush so the animations restart from zero
+    demo.classList.remove('is-reset');
+  });
+})();
+</script>
 
 <p class="content-p mcp-demo-note">
   Claude encrypts the page on your computer before it's uploaded, so not even we can
@@ -131,6 +182,21 @@
   <p class="content-p">
     Claude revises the HTML and updates the page in place. The share link you already
     sent stays exactly the same — whoever opens it now sees the new version.
+  </p>
+</section>
+
+<section class="content-section">
+  <h2 class="content-h2">Artifacts or html.cloud?</h2>
+  <p class="content-p">
+    Both, and Claude sorts it out. Artifacts stay the default for building pages and for
+    anything meant to be public. html.cloud steps in when the page is sensitive or has to
+    reach someone outside your organisation.
+  </p>
+  @include('partials.route-demo')
+
+  <p class="content-p">
+    That switch is real — you'll see it when you install the extension (manual setups use
+    <code>HTML_CLOUD_PREFER=always</code>). <a href="{{ route('vs.artifacts') }}">More on when to use which →</a>
   </p>
 </section>
 
