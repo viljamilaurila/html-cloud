@@ -1,5 +1,6 @@
 import { importViewKey, decryptBytes, unpackCiphertext, b64url, b64urlDecode } from './crypto.js';
 import { getUpload } from './uploads-store.js';
+import { instrumentDocument } from './frame-shim.js';
 
 const docId       = window.__DOC_ID__;
 const loadScreen  = document.getElementById('loading-screen');
@@ -99,9 +100,10 @@ async function main() {
   // Paint the parent page (and the frame's letterbox area) to match the document's
   // own background, so a short document doesn't sit on a mismatched backdrop. The
   // frame is sandboxed/cross-origin, so the parent can't read its styles — instead
-  // the only thing we add to the document is a tiny READ-ONLY script that reports
-  // its computed body background via postMessage. (e.origin is "null" for an opaque
-  // sandbox, so we trust by source, not origin.) Everything else renders as authored.
+  // the injected shim (see frame-shim.js) reports the computed body background via
+  // postMessage. (e.origin is "null" for an opaque sandbox, so we trust by source,
+  // not origin.) The same shim also keeps in-page #anchor links working inside the
+  // srcdoc frame; everything else renders as authored.
   window.addEventListener('message', (e) => {
     if (e.source !== frame.contentWindow || !e.data || typeof e.data.__hcbg !== 'string') return;
     const c = e.data.__hcbg;
@@ -111,12 +113,7 @@ async function main() {
     }
   });
 
-  const bgReporter =
-    '<scr' + 'ipt>(function(){function s(){try{parent.postMessage({__hcbg:getComputedStyle(document.body).backgroundColor},"*")}catch(e){}}' +
-    'if(document.readyState!=="loading")s();else addEventListener("DOMContentLoaded",s);addEventListener("load",s)})()<\/scr' + 'ipt>';
-  const injected = /<head[^>]*>/i.test(html)
-    ? html.replace(/<head[^>]*>/i, (m) => m + bgReporter)
-    : bgReporter + html;
+  const injected = instrumentDocument(html);
 
   // srcdoc works in sandboxed iframes without allow-same-origin.
   frame.srcdoc = injected;
@@ -132,8 +129,8 @@ async function main() {
   const shareUrl = `${window.location.origin}${viewPath}#${b64url(viewKeyRaw)}`;
   const upload   = getUpload(docId);
 
-  // Hand the badge the ORIGINAL plaintext, not `injected` — the bg reporter is
-  // our rendering instrumentation and must never end up in the saved file.
+  // Hand the badge the ORIGINAL plaintext, not `injected` — the shim is our
+  // rendering instrumentation and must never end up in the saved file.
   setupBadge(shareUrl, !!upload, () => downloadDocument(plaintext, downloadFilename(upload, slugSeg)));
 
   // Just uploaded from this tab? Greet the creator once, and explain sharing.

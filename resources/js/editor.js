@@ -1,7 +1,5 @@
-import {
-  importViewKey, encryptBytes, encryptViewKeyWithEditKey,
-  decryptViewKeyWithEditKey, packCiphertext, b64url, b64urlDecode,
-} from './crypto.js';
+import { decryptViewKeyWithEditKey, b64url, b64urlDecode } from './crypto.js';
+import { updateDocument, MAX_SIZE } from './share-core.js';
 import { getUpload } from './uploads-store.js';
 
 if (!window.isSecureContext || !window.crypto?.subtle) {
@@ -164,8 +162,8 @@ async function init() {
   // Replace file — drag & drop
   dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('drag-over'); });
   dropzone.addEventListener('dragleave', e => { if (!dropzone.contains(e.relatedTarget)) dropzone.classList.remove('drag-over'); });
-  dropzone.addEventListener('drop', e => { e.preventDefault(); dropzone.classList.remove('drag-over'); const f = e.dataTransfer?.files?.[0]; if (f) replaceFile(f, viewKeyRaw); });
-  fileInput.addEventListener('change', () => { if (fileInput.files?.[0]) replaceFile(fileInput.files[0], viewKeyRaw); });
+  dropzone.addEventListener('drop', e => { e.preventDefault(); dropzone.classList.remove('drag-over'); const f = e.dataTransfer?.files?.[0]; if (f) replaceFile(f); });
+  fileInput.addEventListener('change', () => { if (fileInput.files?.[0]) replaceFile(fileInput.files[0]); });
 
   // Delete
   document.getElementById('delete-btn').addEventListener('click', async () => {
@@ -187,9 +185,13 @@ init();
 
 // ─── Replace file ───
 
-const MAX_SIZE = 10 * 1024 * 1024;
-
-async function replaceFile(file, viewKeyRaw) {
+/**
+ * Re-encrypt a dropped file under the document's existing view key and PUT it.
+ * The encrypt-then-upload sequence itself lives in share-core.js, shared with
+ * the CLI, extension and MCP server so the wire contract never diverges; this
+ * function only owns the UI around it.
+ */
+async function replaceFile(file) {
   if (!file.name.match(/\.html?$/i)) { alert('Please drop an HTML file (.html or .htm).'); return; }
   if (file.size > MAX_SIZE) { alert('File is too large. Maximum size is 10 MB.'); return; }
 
@@ -198,25 +200,8 @@ async function replaceFile(file, viewKeyRaw) {
   uploadingState.classList.remove('hidden');
 
   try {
-    const viewKey = await importViewKey(viewKeyRaw);
     const plaintext = new Uint8Array(await file.arrayBuffer());
-    const { iv, ciphertext } = await encryptBytes(viewKey, plaintext);
-    const packed = packCiphertext(iv, ciphertext);
-    const encryptedViewKey = await encryptViewKeyWithEditKey(viewKeyRaw, editKeyRaw);
-
-    const r = await fetch(`/api/documents/${docId}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        ciphertext: packed,
-        encrypted_view_key: encryptedViewKey,
-        edit_key: b64url(editKeyRaw),
-        size: plaintext.length,
-      }),
-    });
-
-    if (r.status === 403) { authError.classList.remove('hidden'); editorUi.classList.add('hidden'); return; }
-    if (!r.ok) throw new Error('Upload failed');
+    await updateDocument(docId, b64url(editKeyRaw), plaintext);
 
     uploadingState.classList.add('hidden');
     dropzone.classList.remove('hidden');
@@ -225,6 +210,11 @@ async function replaceFile(file, viewKeyRaw) {
     console.error(err);
     uploadingState.classList.add('hidden');
     dropzone.classList.remove('hidden');
+    if (err.message === 'Invalid edit key for this document.') {
+      authError.classList.remove('hidden');
+      editorUi.classList.add('hidden');
+      return;
+    }
     alert('Something went wrong: ' + err.message);
   }
 }
