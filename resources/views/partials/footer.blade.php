@@ -25,6 +25,7 @@
         <a href="{{ route('vs.codepen') }}">vs CodePen</a>
         <a href="{{ route('vs.drive') }}">vs Google Drive &amp; Dropbox</a>
         <a href="{{ route('vs.email') }}">vs emailing an .html file</a>
+        <a href="{{ route('vs.artifacts') }}">vs Claude artifacts</a>
       </nav>
       <nav class="footer-links-col">
         <span class="footer-links-label">More</span>

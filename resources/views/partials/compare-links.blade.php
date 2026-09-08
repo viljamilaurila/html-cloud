@@ -5,6 +5,7 @@ $comparisons = [
   ['route' => 'vs.codepen', 'label' => 'vs CodePen'],
   ['route' => 'vs.drive',   'label' => 'vs Google Drive & Dropbox'],
   ['route' => 'vs.email',   'label' => 'vs emailing an .html file'],
+  ['route' => 'vs.artifacts', 'label' => 'vs Claude artifacts'],
 ];
 @endphp
 <nav class="compare-links">

@@ -18,6 +18,7 @@ Route::view('/vs/netlify-drop', 'pages.vs.netlify-drop')->name('vs.netlify');
 Route::view('/vs/codepen', 'pages.vs.codepen')->name('vs.codepen');
 Route::view('/vs/google-drive-dropbox', 'pages.vs.google-drive-dropbox')->name('vs.drive');
 Route::view('/vs/email-attachment', 'pages.vs.email-attachment')->name('vs.email');
+Route::view('/vs/claude-artifacts', 'pages.vs.claude-artifacts')->name('vs.artifacts');
 
 // Use-case landing pages.
 Route::view('/share-claude-artifact', 'pages.use.claude-artifact')->name('use.claude');

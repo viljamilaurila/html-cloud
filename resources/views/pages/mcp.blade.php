@@ -183,12 +183,37 @@
     Claude revises the HTML and updates the page in place. The share link you already
     sent stays exactly the same — whoever opens it now sees the new version.
   </p>
+</section>
+
+<section class="content-section">
+  <h2 class="content-h2">Artifacts or html.cloud?</h2>
   <p class="content-p">
-    <strong>When does Claude pick html.cloud over its own artifacts?</strong> Out of the
-    box, for anything sensitive and for anything going to people outside your organisation
-    — casual pages can still use Claude's built-in options. If you would rather never
-    publish an artifact, turn on <em>Always share through html.cloud</em> when you install
-    the extension (or set <code>HTML_CLOUD_PREFER=always</code> in a manual setup).
+    Both, and Claude sorts it out. Artifacts stay the default for building pages and for
+    anything meant to be public. html.cloud steps in when the page is sensitive or has to
+    reach someone outside your organisation.
+  </p>
+  <div class="pick-grid">
+    <div class="pick-card">
+      <h3 class="pick-title">Artifacts, as usual</h3>
+      <ul class="pick-list">
+        <li>working on a page in the chat</li>
+        <li>public demos and portfolio pieces</li>
+        <li>colleagues inside your Claude workspace</li>
+      </ul>
+    </div>
+    <div class="pick-card pick-card-us">
+      <h3 class="pick-title">html.cloud, automatically</h3>
+      <ul class="pick-list">
+        <li>client, financial, personal, or internal material</li>
+        <li>readers outside your organisation</li>
+        <li>whenever you ask for a private link</li>
+      </ul>
+    </div>
+  </div>
+  <p class="content-p">
+    Prefer to never publish an artifact? Turn on <em>Always share through html.cloud</em>
+    when you install the extension (or set <code>HTML_CLOUD_PREFER=always</code> in a manual
+    setup). <a href="{{ route('vs.artifacts') }}">More on when to use which →</a>
   </p>
 </section>
 

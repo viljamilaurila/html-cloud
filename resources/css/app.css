@@ -1546,6 +1546,38 @@ html, body {
   .mcp-text { animation: none; opacity: 1; grid-template-rows: 1fr; }
 }
 
+/* "Which one?" pair of cards (MCP page, artifacts comparison). */
+.pick-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 14px;
+  margin-top: 18px;
+}
+.pick-card {
+  padding: 16px 18px 18px;
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+}
+.pick-card-us { border-color: var(--accent); background: var(--accent-soft); }
+.pick-title {
+  margin: 0 0 10px;
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--ink);
+}
+.pick-card-us .pick-title { color: var(--accent); }
+.pick-list {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: var(--ink2);
+}
+.pick-list li + li { margin-top: 5px; }
+
 /* Download button (MCP page). Scoped to .content-col to out-specify `.content-col a`. */
 .content-col a.btn-download {
   display: inline-flex;
