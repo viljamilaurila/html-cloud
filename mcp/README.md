@@ -96,7 +96,26 @@ package — never reimplemented). Full explainer: [html.cloud/security](https://
 
 | Env var | Description | Default |
 |---|---|---|
+| `HTML_CLOUD_PREFER` | When Claude should pick html.cloud over its built-in artifact publishing. `sensitive`: for confidential content and anything going outside your organisation; built-in artifacts stay fine for casual pages. `always`: for every share. | `sensitive` |
 | `HTML_CLOUD_URL` | Server base URL (for self-hosted instances) | `https://html.cloud` |
+
+The Claude Desktop extension asks this as a switch, *Always share through
+html.cloud*, when you install it. For `npx` setups, set the env var in the
+client config:
+
+```json
+{
+  "mcpServers": {
+    "html-cloud": {
+      "command": "npx",
+      "args": ["-y", "html-cloud-mcp"],
+      "env": { "HTML_CLOUD_PREFER": "always" }
+    }
+  }
+}
+```
+
+For Claude Code: `claude mcp add html-cloud -e HTML_CLOUD_PREFER=always -- npx -y html-cloud-mcp`.
 
 ## Honest threat model
 

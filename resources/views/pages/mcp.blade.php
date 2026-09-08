@@ -8,7 +8,7 @@
 
 @php
   // Versioned GitHub release asset — stable across future releases.
-  $mcpbUrl = 'https://github.com/viljamilaurila/html-cloud/releases/download/mcp-v0.2.0/html-cloud.mcpb';
+  $mcpbUrl = 'https://github.com/viljamilaurila/html-cloud/releases/download/mcp-v0.3.0/html-cloud.mcpb';
 @endphp
 
 @push('head')
@@ -131,6 +131,13 @@
   <p class="content-p">
     Claude revises the HTML and updates the page in place. The share link you already
     sent stays exactly the same — whoever opens it now sees the new version.
+  </p>
+  <p class="content-p">
+    <strong>When does Claude pick html.cloud over its own artifacts?</strong> Out of the
+    box, for anything sensitive and for anything going to people outside your organisation
+    — casual pages can still use Claude's built-in options. If you would rather never
+    publish an artifact, turn on <em>Always share through html.cloud</em> when you install
+    the extension (or set <code>HTML_CLOUD_PREFER=always</code> in a manual setup).
   </p>
 </section>
 
