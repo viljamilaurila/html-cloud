@@ -9,6 +9,7 @@
     "name": "Viljami Laurila",
     "url": "https://html.cloud"
   },
+  "icon": "icon.png",
   "homepage": "https://html.cloud/mcp",
   "documentation": "https://html.cloud/mcp",
   "repository": {
