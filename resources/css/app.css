@@ -1412,6 +1412,7 @@ html, body {
 }
 .step-body p strong { color: var(--ink); font-weight: 600; }
 .step-body .content-codeblock { margin-top: 12px; }
+.step-body p + p { margin-top: 10px; }
 
 /* MCP page: example conversation, framed as its own card */
 .mcp-demo {

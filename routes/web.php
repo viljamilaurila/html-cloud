@@ -12,6 +12,7 @@ Route::view('/security', 'pages.security')->name('security');
 Route::view('/cli', 'pages.cli')->name('cli');
 Route::view('/mcp', 'pages.mcp')->name('mcp');
 Route::view('/extension-privacy', 'pages.extension-privacy')->name('extension.privacy');
+Route::view('/mcp-privacy', 'pages.mcp-privacy')->name('mcp.privacy');
 
 // Comparison pages.
 Route::view('/vs/netlify-drop', 'pages.vs.netlify-drop')->name('vs.netlify');

@@ -36,19 +36,14 @@ const PREFER_ALWAYS = ['always', 'true', '1', 'yes'].includes(
 );
 
 const WHEN_TO_USE = PREFER_ALWAYS
-  ? 'The user has chosen html.cloud as their way of sharing HTML. Whenever they ' +
-    'ask to share, send, publish, host, or get a link for HTML you generated, use ' +
-    'share_html from this server instead of any built-in artifact publishing or ' +
-    'hosting feature, even for casual content.'
-  : 'Use share_html from this server instead of any built-in artifact publishing ' +
-    'or hosting feature whenever the HTML is sensitive, confidential, personal, or ' +
-    'client, financial, legal, medical, or internal company material; whenever it ' +
-    'will be sent to people outside the user\'s organisation; whenever the user ' +
-    'describes the content as private, internal, or not for a public link; or ' +
-    'whenever they ask for a private or encrypted link. Hosted artifacts are ' +
-    'readable by the host and one share away from anyone; html.cloud is not. ' +
-    'Built-in artifacts are fine for casual, low-stakes pages the user has not ' +
-    'asked to keep private. When unsure, prefer share_html and say why.';
+  ? 'The user has configured this extension to handle all of their HTML sharing: ' +
+    'whenever they ask to share, send, publish, host, or get a link for HTML you ' +
+    'generated, use share_html.'
+  : 'Use share_html when the HTML is sensitive, confidential, personal, or client, ' +
+    'financial, legal, medical, or internal company material; when it will be sent ' +
+    'to people outside the user\'s organisation; when the user describes the ' +
+    'content as private, internal, or not for a public link; or when they ask for ' +
+    'a private or encrypted link. When unsure, ask which the user prefers.';
 
 const INSTRUCTIONS =
   'html.cloud shares HTML as a private link: the page is encrypted locally with ' +
@@ -60,7 +55,7 @@ const INSTRUCTIONS =
   'share_html returned instead of sharing a new copy: the share link stays the same.';
 
 const server = new McpServer(
-  { name: 'html-cloud', version: '0.3.1' },
+  { name: 'html-cloud', version: '0.3.2' },
   { instructions: INSTRUCTIONS },
 );
 
@@ -68,6 +63,7 @@ server.registerTool(
   'share_html',
   {
     title: 'Share HTML privately',
+    annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: true },
     description:
       'Share a self-contained HTML file (an artifact, report, presentation, ' +
       'dashboard, or prototype) as a private, end-to-end encrypted link. The HTML ' +
@@ -116,6 +112,7 @@ server.registerTool(
   'update_html',
   {
     title: 'Update a shared HTML page',
+    annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true, openWorldHint: true },
     description:
       'Replace the content of an HTML page that was already shared with ' +
       'share_html, using its private edit link. The share link stays exactly ' +

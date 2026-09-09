@@ -20,7 +20,7 @@ class SiteSecurityTest extends TestCase
 {
     use RefreshDatabase;
 
-    private const PAGES = ['/', '/security', '/cli', '/mcp', '/vs/codepen', '/vs/claude-artifacts', '/share-claude-artifact', '/extension-privacy', '/uploads'];
+    private const PAGES = ['/', '/security', '/cli', '/mcp', '/vs/codepen', '/vs/claude-artifacts', '/share-claude-artifact', '/extension-privacy', '/mcp-privacy', '/uploads'];
 
     private function makeDocument(): Document
     {
