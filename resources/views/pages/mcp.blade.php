@@ -8,7 +8,7 @@
 
 @php
   // Versioned GitHub release asset — stable across future releases.
-  $mcpbUrl = 'https://github.com/viljamilaurila/html-cloud/releases/download/mcp-v0.3.0/html-cloud.mcpb';
+  $mcpbUrl = 'https://github.com/viljamilaurila/html-cloud/releases/download/mcp-v0.3.1/html-cloud.mcpb';
 @endphp
 
 @push('head')
@@ -246,8 +246,8 @@
       <p>Yes. Just ask Claude to change the page — it updates it at the same share link, so nobody needs a new one. Every share also comes with a private edit link you can open yourself to replace the page, change when it expires, or delete it right away.</p>
     </details>
     <details class="faq-item">
-      <summary>Why doesn't it show up in Cowork?</summary>
-      <p>That's a current Claude Desktop limitation, not something you did wrong. Cowork sessions don't yet load locally installed extensions like this one, so the tool only appears in regular chats. Ask for your share link in a normal conversation — or paste the finished HTML into one and ask Claude to share it. When Anthropic adds extension support to Cowork, this will start working there without any changes.</p>
+      <summary>Does it work in Cowork?</summary>
+      <p>Yes, in Cowork sessions linked to the computer the extension is installed on — Claude Desktop passes the extension through to the session. It won't appear in cloud-only Cowork sessions that aren't linked to a computer; for those, ask for your share link in a regular chat, or paste the finished HTML into one and ask Claude to share it.</p>
     </details>
     <details class="faq-item">
       <summary>Prefer to do it yourself?</summary>

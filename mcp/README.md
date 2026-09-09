@@ -27,9 +27,10 @@ settings*, and use *Install Extension…* under *Extension Developer* to pick th
 file — dragging the file into the window is unreliable and may just attach it
 to the chat.
 
-> **Note:** Claude Desktop currently exposes locally installed extensions in
-> regular chats only — the tool won't appear in Cowork sessions yet. That's a
-> Claude Desktop limitation, not a configuration problem.
+> **Cowork:** the extension also works in Cowork sessions that are linked to
+> the computer it is installed on — the desktop app proxies it into the
+> session. A Cowork session running purely in the cloud, with no linked
+> computer, will not see it.
 
 ### Other MCP clients
 
