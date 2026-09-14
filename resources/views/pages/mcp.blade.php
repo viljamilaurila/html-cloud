@@ -8,7 +8,7 @@
 
 @php
   // Versioned GitHub release asset — stable across future releases.
-  $mcpbUrl = 'https://github.com/viljamilaurila/html-cloud/releases/download/mcp-v0.3.2/html-cloud.mcpb';
+  $mcpbUrl = 'https://github.com/viljamilaurila/html-cloud/releases/download/mcp-v0.4.0/html-cloud.mcpb';
 @endphp
 
 @push('head')
