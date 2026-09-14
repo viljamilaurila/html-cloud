@@ -2,7 +2,7 @@
   "manifest_version": "0.2",
   "name": "html-cloud-mcp",
   "display_name": "html.cloud — share HTML privately",
-  "version": "0.3.2",
+  "version": "0.4.0",
   "description": "Let Claude share the HTML it makes for you as a private, encrypted link — and update it later at the same link. No account.",
   "long_description": "Adds a tool that turns HTML Claude generates — a page, report, presentation, or invitation — into a private share link. The HTML is encrypted with AES-256-GCM on your computer before anything is uploaded, so html.cloud stores only ciphertext it cannot read. No account, no public URL. Each share also returns a private edit link, and Claude can use it to update the page in place — ask for a change and the same share link shows the new version.",
   "author": {

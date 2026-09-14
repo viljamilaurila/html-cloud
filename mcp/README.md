@@ -69,8 +69,15 @@ Requires Node.js 20+.
 
 | Argument | Type | Description |
 |---|---|---|
-| `html` | string (required) | The full, self-contained HTML document to share. |
+| `html` | string | The full, self-contained HTML document to share. |
+| `path` | string | Path of a local `.html` file to share instead of passing `html` inline. |
 | `expires` | `7` \| `30` \| `never` | Days until the link expires. Default `30`. |
+
+Pass exactly one of `html` or `path`. `path` is for large pages: MCP hosts cap
+the size of a tool argument, so a long report that the assistant has written to
+disk is shared from the file rather than squeezed through the call. Only
+`.html`/`.htm` files are accepted — the server shares web pages, not arbitrary
+files from your computer.
 
 Returns a **share link** (give it to anyone you want to read the file) and a
 private **edit link** (update the file, change the expiry, or delete it).
@@ -80,7 +87,10 @@ private **edit link** (update the file, change the expiry, or delete it).
 | Argument | Type | Description |
 |---|---|---|
 | `edit_link` | string (required) | The private edit link `share_html` returned. |
-| `html` | string (required) | The complete HTML document that replaces the current one. |
+| `html` | string | The complete HTML document that replaces the current one. |
+| `path` | string | Path of a local `.html` file whose content replaces the current page. |
+
+As with `share_html`, pass exactly one of `html` or `path`.
 
 Replaces the content behind an existing share. The **share link stays the
 same** and the expiry is untouched, so anyone who already has the link sees
@@ -137,7 +147,8 @@ For Claude Code: `claude mcp add html-cloud -e HTML_CLOUD_PREFER=always -- npx -
 Full policy: [html.cloud/mcp-privacy](https://html.cloud/mcp-privacy).
 
 - **Collection.** The server handles only the HTML the assistant passes to
-  `share_html` or `update_html`. It reads nothing else from your computer and
+  `share_html` or `update_html` — inline, or as the one `.html` file whose
+  path the assistant passes. It reads nothing else from your computer and
   nothing from the conversation beyond the tool arguments.
 - **Use and storage.** The HTML is encrypted locally with AES-256-GCM. What is
   sent to html.cloud: the ciphertext, the chosen expiry, a copy of the page key

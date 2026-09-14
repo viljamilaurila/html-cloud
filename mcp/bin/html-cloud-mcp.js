@@ -18,6 +18,11 @@
  * leaving the user's organisation, goes through html.cloud, the rest may use
  * built-in features. The .mcpb manifest exposes this as an install-time switch.
  *
+ * Each tool takes the page either inline (`html`) or as the path of an .html
+ * file (`path`). The file route matters for big pages: hosts cap the size of a
+ * tool argument, and a long report that does not fit is otherwise unshareable
+ * — and unupdatable, which tempts the assistant into sharing a second copy.
+ *
  * The routing rule is sent twice on purpose: as server `instructions` and
  * again inside the share_html tool description. Some hosts (Claude Cowork,
  * which reaches locally installed servers through the desktop app's bridge)
@@ -29,7 +34,7 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod';
 
-import { shareHtml, updateHtml } from '../lib/share.js';
+import { shareHtml, updateHtml, loadHtml } from '../lib/share.js';
 
 const PREFER_ALWAYS = ['always', 'true', '1', 'yes'].includes(
   String(process.env.HTML_CLOUD_PREFER ?? '').trim().toLowerCase(),
@@ -55,7 +60,7 @@ const INSTRUCTIONS =
   'share_html returned instead of sharing a new copy: the share link stays the same.';
 
 const server = new McpServer(
-  { name: 'html-cloud', version: '0.3.2' },
+  { name: 'html-cloud', version: '0.4.0' },
   { instructions: INSTRUCTIONS },
 );
 
@@ -70,23 +75,31 @@ server.registerTool(
       'is encrypted locally with AES-256-GCM before upload — html.cloud stores ' +
       'only ciphertext and cannot read it, and no account is required. ' +
       WHEN_TO_USE +
-      ' Returns a share link to give to others and a private edit link. Keep the ' +
-      'edit link: pass it to update_html to change the page later without ' +
-      'changing the share link. For changes to something already shared in this ' +
-      'conversation, use update_html instead of sharing again.',
+      ' Pass the document inline as html, or write it to an .html file and pass ' +
+      'its path as path — use path for large pages, so the whole document does ' +
+      'not have to fit in a tool argument. Returns a share link to give to ' +
+      'others and a private edit link. Keep the edit link: pass it to ' +
+      'update_html to change the page later without changing the share link. ' +
+      'For changes to something already shared in this conversation, use ' +
+      'update_html instead of sharing again.',
     inputSchema: {
       html: z
         .string()
-        .describe('The full, self-contained HTML document to share.'),
+        .optional()
+        .describe('The full, self-contained HTML document to share. Use path instead for large documents.'),
+      path: z
+        .string()
+        .optional()
+        .describe('Absolute path of a local .html file to share instead of passing html inline.'),
       expires: z
         .enum(['7', '30', 'never'])
         .optional()
         .describe('Days until the link expires. Defaults to 30.'),
     },
   },
-  async ({ html, expires }) => {
+  async ({ html, path, expires }) => {
     try {
-      const { shareUrl, editUrl, expires: exp } = await shareHtml(html, { expires });
+      const { shareUrl, editUrl, expires: exp } = await shareHtml(loadHtml({ html, path }), { expires });
       const expiryNote = exp === 'never' ? 'never expires' : `expires in ${exp} days`;
       return {
         content: [
@@ -120,19 +133,26 @@ server.registerTool(
       'HTML is encrypted locally with the same key as before; html.cloud never ' +
       'sees the content. Use this when the user asks to change, fix, revise, or ' +
       'add to a page you shared earlier in the conversation — pass the full ' +
-      'updated HTML document, not a diff.',
+      'updated HTML document, not a diff: inline as html, or as the path of an ' +
+      '.html file as path. Use path for large pages; do not fall back to ' +
+      'share_html if the document is too big to pass inline.',
     inputSchema: {
       edit_link: z
         .string()
         .describe('The private edit link returned by share_html (https://html.cloud/e/{id}#{key}).'),
       html: z
         .string()
-        .describe('The complete, self-contained HTML document that replaces the current one.'),
+        .optional()
+        .describe('The complete, self-contained HTML document that replaces the current one. Use path instead for large documents.'),
+      path: z
+        .string()
+        .optional()
+        .describe('Absolute path of a local .html file whose content replaces the current page, instead of passing html inline.'),
     },
   },
-  async ({ edit_link, html }) => {
+  async ({ edit_link, html, path }) => {
     try {
-      const { shareUrl, editUrl } = await updateHtml(edit_link, html);
+      const { shareUrl, editUrl } = await updateHtml(edit_link, loadHtml({ html, path }));
       return {
         content: [
           {

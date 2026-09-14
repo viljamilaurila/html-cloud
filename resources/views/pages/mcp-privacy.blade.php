@@ -12,15 +12,17 @@
 <p class="content-lead">
   The html.cloud extension for Claude Desktop (the <code>html-cloud-mcp</code> server) is built so
   that we <em>cannot</em> see the pages Claude shares through it. This page explains exactly what
-  it does with your data. <span class="content-updated">Last updated 2026-09-09.</span>
+  it does with your data. <span class="content-updated">Last updated 2026-09-14.</span>
 </p>
 
 <section class="content-section">
   <h2 class="content-h2">What we collect</h2>
   <p class="content-p">
     The extension handles only the HTML that Claude passes to its two tools, <code>share_html</code>
-    and <code>update_html</code>, when you ask for a page to be shared or changed. It does not read
-    files on your computer, your conversation, or anything else from Claude. It collects:
+    and <code>update_html</code>, when you ask for a page to be shared or changed — either inline, or
+    as the single <code>.html</code> file whose path Claude passes when a page is too large to fit in
+    a tool call. It does not read any other files on your computer, your conversation, or anything
+    else from Claude. It collects:
   </p>
   <ul class="content-list">
     <li><strong>Personal information:</strong> none. No account, no email, no name.</li>
