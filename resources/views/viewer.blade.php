@@ -31,7 +31,7 @@
   </div>
 </div>
 
-<iframe id="content-frame" class="content-frame hidden" sandbox="allow-scripts allow-popups" title="Shared HTML file"></iframe>
+<iframe id="content-frame" class="content-frame hidden" sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox" title="Shared HTML file"></iframe>
 
 <div id="upload-toast" class="upload-toast hidden" role="status">
   <div class="upload-toast-body">

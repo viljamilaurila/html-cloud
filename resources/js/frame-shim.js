@@ -18,6 +18,16 @@
  *    Clicks the page already handled (`defaultPrevented`) and modifier-clicks
  *    are left alone; no other URL resolution is touched.
  *
+ * 3. External links open in a new tab. A plain `<a href="https://…">` would
+ *    navigate the frame itself, replacing the document with a site that either
+ *    refuses to be framed or breaks inside the sandbox — the visitor just sees
+ *    the content vanish. The same click handler sends http(s) links that would
+ *    load in the frame (no target, or `_self`/`_parent`/`_top`) to a new tab
+ *    instead. Links with their own target, `download` links and other schemes
+ *    are left to the browser. The frame's `allow-popups-to-escape-sandbox`
+ *    lets the opened site run as a normal page rather than inheriting the
+ *    sandbox.
+ *
  * Kept as plain strings so the bundler never rewrites what runs inside the
  * frame, with `</script>` split so the tag can't terminate our own script.
  */
@@ -34,7 +44,10 @@ const anchorShim =
   'addEventListener("click",function(e){' +
   'if(e.defaultPrevented||e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;' +
   'var a=e.target&&e.target.closest?e.target.closest("a[href]"):null;if(!a)return;' +
-  'var h=a.getAttribute("href");if(!h||h.charAt(0)!=="#")return;' +
+  'var h=a.getAttribute("href");if(!h)return;' +
+  'if(h.charAt(0)!=="#"){var tg=(a.getAttribute("target")||"").toLowerCase();' +
+  'if(/^https?:$/.test(a.protocol)&&!a.hasAttribute("download")&&(tg===""||tg==="_self"||tg==="_parent"||tg==="_top")){' +
+  'e.preventDefault();open(a.href,"_blank","noopener")}return}' +
   'e.preventDefault();if(location.hash!==h&&!(h==="#"&&location.hash===""))location.hash=h;else g()});' +
   'addEventListener("hashchange",g)})();';
 
