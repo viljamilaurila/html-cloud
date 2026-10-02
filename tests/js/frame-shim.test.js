@@ -32,3 +32,60 @@ test('does not mutate its input', () => {
   instrumentDocument(html);
   assert.equal(html, '<head></head>');
 });
+
+/**
+ * Run the shim against stubbed frame globals and return its click listener
+ * plus the list of URLs it opened in a new tab.
+ */
+function loadClickHandler() {
+  const listeners = {};
+  const opened = [];
+  const source = FRAME_SHIM.slice('<script>'.length, -'</script>'.length);
+  new Function('addEventListener', 'document', 'parent', 'location', 'open', 'scrollTo', 'getComputedStyle', source)(
+    (type, fn) => { listeners[type] = fn; },
+    { readyState: 'loading', body: {}, getElementById: () => null, getElementsByName: () => [] },
+    { postMessage() {} },
+    { hash: '' },
+    (...args) => { opened.push(args); },
+    () => {},
+    () => ({ backgroundColor: '' }),
+  );
+  return { click: listeners.click, opened };
+}
+
+function clickOn(click, attrs, eventProps = {}) {
+  const url = new URL(attrs.href, 'https://html.cloud/v/abc');
+  const a = {
+    href: url.href,
+    protocol: url.protocol,
+    getAttribute: (name) => attrs[name] ?? null,
+    hasAttribute: (name) => name in attrs,
+  };
+  const event = {
+    button: 0,
+    defaultPrevented: false,
+    target: { closest: () => a },
+    preventDefault() { this.defaultPrevented = true; },
+    ...eventProps,
+  };
+  click(event);
+  return event;
+}
+
+test('external links open in a new tab instead of navigating the frame', () => {
+  const { click, opened } = loadClickHandler();
+  for (const target of [undefined, '_self', '_top', '_parent']) {
+    const attrs = target ? { href: 'https://example.com/a', target } : { href: 'https://example.com/a' };
+    assert.equal(clickOn(click, attrs).defaultPrevented, true);
+  }
+  assert.deepEqual(opened, Array(4).fill(['https://example.com/a', '_blank', 'noopener']));
+});
+
+test('links the browser already handles safely are left alone', () => {
+  const { click, opened } = loadClickHandler();
+  assert.equal(clickOn(click, { href: 'https://example.com/', target: '_blank' }).defaultPrevented, false);
+  assert.equal(clickOn(click, { href: 'mailto:a@example.com' }).defaultPrevented, false);
+  assert.equal(clickOn(click, { href: 'https://example.com/f.pdf', download: '' }).defaultPrevented, false);
+  assert.equal(clickOn(click, { href: 'https://example.com/' }, { metaKey: true }).defaultPrevented, false);
+  assert.deepEqual(opened, []);
+});

@@ -89,6 +89,17 @@ class SiteSecurityTest extends TestCase
         $this->assertSame('SAMEORIGIN', $response->headers->get('X-Frame-Options'));
     }
 
+    public function test_viewer_frame_stays_sandboxed_without_same_origin(): void
+    {
+        $doc = $this->makeDocument();
+
+        // Scripts run and links may open real tabs, but the document never gets
+        // html.cloud's origin, top navigation, or form submission.
+        $this->get("/v/{$doc->id}")
+            ->assertOk()
+            ->assertSee('sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox"', false);
+    }
+
     public function test_hsts_is_sent_only_in_production(): void
     {
         $this->assertFalse($this->get('/')->headers->has('Strict-Transport-Security'));
