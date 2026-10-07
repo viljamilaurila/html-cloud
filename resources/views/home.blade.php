@@ -1,7 +1,7 @@
 @extends('layout')
-@section('title', 'html.cloud — Private HTML file sharing')
+@section('title', 'HTML Cloud — Private HTML file sharing')
 @section('description', 'Share an HTML file with a private link. Encrypted in your browser before upload — only people with your link can read it. Not even us. No sign-up.')
-@section('og_title', 'html.cloud — Private HTML file sharing')
+@section('og_title', 'HTML Cloud — Private HTML file sharing')
 @section('og_description', 'Drop an HTML file, get a private link. Encrypted in your browser. Built for AI-generated presentations and sensitive documents.')
 @section('canonical', config('app.url'))
 
@@ -106,7 +106,7 @@
     <section class="home-info">
       <h2 class="home-info-h2">Private HTML file sharing, in plain terms</h2>
       <p class="home-info-p">
-        html.cloud shares a single HTML file through a private link. The person you send it
+        HTML Cloud (html.cloud) shares a single HTML file through a private link. The person you send it
         to just sees the page in their browser: no download, no sign-up, nothing to install
         on either side. And because the file is encrypted before it leaves your machine,
         <a href="{{ route('security') }}">not even we can read it</a>.

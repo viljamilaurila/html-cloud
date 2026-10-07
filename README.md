@@ -1,10 +1,10 @@
 <p align="center">
   <a href="https://html.cloud">
-    <img src="public/favicon.svg" alt="html.cloud logo" width="96" height="96">
+    <img src="public/favicon.svg" alt="HTML Cloud logo" width="96" height="96">
   </a>
 </p>
 
-<h1 align="center">html.cloud</h1>
+<h1 align="center">HTML Cloud</h1>
 
 <p align="center">
   <strong>Share an HTML file. Keep the key.</strong><br>
@@ -12,7 +12,7 @@
 </p>
 
 <p align="center">
-  <a href="https://html.cloud">html.cloud</a> ·
+  <a href="https://html.cloud">HTML Cloud</a> ·
   <a href="https://www.npmjs.com/package/html-cloud">npm</a> ·
   <a href="https://html.cloud/security">Security</a> ·
   <a href="https://html.cloud/cli">CLI</a> ·

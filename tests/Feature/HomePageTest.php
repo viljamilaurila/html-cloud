@@ -19,6 +19,14 @@ class HomePageTest extends TestCase
         $response->assertSee('id="dropzone"', false);
     }
 
+    public function test_home_page_title_leads_with_the_brand_as_words(): void
+    {
+        $response = $this->get('/');
+
+        $response->assertOk();
+        $response->assertSee('<title>HTML Cloud — Private HTML file sharing</title>', false);
+    }
+
     public function test_home_page_no_longer_offers_the_extra_private_toggle(): void
     {
         $response = $this->get('/');
