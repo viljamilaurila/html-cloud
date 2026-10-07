@@ -1,6 +1,6 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-  "name": "io.github.viljamilaurila/html-cloud",
+  "name": "cloud.html/html-cloud",
   "title": "HTML Cloud",
   "description": "Share AI-generated HTML as a private, end-to-end encrypted link. Update it later at the same link.",
   "websiteUrl": "https://html.cloud/mcp",
