@@ -35,22 +35,24 @@ test('does not mutate its input', () => {
 
 /**
  * Run the shim against stubbed frame globals and return its click listener
- * plus the list of URLs it opened in a new tab.
+ * and drag listeners, the URLs it opened in a new tab and what it posted to
+ * the parent.
  */
 function loadClickHandler() {
   const listeners = {};
   const opened = [];
+  const posted = [];
   const source = FRAME_SHIM.slice('<script>'.length, -'</script>'.length);
   new Function('addEventListener', 'document', 'parent', 'location', 'open', 'scrollTo', 'getComputedStyle', source)(
     (type, fn) => { listeners[type] = fn; },
     { readyState: 'loading', body: {}, getElementById: () => null, getElementsByName: () => [] },
-    { postMessage() {} },
+    { postMessage(message) { posted.push(message); } },
     { hash: '' },
     (...args) => { opened.push(args); },
     () => {},
     () => ({ backgroundColor: '' }),
   );
-  return { click: listeners.click, opened };
+  return { click: listeners.click, dragenter: listeners.dragenter, opened, posted };
 }
 
 function clickOn(click, attrs, eventProps = {}) {
@@ -88,4 +90,21 @@ test('links the browser already handles safely are left alone', () => {
   assert.equal(clickOn(click, { href: 'https://example.com/f.pdf', download: '' }).defaultPrevented, false);
   assert.equal(clickOn(click, { href: 'https://example.com/' }, { metaKey: true }).defaultPrevented, false);
   assert.deepEqual(opened, []);
+});
+
+test('dragging an HTML file over the document tells the parent, and nothing else', () => {
+  const { dragenter, posted } = loadClickHandler();
+  const drag = (...items) => {
+    const event = { dataTransfer: { items }, defaultPrevented: false, preventDefault() { this.defaultPrevented = true; } };
+    dragenter(event);
+    return event;
+  };
+
+  const event = drag({ kind: 'file', type: 'text/html' });
+  assert.deepEqual(posted.filter((m) => m.__hcdrag), [{ __hcdrag: 1 }]);
+  assert.equal(event.defaultPrevented, false, 'the document can still handle the drop itself');
+
+  posted.length = 0;
+  drag({ kind: 'file', type: 'image/png' }, { kind: 'string', type: 'text/html' });
+  assert.equal(posted.filter((m) => m.__hcdrag).length, 0, 'other files and dragged text are ignored');
 });

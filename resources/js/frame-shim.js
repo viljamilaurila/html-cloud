@@ -1,6 +1,6 @@
 /**
  * Instrumentation the viewer injects into a decrypted document before it is
- * rendered in the sandboxed srcdoc frame. Two tiny, self-contained scripts:
+ * rendered in the sandboxed srcdoc frame. Small, self-contained scripts:
  *
  * 1. Background reporter (read-only). The frame is sandboxed/cross-origin, so
  *    the parent can't read its styles — instead the document reports its own
@@ -28,6 +28,9 @@
  *    lets the opened site run as a normal page rather than inheriting the
  *    sandbox.
  *
+ * 4. Drag reporter. Lets the viewer show its owner-only "drop to replace"
+ *    target when an HTML file is dragged over the frame (see dragReporter).
+ *
  * Kept as plain strings so the bundler never rewrites what runs inside the
  * frame, with `</script>` split so the tag can't terminate our own script.
  */
@@ -51,7 +54,17 @@ const anchorShim =
   'e.preventDefault();if(location.hash!==h&&!(h==="#"&&location.hash===""))location.hash=h;else g()});' +
   'addEventListener("hashchange",g)})();';
 
-export const FRAME_SHIM = '<scr' + 'ipt>' + bgReporter + anchorShim + '<\/scr' + 'ipt>';
+// Tells the parent an HTML file is being dragged over the document, so the
+// owner's "drop to replace" target can come up above the frame (the parent gets
+// no drag events while the pointer is over the iframe). Reports nothing about the
+// file, never cancels the event, and ignores other files, so a document with its
+// own drop zone keeps working.
+const dragReporter =
+  '(function(){addEventListener("dragenter",function(e){var d=e.dataTransfer,i;if(!d||!d.items)return;' +
+  'for(i=0;i<d.items.length;i++)if(d.items[i].kind==="file"&&d.items[i].type==="text/html"){' +
+  'try{parent.postMessage({__hcdrag:1},"*")}catch(x){}return}})})();';
+
+export const FRAME_SHIM = '<scr' + 'ipt>' + bgReporter + anchorShim + dragReporter + '<\/scr' + 'ipt>';
 
 /**
  * Return the document HTML with the shim inserted at the top of <head>, or

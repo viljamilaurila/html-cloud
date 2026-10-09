@@ -19,6 +19,15 @@ class HomePageTest extends TestCase
         $response->assertSee('id="dropzone"', false);
     }
 
+    public function test_home_page_ships_the_new_version_prompt_and_recent_uploads_hidden(): void
+    {
+        $response = $this->get('/');
+
+        $response->assertOk();
+        $response->assertSee('class="version-prompt hidden" id="version-prompt"', false);
+        $response->assertSee('class="recent-uploads hidden" id="recent-uploads"', false);
+    }
+
     public function test_home_page_title_leads_with_the_brand_as_words(): void
     {
         $response = $this->get('/');

@@ -82,10 +82,24 @@
       <div class="dropzone-hover-overlay" aria-hidden="true"><span>Drop to encrypt &amp; share</span></div>
     </div>
 
+    @include('partials.version-prompt')
+
     <div class="uploading-state hidden" id="uploading-state">
       <div class="uploading-spinner"></div>
       <span class="uploading-text">Encrypting &amp; uploading…</span>
     </div>
+
+    {{-- Filled from this browser's own upload list (never the server); stays
+         hidden for anyone who hasn't shared from here. --}}
+    <section class="recent-uploads hidden" id="recent-uploads" aria-labelledby="recent-uploads-title">
+      <div class="recent-uploads-head">
+        <h2 class="recent-uploads-title" id="recent-uploads-title">Shared from this browser</h2>
+        <a class="recent-uploads-all" href="{{ route('uploads') }}">All uploads →</a>
+      </div>
+      <ul class="recent-uploads-list" id="recent-uploads-list"></ul>
+      <p class="recent-uploads-hint">Have a newer version? Use <strong>Update</strong> — the link stays the same.</p>
+      <input type="file" id="recent-uploads-file" accept=".html,.htm" hidden>
+    </section>
 
     <p class="explainer-cli">
       or from your terminal: <a href="{{ route('cli') }}"><code>npx html-cloud ./file.html</code></a>

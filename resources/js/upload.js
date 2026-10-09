@@ -1,5 +1,6 @@
-import { shareDocument, slugify, viewPath, MAX_SIZE } from './share-core.js';
-import { saveUpload } from './uploads-store.js';
+import { shareDocument, slugify, viewPath } from './share-core.js';
+import { saveUpload, listUploads, findPreviousVersion } from './uploads-store.js';
+import { replaceUpload, checkHtmlFile } from './replace-upload.js';
 
 const dropzone       = document.getElementById('dropzone');
 const fileInput      = document.getElementById('file-input');
@@ -53,16 +54,122 @@ fileInput.addEventListener('change', () => {
   if (fileInput.files?.[0]) handleFile(fileInput.files[0]);
 });
 
+// ─── New version of something already shared? ───
+// Matched by filename against this browser's own upload list. Updating keeps the
+// link people already have, which is what someone dropping "report (1).html"
+// almost always wants — but they choose.
+const versionPrompt = document.getElementById('version-prompt');
+
 async function handleFile(file) {
-  if (!file.name.match(/\.html?$/i)) {
-    alert('Please drop an HTML file (.html or .htm).');
-    return;
-  }
-  if (file.size > MAX_SIZE) {
-    alert('File is too large. Maximum size is 10 MB.');
+  const problem = checkHtmlFile(file);
+  if (problem) {
+    alert(problem);
     return;
   }
 
+  const previous = versionPrompt ? findPreviousVersion(file.name) : null;
+  if (previous) {
+    askAboutPreviousVersion(file, previous);
+    return;
+  }
+
+  await shareAsNew(file);
+}
+
+function askAboutPreviousVersion(file, previous) {
+  document.getElementById('version-prompt-name').textContent = previous.label || 'your earlier upload';
+  document.getElementById('version-prompt-when').textContent = sharedWhen(previous);
+
+  dropzone.classList.add('hidden');
+  versionPrompt.classList.remove('hidden');
+
+  const close = () => {
+    versionPrompt.classList.add('hidden');
+    for (const id of ['version-prompt-update', 'version-prompt-new', 'version-prompt-cancel']) {
+      document.getElementById(id).onclick = null;
+    }
+  };
+
+  document.getElementById('version-prompt-update').onclick = () => { close(); updateExisting(previous, file); };
+  document.getElementById('version-prompt-new').onclick    = () => { close(); shareAsNew(file); };
+  document.getElementById('version-prompt-cancel').onclick = () => {
+    close();
+    dropzone.classList.remove('hidden');
+    fileInput.value = '';
+  };
+  document.getElementById('version-prompt-update').focus();
+}
+
+/** Replace an upload this device owns and land on it, with the same link. */
+async function updateExisting(upload, file) {
+  dropzone.classList.add('hidden');
+  uploadingState.classList.remove('hidden');
+  try {
+    await replaceUpload(upload, file);
+    try { sessionStorage.setItem('hc_just_updated', upload.id); } catch { /* ignore */ }
+    window.location.href = `${viewPath(upload.id, upload.slug)}#${upload.viewKey}`;
+  } catch (err) {
+    console.error(err);
+    uploadingState.classList.add('hidden');
+    dropzone.classList.remove('hidden');
+    showDropzoneError(err.gone ? `${err.message} Drop the file again to share it as a new link.` : err.message);
+    renderRecentUploads();
+  }
+}
+
+function sharedWhen(upload) {
+  const ts = upload.updatedAt || upload.createdAt;
+  if (!ts) return 'earlier';
+  const days = Math.floor((Date.now() - ts) / 86400000);
+  if (days < 1) return 'today';
+  if (days === 1) return 'yesterday';
+  return 'on ' + new Date(ts).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+}
+
+// ─── Recent uploads (home page only) ───
+const recentSection = document.getElementById('recent-uploads');
+const recentList    = document.getElementById('recent-uploads-list');
+const recentFile    = document.getElementById('recent-uploads-file');
+const RECENT_LIMIT  = 3;
+let recentTarget    = null;
+
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, (c) => (
+    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+  ));
+}
+
+function renderRecentUploads() {
+  if (!recentSection) return;
+  const items = listUploads().filter((u) => u.editKey).slice(0, RECENT_LIMIT);
+  recentSection.classList.toggle('hidden', items.length === 0);
+  recentList.innerHTML = items.map((u) => `
+    <li class="recent-upload">
+      <a class="recent-upload-name" href="${esc(viewPath(u.id, u.slug))}#${esc(u.viewKey)}">${esc(u.label || u.id)}</a>
+      <span class="recent-upload-when">${esc(sharedWhen(u))}</span>
+      <button type="button" class="link-btn link-btn-ghost-sm" data-update="${esc(u.id)}">Update…</button>
+    </li>`).join('');
+}
+
+if (recentSection) {
+  recentList.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-update]');
+    if (!btn) return;
+    recentTarget = listUploads().find((u) => u.id === btn.dataset.update) || null;
+    if (recentTarget) recentFile.click();
+  });
+  recentFile.addEventListener('change', () => {
+    const file = recentFile.files?.[0];
+    recentFile.value = '';
+    if (!file || !recentTarget) return;
+    const problem = checkHtmlFile(file);
+    if (problem) { alert(problem); return; }
+    updateExisting(recentTarget, file);
+  });
+  renderRecentUploads();
+}
+
+async function shareAsNew(file) {
   // Home uploads are always shareable links; the extra-private (fragment-stripping)
   // mode can still be switched on from the document's edit page.
   const sensitive = false;

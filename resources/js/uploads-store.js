@@ -34,6 +34,35 @@ export function saveUpload(entry) {
   } catch { /* storage full or unavailable — non-fatal */ }
 }
 
+/**
+ * Reduce a filename to the document it most likely is, so a new version still
+ * matches the upload it replaces: "Report (1).html", "report-v2.html" and
+ * "report final.htm" all become "report". Only ever used to *suggest* an update —
+ * the person always confirms — so a loose match is cheap and a missed one isn't.
+ */
+export function documentStem(fileName) {
+  let stem = String(fileName || '').split(/[\\/]/).pop().toLowerCase().replace(/\.html?$/, '').trim();
+  let previous;
+  do {
+    previous = stem;
+    stem = stem
+      .replace(/\s*\(\d+\)$/, '')                                  // browser duplicate: "report (1)"
+      .replace(/[\s_-]+(v(er(sion)?)?\s*\d+|\d+|copy|final|updated|new|latest)$/, '') // "report-v2", "report final"
+      .trim();
+  } while (stem && stem !== previous);
+  return stem;
+}
+
+/**
+ * The most recent upload from this device that the dropped file looks like a new
+ * version of, or null. `uploads` is injectable for tests.
+ */
+export function findPreviousVersion(fileName, uploads = listUploads()) {
+  const stem = documentStem(fileName);
+  if (!stem) return null;
+  return uploads.find((u) => u.editKey && documentStem(u.label) === stem) || null;
+}
+
 export function removeUpload(id) {
   try {
     localStorage.setItem(KEY, JSON.stringify(listUploads().filter((u) => u.id !== id)));

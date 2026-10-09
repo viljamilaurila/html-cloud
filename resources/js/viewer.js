@@ -1,6 +1,7 @@
 import { importViewKey, decryptBytes, unpackCiphertext, b64url, b64urlDecode } from './crypto.js';
 import { getUpload } from './uploads-store.js';
 import { instrumentDocument } from './frame-shim.js';
+import { replaceUpload, checkHtmlFile } from './replace-upload.js';
 
 const docId       = window.__DOC_ID__;
 const loadScreen  = document.getElementById('loading-screen');
@@ -95,8 +96,6 @@ async function main() {
     stripKeyFromAddressBar(fragment);
   }
 
-  const html = new TextDecoder().decode(plaintext);
-
   // Paint the parent page (and the frame's letterbox area) to match the document's
   // own background, so a short document doesn't sit on a mismatched backdrop. The
   // frame is sandboxed/cross-origin, so the parent can't read its styles — instead
@@ -113,10 +112,7 @@ async function main() {
     }
   });
 
-  const injected = instrumentDocument(html);
-
-  // srcdoc works in sandboxed iframes without allow-same-origin.
-  frame.srcdoc = injected;
+  renderDocument(plaintext);
   frame.classList.remove('hidden');
   loadScreen.classList.add('hidden');
 
@@ -129,17 +125,154 @@ async function main() {
   const shareUrl = `${window.location.origin}${viewPath}#${b64url(viewKeyRaw)}`;
   const upload   = getUpload(docId);
 
-  // Hand the badge the ORIGINAL plaintext, not `injected` — the shim is our
-  // rendering instrumentation and must never end up in the saved file.
-  setupBadge(shareUrl, !!upload, () => downloadDocument(plaintext, downloadFilename(upload, slugSeg)));
+  // Download saves the ORIGINAL plaintext, never the instrumented copy — the shim
+  // is our rendering instrumentation and must never end up in the saved file.
+  setupBadge(shareUrl, !!upload, () => downloadDocument(currentPlaintext, downloadFilename(getUpload(docId), slugSeg)));
+  setupToast(shareUrl);
 
-  // Just uploaded from this tab? Greet the creator once, and explain sharing.
-  let justUploaded = false;
-  try { justUploaded = sessionStorage.getItem('hc_just_uploaded') === docId; } catch { /* ignore */ }
-  if (justUploaded) {
-    try { sessionStorage.removeItem('hc_just_uploaded'); } catch { /* ignore */ }
-    showUploadToast(shareUrl, doc.sensitive);
+  // This browser uploaded it: offer replacing it in place (badge + drop anywhere).
+  if (upload?.editKey) setupReplace(upload);
+
+  // Just uploaded or updated from this tab? Greet the creator once.
+  const greeting = takeOnce('hc_just_uploaded') ? 'uploaded' : takeOnce('hc_just_updated') ? 'updated' : null;
+  if (greeting === 'uploaded') {
+    showToast('Encrypted & uploaded', doc.sensitive
+      ? 'Share it with Copy link — the key stays hidden from the address bar.'
+      : 'Your link is in the address bar. New version later? Drop it on this page.');
+  } else if (greeting === 'updated') {
+    showToast('Updated — same link', 'Everyone with the link now sees this version.');
   }
+}
+
+// The plaintext currently on screen; replaced in place when the owner uploads a
+// new version, so Download always saves what's showing.
+let currentPlaintext = null;
+
+function renderDocument(plaintext) {
+  currentPlaintext = plaintext;
+  // srcdoc works in sandboxed iframes without allow-same-origin.
+  frame.srcdoc = instrumentDocument(new TextDecoder().decode(plaintext));
+}
+
+/** True once if this tab left `key` = this doc's id in sessionStorage. */
+function takeOnce(key) {
+  try {
+    if (sessionStorage.getItem(key) !== docId) return false;
+    sessionStorage.removeItem(key);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+// ─── Replace in place (owner only) ───
+// The edit key comes from this device's own upload list, so only the browser that
+// shared the document ever sees these controls. Dropping a new file asks once,
+// then re-encrypts it under the same link and swaps it in without a reload.
+function setupReplace(upload) {
+  const overlay   = document.getElementById('replace-drop');
+  const confirmEl = document.getElementById('replace-confirm');
+  const nameEl    = document.getElementById('replace-confirm-name');
+  const okBtn     = document.getElementById('replace-confirm-ok');
+  const cancelBtn = document.getElementById('replace-confirm-cancel');
+  const badgeBtn  = document.querySelector('.hc-badge-replace');
+  const input     = document.querySelector('.hc-badge-replace-input');
+  if (!overlay || !confirmEl) return;
+
+  let pending = null;
+
+  const isHtmlDrag = (e) => [...(e.dataTransfer?.items || [])]
+    .some((item) => item.kind === 'file' && item.type === 'text/html');
+
+  // While the overlay is up the frame must not be a drop target at all, or a
+  // drop that lands on it opens the raw file instead of replacing the page.
+  // dragleave is unreliable here (relatedTarget is often null across the iframe
+  // boundary, so the overlay flickered away), so instead the overlay stays up as
+  // long as dragover keeps arriving — browsers fire it continuously — and hides
+  // shortly after it stops: on drop, Esc, or the pointer leaving the window.
+  let hideTimer = null;
+  const hideOverlay = () => {
+    clearTimeout(hideTimer);
+    overlay.classList.add('hidden');
+    frame.style.pointerEvents = '';
+  };
+  const showOverlay = () => {
+    if (pending) return;
+    overlay.classList.remove('hidden');
+    frame.style.pointerEvents = 'none';
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(hideOverlay, 400);
+  };
+
+  // Over the frame the parent gets no drag events, so the injected shim reports
+  // them; over the parent's own edges we see them directly.
+  window.addEventListener('message', (e) => {
+    if (e.source === frame.contentWindow && e.data && e.data.__hcdrag) showOverlay();
+  });
+  document.addEventListener('dragenter', (e) => { if (isHtmlDrag(e)) showOverlay(); });
+
+  overlay.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'copy';
+    showOverlay();
+  });
+  overlay.addEventListener('drop', (e) => {
+    e.preventDefault();
+    hideOverlay();
+    const file = e.dataTransfer?.files?.[0];
+    if (file) ask(file);
+  });
+  // Never let a stray drop navigate the tab away to the raw file.
+  window.addEventListener('dragover', (e) => e.preventDefault());
+  window.addEventListener('drop', (e) => e.preventDefault());
+
+  badgeBtn.classList.remove('hidden');
+  badgeBtn.addEventListener('click', () => input.click());
+  input.addEventListener('change', () => {
+    const file = input.files?.[0];
+    input.value = '';
+    if (file) ask(file);
+  });
+
+  function ask(file) {
+    const problem = checkHtmlFile(file);
+    if (problem) { alert(problem); return; }
+    pending = file;
+    nameEl.textContent = file.name;
+    confirmEl.classList.remove('hidden');
+    okBtn.focus();
+  }
+
+  function close() {
+    pending = null;
+    confirmEl.classList.add('hidden');
+    okBtn.disabled = false;
+    okBtn.textContent = 'Replace page';
+  }
+
+  cancelBtn.addEventListener('click', close);
+  // Esc or a click on the dimmed backdrop cancels, like any dialog.
+  confirmEl.addEventListener('click', (e) => { if (e.target === confirmEl && !okBtn.disabled) close(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && pending && !okBtn.disabled) close(); });
+  okBtn.addEventListener('click', async () => {
+    if (!pending) return;
+    okBtn.disabled = true;
+    okBtn.textContent = 'Encrypting…';
+    try {
+      const owned = getUpload(docId) || upload;
+      renderDocument(await replaceUpload(owned, pending));
+      close();
+      showToast('Updated — same link', 'Everyone with the link now sees this version.');
+    } catch (err) {
+      console.error(err);
+      close();
+      if (err.gone) {
+        badgeBtn.classList.add('hidden');
+        hideOverlay();
+      }
+      alert(err.message);
+    }
+  });
 }
 
 // Save the document to disk. Everything happens on bytes we already hold in
@@ -168,28 +301,36 @@ function downloadFilename(upload, slugSeg) {
   return /\.html?$/i.test(base) ? base : `${base}.html`;
 }
 
-// One-time confirmation shown to the creator right after upload.
-function showUploadToast(shareUrl, sensitive) {
-  const toast = document.getElementById('upload-toast');
-  if (!toast) return;
-  const sub     = document.getElementById('upload-toast-sub');
-  const copyBtn = document.getElementById('upload-toast-copy');
+// Confirmation shown to the creator after an upload or an update. Wired once;
+// showToast() can then raise it as often as needed.
+let toastTimer = null;
 
-  sub.textContent = sensitive
-    ? 'Share it with Copy link — the key stays hidden from the address bar.'
-    : 'Your link is in the address bar — or use Copy link.';
+function setupToast(shareUrl) {
+  const toast   = document.getElementById('upload-toast');
+  const copyBtn = document.getElementById('upload-toast-copy');
+  if (!toast) return;
 
   copyBtn.addEventListener('click', () => {
     copyToClipboard(shareUrl);
     copyBtn.textContent = 'Copied';
     setTimeout(() => { copyBtn.textContent = 'Copy link'; }, 1800);
   });
+  document.getElementById('upload-toast-dismiss').addEventListener('click', dismissToast);
+}
 
-  const dismiss = () => toast.classList.add('upload-toast-leaving');
-  document.getElementById('upload-toast-dismiss').addEventListener('click', dismiss);
-
+function showToast(title, sub) {
+  const toast = document.getElementById('upload-toast');
+  if (!toast) return;
+  document.getElementById('upload-toast-title').textContent = title;
+  document.getElementById('upload-toast-sub').textContent = sub;
+  toast.classList.remove('upload-toast-leaving');
   requestAnimationFrame(() => toast.classList.remove('hidden'));
-  setTimeout(dismiss, 9000); // auto-dismiss; never blocks the document
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(dismissToast, 9000); // auto-dismiss; never blocks the document
+}
+
+function dismissToast() {
+  document.getElementById('upload-toast')?.classList.add('upload-toast-leaving');
 }
 
 // The floating lock pill that lives in the parent viewer page (above the iframe).
