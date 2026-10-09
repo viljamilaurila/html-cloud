@@ -266,7 +266,7 @@
   </p>
 </section>
 
-<section class="content-section">
+<section class="content-section" id="threat-model">
   <h2 class="content-h2">Threat model &amp; honest limitations</h2>
   <p class="content-p">
     Encryption is only as strong as the assumptions around it. Here is what html.cloud does

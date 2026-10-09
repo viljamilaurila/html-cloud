@@ -107,18 +107,11 @@
 
     <p class="explainer-cli">
       or from your terminal: <a href="{{ route('cli') }}"><code>npx html-cloud ./file.html</code></a>
-      <span class="explainer-cli-sep" aria-hidden="true">·</span>
-      <a href="{{ route('mcp') }}" class="explainer-cli-claude">let Claude share for you →</a>
     </p>
 
-    <section class="explainer">
-      @include('partials.illustrations.flow')
-      <p class="explainer-caption">
-        Your browser locks the file before anything leaves your computer.
-        The only key is in the link you share — we never see it, so not even we can read your file.
-        <a href="{{ route('security') }}" class="explainer-readmore">How the encryption works →</a>
-      </p>
-    </section>
+    @include('partials.claude-story')
+
+    @include('partials.under-the-hood')
 
     <section class="home-info">
       <h2 class="home-info-h2">Private HTML file sharing, in plain terms</h2>
@@ -207,5 +200,5 @@
 @endsection
 
 @push('scripts')
-@vite('resources/js/upload.js')
+@vite(['resources/js/upload.js', 'resources/js/claude-story.js', 'resources/js/uth-anim.js'])
 @endpush

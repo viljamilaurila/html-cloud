@@ -28,6 +28,28 @@ class HomePageTest extends TestCase
         $response->assertSee('class="recent-uploads hidden" id="recent-uploads"', false);
     }
 
+    public function test_home_page_shows_the_claude_story_with_a_link_to_set_it_up(): void
+    {
+        $response = $this->get('/');
+
+        $response->assertOk();
+        $response->assertSee('Ask Claude to share it.', false);
+        $response->assertSee('id="claude-story"', false);
+        $response->assertSee(route('mcp'), false);
+        $response->assertSee('Why not just publish the artifact?', false);
+        $response->assertSee(route('vs.artifacts'), false);
+    }
+
+    public function test_home_page_explains_the_key_in_the_link_and_links_to_the_details(): void
+    {
+        $response = $this->get('/');
+
+        $response->assertOk();
+        $response->assertSee('The key lives in the link.', false);
+        $response->assertSee(route('security').'#threat-model', false);
+        $this->get(route('security'))->assertSee('id="threat-model"', false);
+    }
+
     public function test_home_page_title_leads_with_the_brand_as_words(): void
     {
         $response = $this->get('/');

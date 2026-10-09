@@ -10,6 +10,8 @@ export default defineConfig({
                 'resources/js/viewer.js',
                 'resources/js/editor.js',
                 'resources/js/uploads-page.js',
+                'resources/js/claude-story.js',
+                'resources/js/uth-anim.js',
             ],
             refresh: true,
         }),

@@ -85,7 +85,7 @@
     <tbody>
       <tr><td>Best at</td><td class="col-us">Delivering a finished page privately</td><td>Building and iterating on the page inside the chat</td></tr>
       <tr><td>Sharing outside your organisation</td><td class="col-us">Private link, encrypted; no account for the reader</td><td>Publish to a public link</td></tr>
-      <tr><td>Who can open a shared page</td><td class="col-us">Only people who have the exact link</td><td>Anyone with the public link, or workspace members for internal sharing</td></tr>
+      <tr><td>Who can open a shared page</td><td class="col-us">Only people who have the exact link</td><td>Anyone with a public link (an admin setting on Team and Enterprise); otherwise only signed-in Claude users you share it with</td></tr>
       <tr><td>How the page is stored</td><td class="col-us">Ciphertext only; we can't read it</td><td>Readable, so it can be served</td></tr>
       <tr><td>Changing it after sharing</td><td class="col-us">Yes — same link shows the new version</td><td>Yes — republish</td></tr>
       <tr><td>Expiry &amp; deletion</td><td class="col-us">7 / 30 days / never; delete anytime</td><td>Unpublish anytime</td></tr>
