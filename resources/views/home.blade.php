@@ -93,9 +93,13 @@
          hidden for anyone who hasn't shared from here. --}}
     <section class="recent-uploads hidden" id="recent-uploads" aria-labelledby="recent-uploads-title">
       <div class="recent-uploads-head">
-        <h2 class="recent-uploads-title" id="recent-uploads-title">Shared from this browser</h2>
-        <a class="recent-uploads-all" href="{{ route('uploads') }}">All uploads →</a>
+        <h2 class="recent-uploads-title" id="recent-uploads-title">
+          <svg class="recent-uploads-lock" width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="10" height="8" rx="1.5"/><path d="M5 7V5a3 3 0 0 1 6 0v2"/></svg>
+          Your uploads
+        </h2>
+        <a class="recent-uploads-all" href="{{ route('uploads') }}">See all →</a>
       </div>
+      <p class="recent-uploads-private">Only you see this list — it’s kept in this browser, not on our servers. Each file opens only with its private link.</p>
       <ul class="recent-uploads-list" id="recent-uploads-list"></ul>
       <p class="recent-uploads-hint">Have a newer version? Use <strong>Update</strong> — the link stays the same.</p>
       <input type="file" id="recent-uploads-file" accept=".html,.htm" hidden>
@@ -103,9 +107,8 @@
 
     <p class="explainer-cli">
       or from your terminal: <a href="{{ route('cli') }}"><code>npx html-cloud ./file.html</code></a>
-    </p>
-    <p class="explainer-cli explainer-cli-alt">
-      <a href="{{ route('mcp') }}" class="explainer-cli-claude">or let Claude share for you →</a>
+      <span class="explainer-cli-sep" aria-hidden="true">·</span>
+      <a href="{{ route('mcp') }}" class="explainer-cli-claude">let Claude share for you →</a>
     </p>
 
     <section class="explainer">
