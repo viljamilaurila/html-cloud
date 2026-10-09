@@ -12,6 +12,7 @@ export default defineConfig({
                 'resources/js/uploads-page.js',
                 'resources/js/claude-story.js',
                 'resources/js/uth-anim.js',
+                'resources/js/who-uses.js',
             ],
             refresh: true,
         }),

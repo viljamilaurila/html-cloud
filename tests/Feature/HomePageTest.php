@@ -50,6 +50,18 @@ class HomePageTest extends TestCase
         $this->get(route('security'))->assertSee('id="threat-model"', false);
     }
 
+    public function test_home_page_names_the_problem_and_shows_real_situations(): void
+    {
+        $response = $this->get('/');
+
+        $response->assertOk();
+        $response->assertSee('not a public page.', false);
+        $response->assertSeeInOrder(['id="dropzone"', 'id="who-uses"', 'id="claude-story"'], false);
+        foreach (['consultant', 'founder', 'designer', 'analyst', 'lead'] as $role) {
+            $response->assertSee("id=\"who-panel-{$role}\"", false);
+        }
+    }
+
     public function test_home_page_title_leads_with_the_brand_as_words(): void
     {
         $response = $this->get('/');

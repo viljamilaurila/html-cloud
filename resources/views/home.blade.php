@@ -52,6 +52,10 @@
   <main class="home-main">
     <div class="hero">
       <h1 class="headline">Share an HTML file in seconds. <em>Private by design.</em></h1>
+      <p class="hero-sub">
+        AI now hands you reports, proposals and dashboards as HTML — often full of numbers you’d never
+        post publicly. HTML Cloud sends them as an encrypted link, not a public page.
+      </p>
       <div class="hero-art" aria-hidden="true">@include('partials.illustrations.hero-window')</div>
     </div>
 
@@ -109,6 +113,8 @@
       or from your terminal: <a href="{{ route('cli') }}"><code>npx html-cloud ./file.html</code></a>
     </p>
 
+    @include('partials.who-uses')
+
     @include('partials.claude-story')
 
     @include('partials.under-the-hood')
@@ -141,34 +147,6 @@
         </div>
       </dl>
 
-      <h3 class="home-info-h3">Built for the HTML files AI makes for you</h3>
-      <p class="home-info-p">
-        Claude, ChatGPT, and Gemini increasingly hand you a finished HTML file — a report,
-        a slide deck, a small app. html.cloud is the private way to pass it on.
-      </p>
-      <div class="home-uses">
-        <a class="home-use-card" href="{{ route('use.claude') }}">
-          <span class="home-use-art" aria-hidden="true">@include('partials.illustrations.artifact')</span>
-          <span class="home-use-label">Share a Claude artifact</span>
-          <span class="home-use-sub">Reports, dashboards, mini-apps — without publishing them.</span>
-        </a>
-        <a class="home-use-card" href="{{ route('use.presentation') }}">
-          <span class="home-use-art" aria-hidden="true">@include('partials.illustrations.deck')</span>
-          <span class="home-use-label">Share an AI presentation</span>
-          <span class="home-use-sub">HTML slides that open in any browser, full screen.</span>
-        </a>
-        <a class="home-use-card" href="{{ route('use.report') }}">
-          <span class="home-use-art" aria-hidden="true">@include('partials.illustrations.presenter')</span>
-          <span class="home-use-label">Send a client a report</span>
-          <span class="home-use-sub">A private link that can expire when the deal closes.</span>
-        </a>
-        <a class="home-use-card" href="{{ route('use.internal') }}">
-          <span class="home-use-art" aria-hidden="true">@include('partials.illustrations.internal-doc')</span>
-          <span class="home-use-label">Share an internal document</span>
-          <span class="home-use-sub">Dashboards and runbooks that stay inside the team.</span>
-        </a>
-      </div>
-
       <h3 class="home-info-h3">When to use it over the usual routes</h3>
       <ul class="home-routes">
         <li class="home-route">
@@ -200,5 +178,5 @@
 @endsection
 
 @push('scripts')
-@vite(['resources/js/upload.js', 'resources/js/claude-story.js', 'resources/js/uth-anim.js'])
+@vite(['resources/js/upload.js', 'resources/js/who-uses.js', 'resources/js/claude-story.js', 'resources/js/uth-anim.js'])
 @endpush
