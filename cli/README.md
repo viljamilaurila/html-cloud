@@ -53,6 +53,8 @@ Read the full explainer: [html.cloud/security](https://html.cloud/security)
 |---|---|---|
 | `--expires <7\|30\|never>` | Days until the link expires | `30` |
 | `--update <edit-link>` | Replace the content behind an existing share (pass the edit link a previous run printed). The share link stays the same; expiry is unchanged | — |
+| `--name <text>` | Readable name in the share link, e.g. `/v/{id}/q3-report`. Not encrypted — the server and link previews see it | the file's name (none for stdin) |
+| `--no-name` | Leave the name out of the share link | — |
 | `--url <base>` | Server base URL (or `$HTML_CLOUD_URL`) | `https://html.cloud` |
 | `--no-copy` | Don't copy the share link to the clipboard | copy is on |
 

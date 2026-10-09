@@ -121,6 +121,8 @@ Encrypted locally with AES-256-GCM · expires in 30 days · the server never saw
     <tbody>
       <tr><td><code>--expires 7|30|never</code></td><td>Days until the link expires</td><td><code>30</code></td></tr>
       <tr><td><code>--update &lt;edit-link&gt;</code></td><td>Replace the content behind an existing share; the share link stays the same</td><td>—</td></tr>
+      <tr><td><code>--name &lt;text&gt;</code></td><td>Readable name in the share link, e.g. <code>/v/…/q3-report</code>. Not encrypted — visible to the server and link previews</td><td>the file’s name</td></tr>
+      <tr><td><code>--no-name</code></td><td>Leave the name out of the share link</td><td>—</td></tr>
       <tr><td><code>--no-copy</code></td><td>Don't copy the share link to the clipboard</td><td>copy is on</td></tr>
       <tr><td><code>--url &lt;base&gt;</code></td><td>Use a different server (or <code>$HTML_CLOUD_URL</code>)</td><td><code>https://html.cloud</code></td></tr>
     </tbody>

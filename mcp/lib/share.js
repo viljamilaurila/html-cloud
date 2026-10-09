@@ -11,7 +11,7 @@ import { readFileSync } from 'node:fs';
 import { basename } from 'node:path';
 
 import {
-  shareDocument, updateDocument, parseEditLink, MAX_SIZE,
+  shareDocument, updateDocument, parseEditLink, slugify, viewPath, MAX_SIZE,
 } from 'html-cloud/share-core.js';
 
 export { MAX_SIZE };
@@ -71,10 +71,10 @@ async function reaching(baseUrl, work) {
   }
 }
 
-function links(baseUrl, { id, viewFrag, editFrag }) {
+function links(baseUrl, { id, viewFrag, editFrag }, slug = '') {
   return {
     id,
-    shareUrl: `${baseUrl}/v/${id}#${viewFrag}`,
+    shareUrl: `${baseUrl}${viewPath(id, slug)}#${viewFrag}`,
     editUrl:  `${baseUrl}/e/${id}#${editFrag}`,
   };
 }
@@ -83,6 +83,10 @@ function links(baseUrl, { id, viewFrag, editFrag }) {
  * @param {string|Uint8Array} html  The HTML content to share (see loadHtml).
  * @param {object} [opts]
  * @param {'7'|'30'|'never'} [opts.expires='30']
+ * @param {string} [opts.linkName]  Readable name for the link, e.g. "Q3 sales report"
+ *   → /v/{id}/q3-sales-report. Cosmetic, like the filename slug the web upload
+ *   adds: it travels in the URL path (so the server sees it) and is never used
+ *   to find the document. Omitted, the link is just /v/{id}.
  * @param {string} [opts.baseUrl]  Server base URL (default html.cloud / $HTML_CLOUD_URL).
  * @returns {Promise<{id:string, shareUrl:string, editUrl:string, expires:string}>}
  */
@@ -97,7 +101,7 @@ export async function shareHtml(html, opts = {}) {
   const result = await reaching(baseUrl, () =>
     shareDocument(plaintext, { expiresIn: expires, baseUrl }));
 
-  return { ...links(baseUrl, result), expires };
+  return { ...links(baseUrl, result, slugify(opts.linkName ?? '')), expires };
 }
 
 /**
@@ -107,14 +111,17 @@ export async function shareHtml(html, opts = {}) {
  *
  * @param {string} editLink            The private https://html.cloud/e/{id}#{key} link.
  * @param {string|Uint8Array} html     The new, full HTML document (see loadHtml).
+ * @param {object} [opts]
+ * @param {string} [opts.linkName]      The name the page was shared with, so the
+ *   returned share link matches the one people already have (see shareHtml).
  * @returns {Promise<{id:string, shareUrl:string, editUrl:string}>}
  */
-export async function updateHtml(editLink, html) {
+export async function updateHtml(editLink, html, opts = {}) {
   const { baseUrl, id, editFrag } = parseEditLink(editLink);
   const plaintext = encodeHtml(html);
 
   const result = await reaching(baseUrl, () =>
     updateDocument(id, editFrag, plaintext, { baseUrl }));
 
-  return links(baseUrl, result);
+  return links(baseUrl, result, slugify(opts.linkName ?? ''));
 }

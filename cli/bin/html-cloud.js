@@ -12,7 +12,9 @@ import { readFileSync } from 'node:fs';
 import { basename } from 'node:path';
 import { parseArgs } from 'node:util';
 
-import { shareDocument, updateDocument, parseEditLink, MAX_SIZE } from '../share-core.js';
+import {
+  shareDocument, updateDocument, parseEditLink, slugify, viewPath, MAX_SIZE,
+} from '../share-core.js';
 
 const HELP = `
 html-cloud — private HTML file sharing, encrypted before upload
@@ -27,6 +29,11 @@ Options:
   --update <edit-link>    Replace the content behind an existing share. Pass
                           the private edit link a previous run printed; the
                           share link stays the same
+  --name <text>           Readable name for the share link, e.g.
+                          "Q3 report" -> /v/{id}/q3-report (default: the
+                          file's name; stdin gets none)
+  --no-name               Leave the name out of the link. The name is not
+                          encrypted: the server and link previews see it
   --url <base>            Server base URL (default: https://html.cloud,
                           or $HTML_CLOUD_URL)
   --no-copy               Don't copy the share link to the clipboard
@@ -62,6 +69,8 @@ try {
       expires:   { type: 'string' },
       update:    { type: 'string' },
       url:       { type: 'string' },
+      name:      { type: 'string' },
+      'no-name': { type: 'boolean', default: false },
       'no-copy': { type: 'boolean', default: false },
       help:      { type: 'boolean', short: 'h', default: false },
     },
@@ -129,7 +138,12 @@ try {
   fail(err.message.toLowerCase());
 }
 
-const shareLink = `${baseUrl}/v/${id}#${viewFrag}`;
+// A cosmetic name in the path, like the website adds from the filename: it makes
+// the link self-describing and gives link previews a title. Never used to find
+// the document — the same link without it opens the same page.
+const slug = args.values['no-name'] ? ''
+  : slugify(args.values.name ?? (input === '-' ? '' : basename(input)));
+const shareLink = `${baseUrl}${viewPath(id, slug)}#${viewFrag}`;
 
 // Copy only in interactive use — never alter the clipboard from scripts/pipes.
 const copied = !args.values['no-copy'] && process.stdout.isTTY && copyToClipboard(shareLink);

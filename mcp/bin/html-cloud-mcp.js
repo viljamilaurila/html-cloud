@@ -60,7 +60,7 @@ const INSTRUCTIONS =
   'share_html returned instead of sharing a new copy: the share link stays the same.';
 
 const server = new McpServer(
-  { name: 'html-cloud', version: '0.4.1' },
+  { name: 'html-cloud', version: '0.5.0' },
   { instructions: INSTRUCTIONS },
 );
 
@@ -95,11 +95,22 @@ server.registerTool(
         .enum(['7', '30', 'never'])
         .optional()
         .describe('Days until the link expires. Defaults to 30.'),
+      link_name: z
+        .string()
+        .max(80)
+        .optional()
+        .describe(
+          'A short, human-readable name added to the share link so it says what it is, ' +
+          'e.g. "Q3 sales report" gives https://html.cloud/v/{id}/q3-sales-report. ' +
+          'Unlike the page, this name is not encrypted: it is visible in the link and to ' +
+          'the server. Use a generic description, and leave it out when the title itself ' +
+          'is confidential (names of people, clients, deals, medical or legal matters).',
+        ),
     },
   },
-  async ({ html, path, expires }) => {
+  async ({ html, path, expires, link_name }) => {
     try {
-      const { shareUrl, editUrl, expires: exp } = await shareHtml(loadHtml({ html, path }), { expires });
+      const { shareUrl, editUrl, expires: exp } = await shareHtml(loadHtml({ html, path }), { expires, linkName: link_name });
       const expiryNote = exp === 'never' ? 'never expires' : `expires in ${exp} days`;
       return {
         content: [
@@ -148,11 +159,16 @@ server.registerTool(
         .string()
         .optional()
         .describe('Absolute path of a local .html file whose content replaces the current page, instead of passing html inline.'),
+      link_name: z
+        .string()
+        .max(80)
+        .optional()
+        .describe('The link_name given to share_html for this page, if any, so the returned share link matches the one already handed out.'),
     },
   },
-  async ({ edit_link, html, path }) => {
+  async ({ edit_link, html, path, link_name }) => {
     try {
-      const { shareUrl, editUrl } = await updateHtml(edit_link, loadHtml({ html, path }));
+      const { shareUrl, editUrl } = await updateHtml(edit_link, loadHtml({ html, path }), { linkName: link_name });
       return {
         content: [
           {
