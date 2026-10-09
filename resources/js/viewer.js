@@ -72,7 +72,8 @@ async function main() {
 
   let doc;
   try {
-    const res = await fetch(`/api/documents/${docId}`);
+    // Identifies this as someone opening the link, for the daily "opens" total.
+    const res = await fetch(`/api/documents/${docId}`, { headers: { 'X-HTML-Cloud-Client': 'viewer' } });
     if (res.status === 404) return showError('File not found', 'This file may have expired or been removed by its owner.');
     if (!res.ok) throw new Error('Server error');
     doc = await res.json();

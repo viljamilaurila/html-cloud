@@ -128,9 +128,11 @@ if (plaintext.length > MAX_SIZE) fail('file is too large (max 10 MB)');
 // the edit key) so the share link that is already out there keeps working.
 let id, viewFrag, editFrag;
 try {
+  // The client header only feeds the server's daily per-client totals.
+  const headers = { 'X-HTML-Cloud-Client': 'cli' };
   ({ id, viewFrag, editFrag } = editLink
-    ? await updateDocument(editLink.id, editLink.editFrag, plaintext, { baseUrl })
-    : await shareDocument(plaintext, { expiresIn: expires, baseUrl }));
+    ? await updateDocument(editLink.id, editLink.editFrag, plaintext, { baseUrl, headers })
+    : await shareDocument(plaintext, { expiresIn: expires, baseUrl, headers }));
 } catch (err) {
   // fetch throws a TypeError when the host is unreachable; anything else is an
   // Error we raised with a ready-to-print message (server error, rate limit…).

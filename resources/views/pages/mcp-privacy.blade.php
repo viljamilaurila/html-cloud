@@ -1,9 +1,9 @@
 @extends('pages.content')
 
 @section('title', 'Privacy policy — html.cloud for Claude Desktop')
-@section('description', 'What the html.cloud Claude Desktop extension (MCP server) does with your data: HTML is encrypted on your computer before upload, only ciphertext is sent, no personal data, no analytics, no third parties.')
+@section('description', 'What the html.cloud Claude Desktop extension (MCP server) does with your data: HTML is encrypted on your computer before upload, only ciphertext is sent, no personal data, no tracking, no third parties.')
 @section('og_title', 'Privacy policy — html.cloud for Claude Desktop')
-@section('og_description', 'HTML is encrypted on your computer before upload. Only ciphertext is sent. No personal data, no analytics, no third parties.')
+@section('og_description', 'HTML is encrypted on your computer before upload. Only ciphertext is sent. No personal data, no tracking, no third parties.')
 @section('canonical', config('app.url') . '/mcp-privacy')
 
 @section('page')
@@ -26,7 +26,10 @@
   </p>
   <ul class="content-list">
     <li><strong>Personal information:</strong> none. No account, no email, no name.</li>
-    <li><strong>Analytics or tracking:</strong> none. No telemetry, no crash reporting.</li>
+    <li><strong>Usage counts:</strong> the extension tells html.cloud it is the one uploading, so the
+        server can keep daily totals (for example, how many pages were shared through it that day).
+        Nothing per page or per person is kept.</li>
+    <li><strong>Tracking:</strong> none. No telemetry, no crash reporting.</li>
     <li><strong>Third-party services:</strong> none. It communicates only with html.cloud.</li>
   </ul>
 </section>

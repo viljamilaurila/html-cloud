@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ClientKind;
 use App\Enums\Expiry;
+use App\Enums\StatCounter;
 use App\Models\DailyStat;
 use App\Models\Document;
 use Illuminate\Contracts\View\View;
@@ -61,16 +63,26 @@ class DocumentController extends Controller
             'sensitive' => $request->boolean('sensitive'),
         ]);
 
-        DailyStat::recordUpload();
+        DailyStat::bump(
+            StatCounter::Uploads,
+            $document->size < StatCounter::TINY_UPLOAD_BYTES ? StatCounter::TinyUploads : null,
+            ClientKind::fromRequest($request)?->uploadCounter(),
+        );
 
         return response()->json(['id' => $document->id], 201);
     }
 
     // GET /api/documents/{document} — ciphertext plus what the client needs to decrypt it
-    public function show(Document $document): JsonResponse
+    public function show(Request $request, Document $document): JsonResponse
     {
         if ($document->ciphertext === null) {
             return response()->json(['error' => 'Content missing'], 404);
+        }
+
+        // Only the viewer page counts as someone opening a shared link; the
+        // editor and update clients fetch the same data for other reasons.
+        if (ClientKind::fromRequest($request) === ClientKind::Viewer) {
+            DailyStat::bump(StatCounter::Opens);
         }
 
         return response()->json([
@@ -87,6 +99,8 @@ class DocumentController extends Controller
     public function update(Request $request, Document $document): JsonResponse
     {
         $document->update($request->validate($this->payloadRules()));
+
+        DailyStat::bump(StatCounter::Updates);
 
         return response()->json(['ok' => true]);
     }
@@ -117,6 +131,8 @@ class DocumentController extends Controller
     public function destroy(Document $document): JsonResponse
     {
         $document->delete();
+
+        DailyStat::bump(StatCounter::Deletes);
 
         return response()->json(['ok' => true]);
     }

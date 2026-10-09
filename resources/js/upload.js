@@ -7,6 +7,8 @@ const fileInput      = document.getElementById('file-input');
 const uploadingState = document.getElementById('uploading-state');
 // Default expiry; adjustable on the edit page after upload.
 const EXPIRES_IN = '30';
+// Lets the server count uploads per client (a daily total, nothing more).
+const CLIENT_HEADER = { 'X-HTML-Cloud-Client': 'web' };
 
 // Web Crypto requires a secure context (HTTPS or localhost/127.0.0.1).
 if (!window.isSecureContext || !window.crypto?.subtle) {
@@ -185,6 +187,7 @@ async function shareAsNew(file) {
     const { id, viewFrag, editFrag } = await shareDocument(plaintext, {
       expiresIn: EXPIRES_IN,
       sensitive,
+      headers: CLIENT_HEADER,
     });
 
     // Sensitive docs keep the filename out of the URL/preview entirely; shareable

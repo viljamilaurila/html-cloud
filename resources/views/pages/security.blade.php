@@ -213,6 +213,8 @@
         <li>The size of the blob, in bytes</li>
         <li>The expiry you chose (7 days / 30 days / never)</li>
         <li>An auth hash so the owner can edit or delete</li>
+        <li>Daily totals — how many files were uploaded, updated, opened or deleted each day.
+            Never per file or per person</li>
       </ul>
     </div>
     <div class="store-col">
@@ -220,7 +222,8 @@
       <ul class="content-list">
         <li>The file contents</li>
         <li>The decryption key</li>
-        <li>The filename</li>
+        <li>The filename — unless you keep the readable name in the share link
+            (<code>/v/…/report</code>), which is visible to us like any URL</li>
         <li>Anything that could decrypt the blob on its own</li>
       </ul>
     </div>

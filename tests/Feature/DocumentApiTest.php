@@ -63,6 +63,49 @@ class DocumentApiTest extends TestCase
         $this->assertSame(1, DailyStat::count());
     }
 
+    public function test_uploads_are_counted_per_client_and_tiny_ones_separately(): void
+    {
+        $this->postJson('/api/documents', $this->uploadPayload(['size' => 5000]), ['X-HTML-Cloud-Client' => 'web'])->assertCreated();
+        $this->postJson('/api/documents', $this->uploadPayload(['size' => 5000]), ['X-HTML-Cloud-Client' => 'MCP'])->assertCreated();
+        $this->postJson('/api/documents', $this->uploadPayload(['size' => 99]), ['X-HTML-Cloud-Client' => 'mcp'])->assertCreated();
+        $this->postJson('/api/documents', $this->uploadPayload(['size' => 100]), ['X-HTML-Cloud-Client' => 'something-else'])->assertCreated();
+
+        $stats = DailyStat::findOrFail(now()->toDateString());
+        $this->assertSame(4, $stats->uploads, 'every upload still counts in the total');
+        $this->assertSame(1, $stats->web_uploads);
+        $this->assertSame(2, $stats->mcp_uploads);
+        $this->assertSame(0, $stats->cli_uploads, 'unknown clients are not attributed');
+        $this->assertSame(1, $stats->tiny_uploads);
+    }
+
+    public function test_only_the_viewer_counts_as_opening_a_link(): void
+    {
+        $document = $this->editable();
+
+        $this->getJson("/api/documents/{$document->id}", ['X-HTML-Cloud-Client' => 'viewer'])->assertOk();
+        $this->getJson("/api/documents/{$document->id}", ['X-HTML-Cloud-Client' => 'mcp'])->assertOk();
+        $this->getJson("/api/documents/{$document->id}")->assertOk();
+
+        $this->assertSame(1, DailyStat::findOrFail(now()->toDateString())->opens);
+    }
+
+    public function test_updates_and_deletes_are_counted_once_they_succeed(): void
+    {
+        $document = $this->editable();
+        $payload = ['ciphertext' => 'bmV3', 'encrypted_view_key' => 'bmV3', 'size' => 3];
+
+        $this->putJson("/api/documents/{$document->id}", [...$payload, 'edit_key' => 'd3Jvbmc'])->assertForbidden();
+        $this->assertNull(DailyStat::find(now()->toDateString()), 'a refused update is not counted');
+
+        $this->putJson("/api/documents/{$document->id}", [...$payload, 'edit_key' => $this->editKey])->assertOk();
+        $this->deleteJson("/api/documents/{$document->id}", ['edit_key' => $this->editKey])->assertOk();
+
+        $stats = DailyStat::findOrFail(now()->toDateString());
+        $this->assertSame(1, $stats->updates);
+        $this->assertSame(1, $stats->deletes);
+        $this->assertSame(0, $stats->uploads);
+    }
+
     public function test_upload_honours_expiry_and_sensitivity_options(): void
     {
         $week = $this->postJson('/api/documents', $this->uploadPayload(['expires_in' => '7', 'sensitive' => true]))->assertCreated();

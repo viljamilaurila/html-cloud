@@ -18,6 +18,9 @@ export { MAX_SIZE };
 
 const EXPIRES = ['7', '30', 'never'];
 
+// Lets the server count uploads per client (a daily total, nothing more).
+const CLIENT_HEADERS = { 'X-HTML-Cloud-Client': 'mcp' };
+
 function resolveBaseUrl(baseUrl) {
   return (baseUrl ?? process.env.HTML_CLOUD_URL ?? 'https://html.cloud').replace(/\/+$/, '');
 }
@@ -99,7 +102,7 @@ export async function shareHtml(html, opts = {}) {
   const plaintext = encodeHtml(html);
 
   const result = await reaching(baseUrl, () =>
-    shareDocument(plaintext, { expiresIn: expires, baseUrl }));
+    shareDocument(plaintext, { expiresIn: expires, baseUrl, headers: CLIENT_HEADERS }));
 
   return { ...links(baseUrl, result, slugify(opts.linkName ?? '')), expires };
 }
@@ -121,7 +124,7 @@ export async function updateHtml(editLink, html, opts = {}) {
   const plaintext = encodeHtml(html);
 
   const result = await reaching(baseUrl, () =>
-    updateDocument(id, editFrag, plaintext, { baseUrl }));
+    updateDocument(id, editFrag, plaintext, { baseUrl, headers: CLIENT_HEADERS }));
 
   return links(baseUrl, result, slugify(opts.linkName ?? ''));
 }
