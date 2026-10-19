@@ -87,6 +87,10 @@ Let Claude (or any MCP client) share HTML for you. The server is published as `h
 
 See [html.cloud/mcp](https://html.cloud/mcp) for setup instructions.
 
+## Agent skill
+
+[`skills/html-cloud/SKILL.md`](skills/html-cloud/SKILL.md) tells an agent when to share through html.cloud and how — with the MCP server or, without it, the CLI — including updating a page at the same link instead of sharing a new copy. Copy the `skills/html-cloud/` folder into your agent's skills directory (for Claude Code, `~/.claude/skills/`).
+
 ## Stack
 
 - **Laravel 13** (PHP 8.4+)
