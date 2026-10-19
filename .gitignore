@@ -34,3 +34,6 @@ Thumbs.db
 
 # Machine-specific Claude Code dev-server config
 /.claude/launch.json
+
+# The CLI has no dependencies; npm regenerates this on publish.
+/cli/package-lock.json

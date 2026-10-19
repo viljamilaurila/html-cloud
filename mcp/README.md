@@ -72,6 +72,7 @@ Requires Node.js 20+.
 | `html` | string | The full, self-contained HTML document to share. |
 | `path` | string | Path of a local `.html` file to share instead of passing `html` inline. |
 | `expires` | `7` \| `30` \| `never` | Days until the link expires. Default `30`. |
+| `link_name` | string | Optional readable name added to the share link, e.g. `"Q3 sales report"` gives `/v/{id}/q3-sales-report`. Not encrypted — visible in the link and to the server. Max 80 characters. |
 
 Pass exactly one of `html` or `path`. `path` is for large pages: MCP hosts cap
 the size of a tool argument, so a long report that the assistant has written to
@@ -89,6 +90,7 @@ private **edit link** (update the file, change the expiry, or delete it).
 | `edit_link` | string (required) | The private edit link `share_html` returned. |
 | `html` | string | The complete HTML document that replaces the current one. |
 | `path` | string | Path of a local `.html` file whose content replaces the current page. |
+| `link_name` | string | The `link_name` given to `share_html` for this page, if any, so the returned share link matches the one already handed out. |
 
 As with `share_html`, pass exactly one of `html` or `path`.
 

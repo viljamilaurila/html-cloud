@@ -72,7 +72,7 @@ See [html.cloud/cli](https://html.cloud/cli) for usage and options.
 
 ## MCP server
 
-Let Claude (or any MCP client) share HTML for you. The server is published as `html-cloud-mcp` and lives in [`cli/mcp/`](cli/mcp/):
+Let Claude (or any MCP client) share HTML for you. The server is published as `html-cloud-mcp` and lives in [`mcp/`](mcp/):
 
 ```json
 {
