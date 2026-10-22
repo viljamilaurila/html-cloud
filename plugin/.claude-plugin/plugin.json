@@ -9,6 +9,9 @@
     "url": "https://html.cloud"
   },
   "homepage": "https://html.cloud/mcp",
+  "documentationUrl": "https://html.cloud/mcp",
+  "privacyPolicyUrl": "https://html.cloud/mcp-privacy",
+  "supportUrl": "https://github.com/viljamilaurila/html-cloud/issues",
   "repository": "https://github.com/viljamilaurila/html-cloud",
   "license": "MIT",
   "keywords": ["html", "share", "encrypted", "private-link", "zero-knowledge", "reports", "artifacts"]
