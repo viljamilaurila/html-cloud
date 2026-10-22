@@ -60,7 +60,7 @@ const INSTRUCTIONS =
   'share_html returned instead of sharing a new copy: the share link stays the same.';
 
 const server = new McpServer(
-  { name: 'html-cloud', version: '0.5.0' },
+  { name: 'html-cloud', version: '0.5.1' },
   { instructions: INSTRUCTIONS },
 );
 
