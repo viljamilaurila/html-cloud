@@ -61,7 +61,7 @@ Full policy: [html.cloud/mcp-privacy](https://html.cloud/mcp-privacy).
 - **Contact:** [viljami@liito.io](mailto:viljami@liito.io) or
   [GitHub issues](https://github.com/viljamilaurila/html-cloud/issues).
 
-Anyone with the share link can read the page: the link is the credential.
+Anyone with the share link can read the page, so send it only to the people meant to read it.
 Keep the edit link private. More on the design: [html.cloud/security](https://html.cloud/security).
 
 ## License

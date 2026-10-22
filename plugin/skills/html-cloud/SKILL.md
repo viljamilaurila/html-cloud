@@ -73,8 +73,8 @@ The share link and the expiry stay the same.
   Keep it generic, and leave it out when the title itself is confidential
   (names of people, clients, deals, medical or legal matters). The CLI uses
   the file name by default; pass `--no-name` in that case.
-- **Anyone with the share link can read the page.** The link is the credential,
-  so say so when the content is sensitive.
+- **Anyone with the share link can read the page.** When the content is
+  sensitive, tell the user to send the link only to the people meant to read it.
 - **Keep the edit link out of anything shared.** Don't put it in the page, a
   commit, or a message to the recipients.
 - Limits: one HTML file, at most 10 MB.
