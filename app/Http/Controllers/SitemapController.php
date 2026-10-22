@@ -11,8 +11,17 @@ class SitemapController extends Controller
     // included only if the file actually exists.
     private const IMAGES = [
         'vs/netlify-drop' => 'screenshots/netlify-drop.webp',
-        'vs/codepen'      => 'screenshots/codepen.webp',
+        'vs/codepen' => 'screenshots/codepen.webp',
     ];
+
+    /**
+     * Pages that stay live but aren't worth asking Google to rank: the
+     * device-local uploads list (noindex) and the legal privacy policies the
+     * browser extension and Claude plugin link to.
+     *
+     * @var list<string>
+     */
+    private const EXCLUDED = ['uploads', 'extension-privacy', 'mcp-privacy'];
 
     // GET /sitemap.xml — lists public, indexable content pages only.
     // Auto-includes any param-free GET route; dynamic document routes
@@ -24,7 +33,7 @@ class SitemapController extends Controller
         $imageMap = [];
         foreach (self::IMAGES as $uri => $rel) {
             if (is_file(public_path($rel))) {
-                $imageMap[url('/' . $uri)][] = asset($rel);
+                $imageMap[url('/'.$uri)][] = asset($rel);
             }
         }
 
@@ -44,28 +53,28 @@ class SitemapController extends Controller
             if (in_array($uri, ['sitemap.xml', 'up'], true)) {
                 continue; // skip self and the framework health check
             }
-            if ($uri === 'uploads') {
-                continue; // page is noindex (device-local registry)
+            if (in_array($uri, self::EXCLUDED, true)) {
+                continue;
             }
 
-            $locs[url($uri === '/' ? '/' : '/' . $uri)] = true;
+            $locs[url($uri === '/' ? '/' : '/'.$uri)] = true;
         }
 
-        $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n"
-            . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"'
-            . ' xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">' . "\n";
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n"
+            .'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"'
+            .' xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">'."\n";
 
         foreach (array_keys($locs) as $loc) {
-            $xml .= '  <url><loc>' . htmlspecialchars($loc, ENT_XML1) . '</loc>';
+            $xml .= '  <url><loc>'.htmlspecialchars($loc, ENT_XML1).'</loc>';
             foreach ($imageMap[$loc] ?? [] as $img) {
                 $xml .= '<image:image><image:loc>'
-                    . htmlspecialchars($img, ENT_XML1)
-                    . '</image:loc></image:image>';
+                    .htmlspecialchars($img, ENT_XML1)
+                    .'</image:loc></image:image>';
             }
-            $xml .= '</url>' . "\n";
+            $xml .= '</url>'."\n";
         }
 
-        $xml .= '</urlset>' . "\n";
+        $xml .= '</urlset>'."\n";
 
         return response($xml, 200)->header('Content-Type', 'application/xml');
     }
