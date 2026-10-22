@@ -62,7 +62,7 @@ already sent keeps working:
 
 - MCP: call `update_html` with the `edit_link` from earlier and the **full**
   revised HTML (not a diff), as `html` or `path`. If the page was shared with
-  a `link_name`, pass the same one.
+  a `link_name`, use the same one again.
 - CLI: `npx html-cloud ./report.html --update "<edit link>"`
 
 The share link and the expiry stay the same.
@@ -72,7 +72,7 @@ The share link and the expiry stay the same.
 - **`link_name` is not encrypted.** It is visible in the link and to the server.
   Keep it generic, and leave it out when the title itself is confidential
   (names of people, clients, deals, medical or legal matters). The CLI uses
-  the file name by default; pass `--no-name` in that case.
+  the file name by default; add `--no-name` in that case.
 - **Anyone with the share link can read the page.** When the content is
   sensitive, tell the user to send the link only to the people meant to read it.
 - **Keep the edit link out of anything shared.** Don't put it in the page, a
