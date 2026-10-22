@@ -25,7 +25,10 @@ feature is fine. When unsure, ask the user which they prefer.
 
 ## How to share
 
-Prefer the MCP tools when they are available; otherwise use the CLI.
+Prefer the MCP tools when they are available; otherwise use the CLI. If you
+have neither the tools nor a shell (for example, in claude.ai chat), give the
+user the finished page as a file and tell them they can upload it at
+https://html.cloud to get the same kind of private link.
 
 ### With the MCP server (`share_html`, `update_html`)
 

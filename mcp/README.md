@@ -159,8 +159,9 @@ Full policy: [html.cloud/mcp-privacy](https://html.cloud/mcp-privacy).
   of it lets the server read the page. Keys exist only in the links returned
   to you.
 - **Sharing.** No third parties. The server talks to exactly one host,
-  html.cloud, and only when you share or update a page. No analytics, no
-  telemetry, no account.
+  html.cloud, and only when you share or update a page. Each request says it
+  comes from the MCP server, so html.cloud can keep daily totals; nothing per
+  page or per person. No analytics, no telemetry, no account.
 - **Retention.** A page is unavailable from the moment its link expires (7 or
   30 days, or never if you chose that) and its ciphertext is permanently
   deleted by a daily clean-up; deleting via the edit link removes it at once.

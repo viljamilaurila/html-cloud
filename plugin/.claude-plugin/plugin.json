@@ -1,0 +1,15 @@
+{
+  "name": "html-cloud",
+  "displayName": "html.cloud",
+  "version": "0.5.1",
+  "description": "Share HTML that Claude makes as a private, end-to-end encrypted link, and update it later at the same link. The page is encrypted on your computer; html.cloud stores only ciphertext it cannot read. No account.",
+  "author": {
+    "name": "Viljami Laurila",
+    "email": "viljami@liito.io",
+    "url": "https://html.cloud"
+  },
+  "homepage": "https://html.cloud/mcp",
+  "repository": "https://github.com/viljamilaurila/html-cloud",
+  "license": "MIT",
+  "keywords": ["html", "share", "encrypted", "private-link", "zero-knowledge", "reports", "artifacts"]
+}

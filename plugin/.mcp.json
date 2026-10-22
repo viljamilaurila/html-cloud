@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "html-cloud": {
+      "command": "npx",
+      "args": ["-y", "html-cloud-mcp@0.5.1"]
+    }
+  }
+}
