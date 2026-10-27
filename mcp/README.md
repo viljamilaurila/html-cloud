@@ -30,8 +30,9 @@ to the chat.
 > **About the install warning:** Claude Desktop shows the same red "access to
 > everything on your computer" box for every extension installed from a file
 > rather than from its built-in directory. It is a statement about how
-> extensions run, not about this one. The server is the ~250 lines in `bin/`
-> and `lib/` of this directory, it talks to a single host (html.cloud), and it
+> extensions run, not about this one. The server is the ~500 lines in `bin/`
+> and `lib/` of this directory, with no third-party dependencies (it speaks
+> MCP's stdio JSON-RPC itself, in `lib/stdio-server.js`); it talks to a single host (html.cloud), and it
 > uploads only ciphertext. Extensions installed from Claude's directory don't
 > show the warning; getting listed there is in progress.
 

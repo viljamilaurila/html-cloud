@@ -7,8 +7,9 @@ html.cloud stores only ciphertext it cannot read. No account, no public URL.
 
 ## What's inside
 
-- **MCP server** (`html-cloud-mcp`, open source, in this repository's
-  [`mcp/`](https://github.com/viljamilaurila/html-cloud/tree/main/mcp) folder).
+- **MCP server** (`html-cloud-mcp`, open source, in [`server/`](server/), copied
+  from this repository's [`mcp/`](https://github.com/viljamilaurila/html-cloud/tree/main/mcp)
+  folder by `mcp/scripts/sync-plugin.js`).
   It adds two tools:
   - `share_html` encrypts a page and returns a share link and a private edit link.
   - `update_html` replaces a shared page using its edit link. The share link stays the same.
@@ -26,14 +27,16 @@ Q3 numbers") and Claude updates the same page.
 
 ## Where it works
 
-The MCP server is a local program, started with `npx` (Node.js 20 or later),
+The MCP server is a local program that runs with Node.js 20 or later,
 so the tools work in **Claude Code** and in **Cowork** sessions on your
 computer. Chat on claude.ai and in the desktop app loads only the skill. There
 you can upload a file yourself at [html.cloud](https://html.cloud).
 
 ## What it runs, sends and stores
 
-- **Runs:** `npx -y html-cloud-mcp@0.5.1`, downloaded from npm on first use.
+- **Runs:** `node server/bin/html-cloud-mcp.js` from this plugin. The whole
+  server is in [`server/`](server/) as plain source, with no dependencies, so
+  nothing is downloaded when it starts.
 - **Reads:** only the HTML Claude passes to a tool, inline or as the one
   `.html` file whose path Claude passes. Nothing else from your computer or
   the conversation.

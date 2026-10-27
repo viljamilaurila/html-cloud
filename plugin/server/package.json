@@ -1,0 +1,8 @@
+{
+  "name": "html-cloud-plugin-server",
+  "version": "0.6.0",
+  "private": true,
+  "description": "The html-cloud-mcp server, copied into the Claude plugin by mcp/scripts/sync-plugin.js. No dependencies.",
+  "type": "module",
+  "license": "MIT"
+}

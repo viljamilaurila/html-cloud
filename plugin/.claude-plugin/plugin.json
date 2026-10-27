@@ -1,7 +1,7 @@
 {
   "name": "html-cloud",
   "displayName": "html.cloud",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "description": "Share HTML that Claude makes as a private, end-to-end encrypted link, and update it later at the same link. The page is encrypted on your computer; html.cloud stores only ciphertext it cannot read. No account.",
   "author": {
     "name": "Viljami Laurila",

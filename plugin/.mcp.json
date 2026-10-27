@@ -1,8 +1,8 @@
 {
   "mcpServers": {
     "html-cloud": {
-      "command": "npx",
-      "args": ["-y", "html-cloud-mcp@0.5.1"]
+      "command": "node",
+      "args": ["${CLAUDE_PLUGIN_ROOT}/server/bin/html-cloud-mcp.js"]
     }
   }
 }

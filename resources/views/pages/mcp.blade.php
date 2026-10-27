@@ -162,7 +162,7 @@
       <span class="step-num">3</span>
       <div class="step-body">
         <p><strong>Click Install.</strong> That's it — no accounts, no terminal, no settings to edit. The first time Claude uses it, you'll be asked to allow it; click <em>Allow</em>.</p>
-        <p><strong>About the red warning.</strong> Claude Desktop shows the same "access to everything on your computer" box for every extension installed from a file rather than from its built-in directory — it isn't about html.cloud specifically. This one is open source, about 250 lines you can <a href="https://github.com/viljamilaurila/html-cloud/tree/main/mcp" rel="noopener" target="_blank">read on GitHub</a>, talks to one host (html.cloud), and sends only encrypted content. Extensions installed from Claude's directory don't show the warning; we're working on getting listed.</p>
+        <p><strong>About the red warning.</strong> Claude Desktop shows the same "access to everything on your computer" box for every extension installed from a file rather than from its built-in directory — it isn't about html.cloud specifically. This one is open source, about 500 lines with no third-party dependencies, which you can <a href="https://github.com/viljamilaurila/html-cloud/tree/main/mcp" rel="noopener" target="_blank">read on GitHub</a>, talks to one host (html.cloud), and sends only encrypted content. Extensions installed from Claude's directory don't show the warning; we're working on getting listed.</p>
       </div>
     </li>
   </ol>
@@ -248,7 +248,7 @@
     </details>
     <details class="faq-item">
       <summary>Why does Claude Desktop warn that it can access everything on my computer?</summary>
-      <p>Because it's installed from a file, not from Claude's built-in extension directory — Claude Desktop shows that same box for every extension installed that way, whoever made it. It's an honest statement about how extensions run, not a finding about this one. What this extension actually does is public: about 250 lines of open-source code on <a href="https://github.com/viljamilaurila/html-cloud/tree/main/mcp" rel="noopener" target="_blank">GitHub</a>, one outbound host (html.cloud), and the only thing it uploads is ciphertext (<a href="{{ route('mcp.privacy') }}">privacy policy</a>). If you'd rather not install anything, the <a href="{{ route('home') }}">homepage</a> does the same job in your browser.</p>
+      <p>Because it's installed from a file, not from Claude's built-in extension directory — Claude Desktop shows that same box for every extension installed that way, whoever made it. It's an honest statement about how extensions run, not a finding about this one. What this extension actually does is public: about 500 lines of open-source code with no third-party dependencies on <a href="https://github.com/viljamilaurila/html-cloud/tree/main/mcp" rel="noopener" target="_blank">GitHub</a>, one outbound host (html.cloud), and the only thing it uploads is ciphertext (<a href="{{ route('mcp.privacy') }}">privacy policy</a>). If you'd rather not install anything, the <a href="{{ route('home') }}">homepage</a> does the same job in your browser.</p>
     </details>
     <details class="faq-item">
       <summary>Does it work in Cowork?</summary>

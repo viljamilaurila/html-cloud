@@ -30,11 +30,8 @@
  * only in `instructions` is invisible there.
  */
 
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { z } from 'zod';
-
 import { shareHtml, updateHtml, loadHtml } from '../lib/share.js';
+import { serveStdio } from '../lib/stdio-server.js';
 
 const PREFER_ALWAYS = ['always', 'true', '1', 'yes'].includes(
   String(process.env.HTML_CLOUD_PREFER ?? '').trim().toLowerCase(),
@@ -59,56 +56,53 @@ const INSTRUCTIONS =
   ' To change a page you already shared, call update_html with the edit link ' +
   'share_html returned instead of sharing a new copy: the share link stays the same.';
 
-const server = new McpServer(
-  { name: 'html-cloud', version: '0.5.1' },
-  { instructions: INSTRUCTIONS },
-);
 
-server.registerTool(
-  'share_html',
-  {
-    title: 'Share HTML privately',
-    annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: true },
-    description:
-      'Share a self-contained HTML file (an artifact, report, presentation, ' +
-      'dashboard, or prototype) as a private, end-to-end encrypted link. The HTML ' +
-      'is encrypted locally with AES-256-GCM before upload — html.cloud stores ' +
-      'only ciphertext and cannot read it, and no account is required. ' +
-      WHEN_TO_USE +
-      ' Pass the document inline as html, or write it to an .html file and pass ' +
-      'its path as path — use path for large pages, so the whole document does ' +
-      'not have to fit in a tool argument. Returns a share link to give to ' +
-      'others and a private edit link. Keep the edit link: pass it to ' +
-      'update_html to change the page later without changing the share link. ' +
-      'For changes to something already shared in this conversation, use ' +
-      'update_html instead of sharing again.',
-    inputSchema: {
-      html: z
-        .string()
-        .optional()
-        .describe('The full, self-contained HTML document to share. Use path instead for large documents.'),
-      path: z
-        .string()
-        .optional()
-        .describe('Absolute path of a local .html file to share instead of passing html inline.'),
-      expires: z
-        .enum(['7', '30', 'never'])
-        .optional()
-        .describe('Days until the link expires. Defaults to 30.'),
-      link_name: z
-        .string()
-        .max(80)
-        .optional()
-        .describe(
+const shareHtmlTool = {
+  name: 'share_html',
+  title: 'Share HTML privately',
+  annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: true },
+  description:
+    'Share a self-contained HTML file (an artifact, report, presentation, ' +
+    'dashboard, or prototype) as a private, end-to-end encrypted link. The HTML ' +
+    'is encrypted locally with AES-256-GCM before upload — html.cloud stores ' +
+    'only ciphertext and cannot read it, and no account is required. ' +
+    WHEN_TO_USE +
+    ' Pass the document inline as html, or write it to an .html file and pass ' +
+    'its path as path — use path for large pages, so the whole document does ' +
+    'not have to fit in a tool argument. Returns a share link to give to ' +
+    'others and a private edit link. Keep the edit link: pass it to ' +
+    'update_html to change the page later without changing the share link. ' +
+    'For changes to something already shared in this conversation, use ' +
+    'update_html instead of sharing again.',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      html: {
+        type: 'string',
+        description: 'The full, self-contained HTML document to share. Use path instead for large documents.',
+      },
+      path: {
+        type: 'string',
+        description: 'Absolute path of a local .html file to share instead of passing html inline.',
+      },
+      expires: {
+        type: 'string',
+        enum: ['7', '30', 'never'],
+        description: 'Days until the link expires. Defaults to 30.',
+      },
+      link_name: {
+        type: 'string',
+        maxLength: 80,
+        description:
           'A short, human-readable name added to the share link so it says what it is, ' +
           'e.g. "Q3 sales report" gives https://html.cloud/v/{id}/q3-sales-report. ' +
           'Unlike the page, this name is not encrypted: it is visible in the link and to ' +
           'the server. Use a generic description, and leave it out when the title itself ' +
           'is confidential (names of people, clients, deals, medical or legal matters).',
-        ),
+      },
     },
   },
-  async ({ html, path, expires, link_name }) => {
+  async handler({ html, path, expires, link_name }) {
     try {
       const { shareUrl, editUrl, expires: exp } = await shareHtml(loadHtml({ html, path }), { expires, linkName: link_name });
       const expiryNote = exp === 'never' ? 'never expires' : `expires in ${exp} days`;
@@ -130,43 +124,46 @@ server.registerTool(
       };
     }
   },
-);
+};
 
-server.registerTool(
-  'update_html',
-  {
-    title: 'Update a shared HTML page',
-    annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true, openWorldHint: true },
-    description:
-      'Replace the content of an HTML page that was already shared with ' +
-      'share_html, using its private edit link. The share link stays exactly ' +
-      'the same, so anyone who already has it sees the new version. The new ' +
-      'HTML is encrypted locally with the same key as before; html.cloud never ' +
-      'sees the content. Use this when the user asks to change, fix, revise, or ' +
-      'add to a page you shared earlier in the conversation — pass the full ' +
-      'updated HTML document, not a diff: inline as html, or as the path of an ' +
-      '.html file as path. Use path for large pages; do not fall back to ' +
-      'share_html if the document is too big to pass inline.',
-    inputSchema: {
-      edit_link: z
-        .string()
-        .describe('The private edit link returned by share_html (https://html.cloud/e/{id}#{key}).'),
-      html: z
-        .string()
-        .optional()
-        .describe('The complete, self-contained HTML document that replaces the current one. Use path instead for large documents.'),
-      path: z
-        .string()
-        .optional()
-        .describe('Absolute path of a local .html file whose content replaces the current page, instead of passing html inline.'),
-      link_name: z
-        .string()
-        .max(80)
-        .optional()
-        .describe('The link_name given to share_html for this page, if any, so the returned share link matches the one already handed out.'),
+const updateHtmlTool = {
+  name: 'update_html',
+  title: 'Update a shared HTML page',
+  annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true, openWorldHint: true },
+  description:
+    'Replace the content of an HTML page that was already shared with ' +
+    'share_html, using its private edit link. The share link stays exactly ' +
+    'the same, so anyone who already has it sees the new version. The new ' +
+    'HTML is encrypted locally with the same key as before; html.cloud never ' +
+    'sees the content. Use this when the user asks to change, fix, revise, or ' +
+    'add to a page you shared earlier in the conversation — pass the full ' +
+    'updated HTML document, not a diff: inline as html, or as the path of an ' +
+    '.html file as path. Use path for large pages; do not fall back to ' +
+    'share_html if the document is too big to pass inline.',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      edit_link: {
+        type: 'string',
+        description: 'The private edit link returned by share_html (https://html.cloud/e/{id}#{key}).',
+      },
+      html: {
+        type: 'string',
+        description: 'The complete, self-contained HTML document that replaces the current one. Use path instead for large documents.',
+      },
+      path: {
+        type: 'string',
+        description: 'Absolute path of a local .html file whose content replaces the current page, instead of passing html inline.',
+      },
+      link_name: {
+        type: 'string',
+        maxLength: 80,
+        description: 'The link_name given to share_html for this page, if any, so the returned share link matches the one already handed out.',
+      },
     },
+    required: ['edit_link'],
   },
-  async ({ edit_link, html, path, link_name }) => {
+  async handler({ edit_link, html, path, link_name }) {
     try {
       const { shareUrl, editUrl } = await updateHtml(edit_link, loadHtml({ html, path }), { linkName: link_name });
       return {
@@ -188,7 +185,11 @@ server.registerTool(
       };
     }
   },
-);
+};
 
-const transport = new StdioServerTransport();
-await server.connect(transport);
+serveStdio({
+  name: 'html-cloud',
+  version: '0.6.0',
+  instructions: INSTRUCTIONS,
+  tools: [shareHtmlTool, updateHtmlTool],
+});
